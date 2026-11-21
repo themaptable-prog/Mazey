@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Mazy - Offline Vector Maze Adventure</title>
+<style>
+  * { box-sizing: border-box; }
+  canvas, #dpad, .dbtn {touch-action:none;}
+  #controls {touch-action:pan-y;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
+  #controls * {touch-action:auto;}
+  input[type="range"] {touch-action:pan-x;}
+  html, body { margin:0; height:100%; background:#0b0c10; color:#c5c6c7; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow:hidden; }
+
+  /* Collapsible Sidebar Controls */
+  #controls {
+    position: fixed; top: 0; left: 0; width: 320px; height: 100vh;
+    background: #1f2833; border-right: 1px solid #45a29e;
+    padding: 16px 16px 80px; z-index: 20; overflow-y: auto;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 4px 0 20px rgba(0,0,0,0.6);
+  }
+  #controls.collapsed { transform: translateX(-320px); }
+
+  #toggle-btn {
+    position: fixed; top: 12px; left: 332px; z-index: 21;
+    background: #1f2833; color: #66fcf1; border: 1px solid #45a29e;
+    padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  }
+  #controls.collapsed + #toggle-btn { left: 12px; }
+
+  .section-title {
+    font-size: 12px; font-weight: bold; text-transform: uppercase;
+    letter-spacing: 1px; color: #66fcf1; margin-top: 18px; margin-bottom: 8px;
+    border-bottom: 1px solid #45a29e; padding-bottom: 4px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .section-title span.badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #0b0c10; color: #45a29e; }
+  .section-title.locked-title { color: #f59e0b; border-color: #f59e0b; }
+  .section-title.locked-title span.badge { color: #f59e0b; }
+
+  label { display: block; margin-top: 10px; font-size: 11px; text-transform: uppercase; color: #c5c6c7; font-weight: 600; }
+  input[type="text"], input[type="number"], select {
+    width: 100%; margin-top: 4px; padding: 8px; background: #0b0c10; color: #66fcf1;
+    border: 1px solid #45a29e; border-radius: 4px; font-size: 13px; outline: none;
+  }
+  input[type="range"] { width: 100%; margin-top: 4px; accent-color: #66fcf1; cursor: pointer; }
+  input[type="color"] { width: 100%; height: 32px; margin-top: 4px; border: none; border-radius: 4px; cursor: pointer; background: transparent; }
+
+  [hidden] {display:none!important;}
+  .checkbox-group { display: flex; align-items: center; margin-top: 8px; gap: 8px; font-size: 12px; text-transform: none; cursor: pointer; }
+  .checkbox-group input { accent-color: #66fcf1; width: 16px; height: 16px; cursor: pointer; }
+
+  button.btn {
+    width: 100%; margin-top: 12px; padding: 10px; font-weight: bold; text-transform: uppercase;
+    border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; font-size: 12px;
+  }
+  .btn-primary { background: #45a29e; color: #0b0c10; }
+  .btn-primary:hover { background: #66fcf1; box-shadow: 0 0 10px rgba(102, 252, 241, 0.4); }
+  .btn-secondary { background: #252836; color: #66fcf1; border: 1px solid #45a29e; }
+  .btn-secondary:hover { background: #1f2833; border-color: #66fcf1; }
+
+  /* HUD Header */
+  #hud {
+    position: fixed; top: 12px; right: 12px; z-index: 10;
+    display: flex; gap: 12px; align-items: center; background: rgba(31, 40, 51, 0.85);
+    backdrop-filter: blur(8px); padding: 8px 16px; border-radius: 8px; border: 1px solid #45a29e;
+    font-weight: bold; color: #66fcf1; font-size: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  }
+  .hud-item { display: flex; align-items: center; gap: 6px; }
+  .key-icon { width: 12px; height: 12px; border-radius: 50%; display: inline-block; border: 1px solid #fff; }
+
+  /* Mobile D-Pad */
+  @media (max-width: 600px) { #controls { width: min(320px, 88vw); } #controls.collapsed {transform:translateX(-100%);} #toggle-btn {left: min(332px, calc(88vw + 12px));} #hud {top:56px;right:8px;gap:6px;padding:6px;font-size:11px;} #dpad {bottom:16px;right:12px;} }
+  #dpad {
+    position: fixed; bottom: 20px; right: 20px; width: 130px; height: 130px;
+    display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+    gap: 4px; z-index: 15; opacity: 0.7; transition: opacity 0.2s;
+  }
+  #dpad:hover { opacity: 0.95; }
+  .dbtn { background: rgba(31, 40, 51, 0.7); border: 1px solid #45a29e; border-radius: 8px; cursor: pointer; }
+  .dbtn:active { background: #66fcf1; }
+  #joystick {grid-column:2;grid-row:2;border:1px solid #45a29e;border-radius:50%;background:rgba(31,40,51,.85);display:flex;align-items:center;justify-content:center;touch-action:none;position:relative;}
+  #joystickKnob {width:44%;height:44%;border-radius:50%;background:#66fcf1;box-shadow:0 0 8px #45a29e;pointer-events:none;transform:translate(0,0);}
+  #btn-up { grid-column: 2; grid-row: 1; }
+  #btn-left { grid-column: 1; grid-row: 2; }
+  #btn-down { grid-column: 2; grid-row: 3; }
+  #btn-right { grid-column: 3; grid-row: 2; }
+
+  /* Modal Dialog for Victory / Export */
+  #modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100;
+    display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px);
+  }
+  #modal-card {
+    background: #1f2833; border: 2px solid #66fcf1; border-radius: 12px;
+    padding: 24px; width: 340px; text-align: center; color: #c5c6c7;
+    box-shadow: 0 0 30px rgba(102, 252, 241, 0.3);
+  }
+  #modal-card h2 { color: #66fcf1; margin-top: 0; }
+
+  canvas { display: block; width: 100vw; height: 100vh; cursor: crosshair; touch-action:none; }
+  .dbtn { touch-action:none; display:flex;align-items:center;justify-content:center;color:#66fcf1;font-size:22px;user-select:none; }
+</style>
+</head>
+<body>
+
+<div id="controls">
+  <div style="font-size: 18px; font-weight: bold; color: #66fcf1; text-align: center; margin-bottom: 4px;"><span id="appVersionHeading">MAZY</span></div>
+  <div style="font-size: 11px; text-align: center; color: #c5c6c7; margin-bottom: 12px;">Vector Maze Adventure</div>
+
+  <!-- LOCKED BLUEPRINT SETTINGS -->
+  <button class="btn btn-primary" id="btnGenerate">⚡ Generate New Level</button>
+  <div class="section-title locked-title">
+    <span>Blueprint Settings</span>
+    <span class="badge">Locked in Play</span>
+  </div>
+
+  <label>Columns (Grid Width)
+    <input type="number" id="w" value="31" min="3" max="250">
+  </label>
+
+  <label>Rows (Grid Height)
+    <input type="number" id="h" value="31" min="3" max="250">
+  </label>
+
+  <label>Maze Generation Algorithm
+    <select id="algo">
+      <option value="backtracker" selected>Recursive Backtracker (Long Paths)</option>
+      <option value="prims">Prim's Algorithm (Short Branches)</option>
+    </select>
+  </label>
+
+  <label>Seed (Optional for Replays)
+    <input type="text" id="seedInput" placeholder="Auto-generated if blank">
+  </label>
+  <label class="checkbox-group"><input type="checkbox" id="keepSeed"><span>Keep seed for next generation</span></label>
+
+  <label>Objective Mode
+    <select id="objectiveMode">
+      <option value="standard">Standard (Start to Exit)</option>
+      <option value="collector">Gem Collector (Collect All Gems)</option>
+      <option value="keys" selected>Keys & Color Gates (Unlock Barriers)</option>
+    </select>
+  </label>
+
+  <div id="gemOptions" class="objective-extra" hidden>
+    <label>Gems to collect: <span id="gemCountLabel"></span>
+      <input type="range" id="gemCount" min="1" max="100" value="100" step="1">
+    </label>
+  </div>
+  <div id="gateOptions" class="objective-extra" hidden>
+
+<!-- ADVANCED PUZZLE TOPOLOGY CONTROLS -->
+<div class="section-title locked-title"><span>Puzzle Topologies</span><span class="badge">Modular</span></div>
+<label>Metroidvania Cross-Overs (Teaser Gates)
+  <select id="topoCrossOver">
+    <option value="off">Off</option>
+    <option value="on" selected>Forced On</option>
+    <option value="random">Random (Seed-driven)</option>
+  </select>
+</label>
+
+<label>Central Hub & Spokes Nexus
+  <select id="topoHub">
+    <option value="off" selected>Off</option>
+    <option value="on">Forced On</option>
+    <option value="random">Random (Seed-driven)</option>
+  </select>
+</label>
+
+<label>Parallel Wing Bifurcation
+  <select id="topoWings" disabled title="Paused while the new region planner is tested">
+    <option value="off" selected>Off</option>
+    <option value="on">Forced On</option>
+    <option value="random">Random (Seed-driven)</option>
+  </select>
+</label>
+
+<label>Cyclic Shortcut Loops
+  <select id="topoCycles" disabled title="Paused while the new region planner is tested">
+    <option value="off" selected>Off</option>
+    <option value="on">Forced On</option>
+    <option value="random">Random (Seed-driven)</option>
+  </select>
+</label>
+    
+    <p style="font-size:12px;line-height:1.4;color:#a8c9cc">Region planner: Teaser Gates and Hub & Spokes. Wings and Cycles remain paused. Hub creates a shared central nexus with separate gated spokes (at least 2 pairs; start with 3). Requests that cannot fit distinct spokes are rejected, keeping your current maze. Minimum 9 × 9, with at least 55 cells per region. Keys remain ordered; later gates can be found in earlier regions.</p>
+    <label class="checkbox-group"><input type="checkbox" id="showPuzzlePlan"><span>Reveal puzzle plan (spoilers)</span></label>
+    <div style="display:flex;gap:4px;margin-bottom:8px"><button type="button" id="exampleA">Example A</button><button type="button" id="exampleB">Example B</button><button type="button" id="exampleC">Example C</button></div>
+    <p style="font-size:11px;color:#a8c9cc">Examples use 31 × 31, 3 pairs, Backtracker, Teasers On and Hub Off. Plan labels: K = key, G = gate, R = region.</p>
+    <div style="display:flex;gap:4px;margin-bottom:8px"><button type="button" id="hubAlone">Hub only</button><button type="button" id="hubTeasers">Hub + Teasers</button></div>
+    <div id="puzzleReport" style="font-size:12px;line-height:1.5;white-space:pre-line;color:#a8c9cc" aria-live="polite"></div>
+    <label>Gate and key pairs: <span id="gateCountLabel"></span>
+      <input type="range" id="gateCount" min="1" max="12" value="3" step="1">
+    </label>
+  </div>
+  <div class="checkbox-group">
+    <input type="checkbox" id="enableSlime">
+    <span>Enable Slime Hazards</span>
+  </div>
+  <label>Slime Density
+    <input type="range" id="slimeDensity" min="0.05" max="0.35" step="0.05" value="0.15">
+  </label>
+
+  <div class="checkbox-group">
+    <input type="checkbox" id="enableEnemies">
+    <span>Enable Shadow Enemies</span>
+  </div>
+  <label>Enemy Count
+    <input type="range" id="enemyCount" min="1" max="15" step="1" value="4">
+  </label>
+
+  <div class="section-title locked-title"><span>Next Level Lighting & Walls</span><span class="badge">Next Generate</span></div>
+  <div class="checkbox-group">
+    <input type="checkbox" id="enableFog">
+    <span>Torch / Fog of War</span>
+  </div>
+  <label>Torch Type
+    <select id="torchType">
+      <option value="cone" selected>Directional Beam (Points to Cursor)</option>
+      <option value="radial">360° Radial Light</option>
+    </select>
+  </label>
+  <label>Torch Reach
+    <input type="range" id="torchReach" min="2" max="12" step="0.5" value="5.5">
+  </label>
+  <label>Ambient Light (Fog Darkness)
+    <input type="range" id="torchAmbient" min="0" max="0.8" step="0.05" value="0.05">
+  </label>
+  <label>Wall Line Thickness
+    <input type="range" id="lineWidth" min="1" max="12" step="1" value="4">
+  </label>
+  <div class="section-title"><span>Live Gameplay Settings</span><span class="badge">Live Edit</span></div>
+  <div class="checkbox-group">
+    <input type="checkbox" id="clickToMove" checked>
+    <span>Enable canvas movement (turn off to pan)</span>
+  </div>
+
+  <label>Touch movement style
+    <select id="touchMoveStyle">
+      <option value="relative">Original swipe-to-step (v0.18)</option>
+      <option value="continuous">Continuous drag (distance controls steps)</option>
+      <option value="velocity" selected>Drag speed (hold to keep moving)</option>
+      <option value="absolute">Original: move towards touch position</option>
+    </select>
+  </label>
+  <div id="velocitySettings" style="border:1px solid #54617a;border-radius:9px;padding:10px;margin:10px 0;">
+    <strong>Drag-speed movement tuning</strong>
+    <label>Speed response: <output id="velocityGainValue">200%</output>
+      <input type="range" id="velocityGain" min="20" max="300" step="10" value="200">
+    </label>
+    <label>Minimum moving speed: <output id="velocityMinValue">0 squares/sec</output>
+      <input type="range" id="velocityMin" min="0" max="8" step="0.5" value="0">
+    </label>
+    <label>Maximum moving speed: <output id="velocityMaxValue">20 squares/sec</output>
+      <input type="range" id="velocityMax" min="2" max="30" step="1" value="20">
+    </label>
+    <label>Speed smoothing: <output id="velocitySmoothValue">50%</output>
+      <input type="range" id="velocitySmooth" min="0" max="90" step="5" value="50">
+    </label>
+    <label>Direction-change deadzone: <output id="velocityTurnValue">5 px</output>
+      <input type="range" id="velocityTurn" min="0" max="35" step="1" value="5">
+    </label>
+    <small>Drag faster or slower to change speed. Hold still to maintain the last speed; release to stop. Speed response scales the finger's measured velocity; minimum and maximum limit movement. Smoothing filters sudden speed changes.</small>
+  </div>
+  <label>Drag distance per square: <output id="touchDistanceValue">60 px</output>
+    <input type="range" id="touchDistance" min="20" max="150" step="5" value="60">
+  </label>
+  <label>Initial movement threshold: <output id="touchThresholdValue">12 px</output>
+    <input type="range" id="touchThreshold" min="0" max="40" step="2" value="12">
+  </label>
+  <div class="checkbox-group">
+    <input type="checkbox" id="touchAxisLock" checked>
+    <span>Lock each swipe segment to its dominant axis</span>
+  </div>
+  <label>Held control repeat rate: <output id="touchSensitivityValue">12 grids/sec</output>
+    <input type="range" id="touchSensitivity" min="1" max="12" step="1" value="12">
+  </label>
+  <small>Continuous drag: every distance increment moves one square and turns can happen without lifting. Drag speed: movement continues while held at the latest drag speed; use its tuning sliders to control the response and limits. Original swipe preserves v0.18 behaviour. Arrows: tap for one step or hold to repeat. Joystick: farther tilt repeats faster. Torch follows input even against walls.</small>
+  <div class="checkbox-group">
+    <input type="checkbox" id="showHint">
+    <span>Show BFS Solution Hint</span>
+  </div>
+
+  <label>Background Color
+    <input type="color" id="colorBg" value="#0b0c10">
+  </label>
+  <label>Wall Vector Color
+    <input type="color" id="colorWall" value="#66fcf1">
+  </label>
+  <label>Visited Path Color
+    <input type="color" id="colorFill" value="#45a29e">
+  </label>
+
+  <button class="btn btn-secondary" id="btnFit">⊞ Fit Maze to Screen</button>
+  <button class="btn btn-secondary" id="btnExportJSON">💾 Export Level Package (.json)</button>
+  <button class="btn btn-secondary" id="btnExportPNG">📷 Save Canvas Screenshot</button>
+</div>
+
+<button id="toggle-btn">▾ Controls</button>
+
+<!-- HUD Bar -->
+<div id="hud">
+  <div class="hud-item" id="timerDisplay">Time: 0.0s</div>
+  <div class="hud-item" id="objectiveDisplay">Gems: 0/0</div>
+  <div class="hud-item" id="keysDisplay" style="display:none;">Keys: </div>
+</div>
+
+<!-- Touch D-Pad -->
+<div id="dpad">
+  <div class="dbtn" id="btn-up" aria-label="Up">▲</div>
+  <div class="dbtn" id="btn-left" aria-label="Left">◀</div>
+  <div class="dbtn" id="btn-down" aria-label="Down">▼</div>
+  <div class="dbtn" id="btn-right" aria-label="Right">▶</div>
+  <div id="joystick" aria-label="Directional joystick"><div id="joystickKnob"></div></div>
+</div>
+
+<!-- Victory / Profile Modal -->
+<div id="modal-overlay">
+  <div id="modal-card">
+    <h2>🎉 Maze Cleared!</h2>
+    <p id="modal-stats" style="font-size: 14px; margin-bottom: 16px;"></p>
+    <label style="text-align: left;">Enter Pilot Username:
+      <input type="text" id="usernameInput" value="Explorer_1">
+    </label>
+    <button class="btn btn-primary" id="btnSaveProfile" style="margin-top: 16px;">Save Score & Close</button>
+    <button class="btn btn-secondary" id="btnRetryMaze" style="margin-top: 10px;">↻ Retry Same Maze</button>
+    <button class="btn btn-secondary" id="btnNewMazeAfterWin" style="margin-top: 10px;">⚡ Generate New Maze</button>
+  </div>
+</div>
+
+<details id="debugPanel" style="position:fixed;bottom:8px;left:8px;z-index:30;background:#151b24;color:#b9f5ed;border:1px solid #45a29e;border-radius:6px;padding:7px;max-width:min(420px,85vw);font:12px monospace"><summary style="cursor:pointer">Diagnostics</summary><div id="debugStatus">Waiting for startup…</div><button id="debugCopy" style="margin-top:6px">Copy diagnostics</button><pre id="debugLog" style="max-height:150px;overflow:auto;white-space:pre-wrap"></pre></details>
+<canvas id="canvas"></canvas>
+
+<script>
+ 'use strict';
+// VERSION AND FILE NAMING RULE:
+// Update APP_VERSION here only. Release the HTML as MazyV#.##.html
+// (for example, MazyV0.16.html). Do not hard-code versions elsewhere.
+const APP_VERSION='0.33';
+document.title=`Mazy v${APP_VERSION} - Offline Vector Maze Adventure`;
+document.getElementById('appVersionHeading').textContent=`MAZY v${APP_VERSION}`;
+const $ = id => document.getElementById(id);
+const debugLines=[];
+$('touchSensitivity').addEventListener('input',()=>{$('touchSensitivityValue').textContent=$('touchSensitivity').value+' grids/sec';});
+
+
+function updateVelocitySettings(){
+ $('velocitySettings').style.display=$('touchMoveStyle').value==='velocity'?'block':'none';
+ for(const [id,out,suffix] of [['velocityGain','velocityGainValue','%'],['velocityMin','velocityMinValue',' squares/sec'],['velocityMax','velocityMaxValue',' squares/sec'],['velocitySmooth','velocitySmoothValue','%'],['velocityTurn','velocityTurnValue',' px']])$(out).textContent=$(id).value+suffix;
+}
+$('touchMoveStyle').addEventListener('change',()=>{resetSwipe();resetNewTouchModes();updateVelocitySettings();});
+for(const id of ['velocityGain','velocityMin','velocityMax','velocitySmooth','velocityTurn'])$(id).addEventListener('input',()=>{
+ if(Number($('velocityMin').value)>Number($('velocityMax').value)){
+  if(id==='velocityMin')$('velocityMax').value=$('velocityMin').value;
+  else $('velocityMin').value=$('velocityMax').value;
+ }
+ updateVelocitySettings();
+});
+updateVelocitySettings();
+
+for(const [id,out] of [['touchDistance','touchDistanceValue'],['touchThreshold','touchThresholdValue']]){
+ $(id).addEventListener('input',()=>{$(out).textContent=$(id).value+' px';});
+}
+
+function debugLog(message){const line=new Date().toLocaleTimeString()+' '+message;debugLines.push(line);if(debugLines.length>80)debugLines.shift();$('debugLog').textContent=debugLines.join('\n');}
+window.addEventListener('error',e=>{debugLog('ERROR '+e.message+' at '+e.filename+':'+e.lineno);$('debugStatus').textContent='Error detected — expand diagnostics';});
+window.addEventListener('unhandledrejection',e=>debugLog('PROMISE ERROR '+String(e.reason)));
+$('debugCopy').onclick=()=>{const data=debugLines.join('\n');if(navigator.clipboard?.writeText)navigator.clipboard.writeText(data).catch(()=>prompt('Copy diagnostics',data));else prompt('Copy diagnostics',data);};
+
+const canvas=$('canvas'), ctx=canvas.getContext('2d');
+const N=1,E=2,S=4,W=8, DIRS=[[N,0,-1],[E,1,0],[S,0,1],[W,-1,0]];
+const OPPOSITE={[N]:S,[E]:W,[S]:N,[W]:E};
+const GATE_COLORS={red:'#ef4444',blue:'#3b82f6',green:'#10b981',yellow:'#f59e0b'};
+const CELL=36;
+let grid=[],cols=21,rows=21,visitedMap=[],slimeMap=[],gateMap=[];
+let gems=[],keys=[],enemies=[],playerKeys=new Set();
+let px=0,py=0,exitX=0,exitY=0,scale=1,offsetX=0,offsetY=0;
+let activeSeed='',rng=Math.random,levelObjective='standard';
+let levelSettings={fog:true,type:'cone',reach:5.5,ambient:.05,lineWidth:4,algorithm:'backtracker',slime:false,slimeDensity:.15,enemies:true,enemyCount:4};
+let generationCount=0;
+let isFinished=false,elapsedTime=0,startTime=0,timerInterval=null,lastEnemyTick=0;
+let moveDelay=120,lastMoveTime=0,mousePos={x:0,y:0},aimAngle=-Math.PI/2;
+let pointers=new Map(),dragMode=null,lastPointer=null,pinchDistance=0,pinchMid=null;
+let touchOrigin=null,relativeDirection=null,heldDirection=null,heldPointer=null,heldInterval=null;
+let continuousPrevious=null,continuousDistance=0,continuousDirection=null;
+let velocityPrevious=null,velocityDirection=null,velocityPixelsPerMs=0,velocityBudget=0,velocityLastFrame=0,velocityFrame=null;
+
+
+
+// --- TOPOLOGY & GENERATION HELPER FUNCTIONS ---
+
+function resolveTopologySetting(id) {
+  const val = $(id).value;
+  if (val === 'on') return true;
+  if (val === 'off') return false;
+  return rng() > 0.5; // Random / seed-driven
+}
+
+
+
+// Topologies share immutable zone labels. No modifier may open a zone boundary.
+let puzzleZones = null, puzzleTopology = null;
+function carvePassage(x,y,d) {
+ const edge=DIRS.find(v=>v[0]===d);if(!edge)return;
+ const nx=x+edge[1],ny=y+edge[2];
+ if(!isValid(x,y)||!isValid(nx,ny))return;
+ grid[y][x]|=d;grid[ny][nx]|=OPPOSITE[d];
+}
+
+
+function reachableWithKeys(owned) {
+ const seen=new Uint8Array(cols*rows),queue=[0];seen[0]=1;
+ for(let head=0;head<queue.length;head++){
+  const cur=queue[head],x=cur%cols,y=Math.floor(cur/cols);
+  for(const [d,dx,dy] of DIRS){
+   if(!walkable(x,y,d,false)||gateMap[y][x].some(g=>g.dir===d&&!g.colors.every(c=>owned.has(c))))continue;
+   const next=(y+dy)*cols+x+dx;if(!seen[next]){seen[next]=1;queue.push(next);}
+  }
+ }
+ return seen;
+}
+
+
+
+
+
+function validateMultiTopologySolvability() {
+ // Verify geometry and every progression prefix, including ALL cells of locked zones.
+ for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)for(const [d,dx,dy] of DIRS){
+  const nx=x+dx,ny=y+dy;
+  if(grid[y][x]&d){if(!isValid(nx,ny)||!(grid[ny][nx]&OPPOSITE[d]))return false;}
+ }
+ const owned=new Set();let previousSize=0;
+ for(let stage=0;stage<=keys.length;stage++){
+  let seen=reachableWithKeys(owned),changed=true;
+  while(changed){changed=false;
+   for(const item of [...(puzzlePlan?.wingSwitches||[]),...(puzzlePlan?.returnLatches||[])]){
+    if(seen[item.y*cols+item.x]&&!owned.has(item.token)){owned.add(item.token);changed=true;}
+   }
+   if(changed)seen=reachableWithKeys(owned);
+  }
+  let size=0;
+  for(let cell=0;cell<seen.length;cell++){
+   if(seen[cell])size++;
+   if(Boolean(seen[cell])!==(puzzleZones[cell]<=stage))return false;
+  }
+  if(stage&&size<=previousSize)return false;
+  previousSize=size;
+  for(let i=stage;i<keys.length;i++)if(Boolean(seen[keys[i].y*cols+keys[i].x])!==(i===stage))return false;
+  if(stage<keys.length){if(seen[exitY*cols+exitX])return false;owned.add(keys[stage].color);}
+  else if(!seen[exitY*cols+exitX])return false;
+ }
+ return true;
+}
+
+function resetNewTouchModes(){
+ continuousPrevious=null;continuousDistance=0;continuousDirection=null;
+ velocityPrevious=null;velocityDirection=null;velocityPixelsPerMs=0;velocityBudget=0;velocityTurnAccumX=0;velocityTurnAccumY=0;
+ if(velocityFrame!==null)cancelAnimationFrame(velocityFrame);
+ velocityFrame=null;
+}
+function continuousDrag(x,y){
+ if(!continuousPrevious){continuousPrevious={x,y};return;}
+ const dx=x-continuousPrevious.x,dy=y-continuousPrevious.y;
+ continuousPrevious={x,y};
+ const dist=Math.hypot(dx,dy),threshold=Number($('touchThreshold').value);
+ if(dist<0.01)return;
+ const next=directionFromDelta(dx,dy,0);
+ if(!next)return;
+ aimInDirection(next);
+ if(!sameDirection(next,continuousDirection)){
+  continuousDirection=next;continuousDistance=0;
+ }
+ // A small deadzone per directional segment filters accidental turns.
+ continuousDistance+=dist;
+ const distancePerCell=Number($('touchDistance').value);
+ const effective=Math.max(0,continuousDistance-threshold);
+ const steps=Math.min(50,Math.floor(effective/distancePerCell));
+ if(steps){continuousDistance-=steps*distancePerCell;
+  for(let i=0;i<steps&&!isFinished;i++)step(next[0],next[1]);
+ }
+}
+let velocityTurnAccumX=0,velocityTurnAccumY=0;
+function velocityDrag(x,y,now){
+ if(!velocityPrevious){velocityPrevious={x,y,time:now};return;}
+ const dx=x-velocityPrevious.x,dy=y-velocityPrevious.y;
+ const dt=Math.max(1,now-velocityPrevious.time);
+ velocityPrevious={x,y,time:now};
+ const dist=Math.hypot(dx,dy);
+ if(dist<0.5)return;
+ velocityTurnAccumX+=dx;velocityTurnAccumY+=dy;
+ const turnDistance=Math.hypot(velocityTurnAccumX,velocityTurnAccumY);
+ if(turnDistance>=Number($('velocityTurn').value)){
+  const next=directionFromDelta(velocityTurnAccumX,velocityTurnAccumY,0);
+  if(next){velocityDirection=next;aimInDirection(next);}
+  velocityTurnAccumX=0;velocityTurnAccumY=0;
+ }
+ const gain=Number($('velocityGain').value)/100;
+ const perCell=Math.max(1,Number($('touchDistance').value));
+ const min=Number($('velocityMin').value),max=Math.max(min,Number($('velocityMax').value));
+ const measured=dist/dt*1000/perCell*gain;
+ const target=Math.min(max,Math.max(min,measured));
+ const smooth=Number($('velocitySmooth').value)/100;
+ velocityPixelsPerMs=velocityPixelsPerMs?smooth*velocityPixelsPerMs+(1-smooth)*target:target;
+}
+function velocityTick(now){
+ if(dragMode!=='velocity'||!touchOrigin||isFinished){velocityFrame=null;return;}
+ const dt=Math.min(50,Math.max(0,now-velocityLastFrame));velocityLastFrame=now;
+ if(velocityDirection&&velocityPixelsPerMs>0){
+  const min=Number($('velocityMin').value),max=Math.max(min,Number($('velocityMax').value));
+  const squaresPerSecond=Math.min(max,Math.max(min,velocityPixelsPerMs));
+  velocityBudget+=squaresPerSecond*dt/1000;
+  const count=Math.min(8,Math.floor(velocityBudget));
+  velocityBudget-=count;
+  for(let i=0;i<count&&!isFinished;i++)step(...velocityDirection);
+ }
+ velocityFrame=requestAnimationFrame(velocityTick);
+}
+
+let renderQueued=false,hintCache=null,hintKey='';
+let revealedMap=[], visibilityPolygon=[], visibilityDirty=true;
+let discoveredWalls=new Set(), currentlyLitWalls=new Set();
+let profileName='Explorer_1';
+const lightCanvas=document.createElement('canvas'),lightCtx=lightCanvas.getContext('2d');
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const randomInt=n=>Math.floor(rng()*n);
+const isValid=(x,y)=>x>=0&&x<cols&&y>=0&&y<rows;
+function readNumber(id,fallback,min,max){const v=Number($(id).value);return Number.isFinite(v)?clamp(Math.round(v),min,max):fallback;}
+function initSeed(value){
+ activeSeed=value.trim()||Math.random().toString(36).slice(2,10);
+ let a=2166136261>>>0;
+ for(let i=0;i<activeSeed.length;i++)a=Math.imul(a^activeSeed.charCodeAt(i),16777619);
+ rng=()=>{a+=0x6D2B79F5;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};
+}
+function fitCamera(){
+ scale=clamp(Math.min((window.innerWidth-36)/(cols*CELL),(window.innerHeight-36)/(rows*CELL)),0.08,6);
+ offsetX=(window.innerWidth-cols*CELL*scale)/2;offsetY=(window.innerHeight-rows*CELL*scale)/2;
+ requestDraw();
+}
+function resize(){
+ const dpr=Math.min(window.devicePixelRatio||1,2);
+ const width=window.innerWidth,height=window.innerHeight;
+ canvas.style.width=width+'px';canvas.style.height=height+'px';
+ canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);
+ lightCanvas.width=canvas.width;lightCanvas.height=canvas.height;
+ // Camera coordinates are in CSS pixels; convert using a draw-time transform.
+ if(grid.length)fitCamera();else requestDraw();
+}
+function generateBacktracker(){
+ const seen=new Uint8Array(cols*rows),stack=[0];seen[0]=1;
+ while(stack.length){
+  const cur=stack[stack.length-1],x=cur%cols,y=Math.floor(cur/cols),options=[];
+  for(const [d,dx,dy] of DIRS){const nx=x+dx,ny=y+dy;if(isValid(nx,ny)&&!seen[ny*cols+nx])options.push([d,nx,ny]);}
+  if(!options.length){stack.pop();continue;}
+  const [d,nx,ny]=options[randomInt(options.length)];grid[y][x]|=d;grid[ny][nx]|=OPPOSITE[d];seen[ny*cols+nx]=1;stack.push(ny*cols+nx);
+ }
+}
+function generatePrims(){
+ const seen=new Uint8Array(cols*rows),frontier=[];seen[0]=1;
+ const add=(x,y)=>{for(const [d,dx,dy] of DIRS){const nx=x+dx,ny=y+dy;if(isValid(nx,ny)&&!seen[ny*cols+nx])frontier.push([x,y,d,nx,ny]);}};
+ add(0,0);
+ while(frontier.length){const i=randomInt(frontier.length),edge=frontier[i];frontier[i]=frontier[frontier.length-1];frontier.pop();
+  const [x,y,d,nx,ny]=edge;if(seen[ny*cols+nx])continue;
+  grid[y][x]|=d;grid[ny][nx]|=OPPOSITE[d];seen[ny*cols+nx]=1;add(nx,ny);
+ }
+}
+
+
+function walkable(x, y, d, withGates = true) {
+  const edge=DIRS.find(v=>v[0]===d);
+  if (!edge || !isValid(x,y) || !isValid(x+edge[1],y+edge[2]) || !(grid[y][x]&d) || !(grid[y+edge[2]][x+edge[1]]&OPPOSITE[d])) return false;
+  if (withGates && gateMap[y][x].some(g => g.dir === d && !g.colors.every(c => playerKeys.has(c)))) return false;
+  return true;
+}
+
+function gateSegments() {
+  const result = [];
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      for (const g of gateMap[y][x]) {
+        if (g.dir === N) result.push([x, y, x + 1, y, g.colors]);
+        if (g.dir === W) result.push([x, y, x, y + 1, g.colors]);
+        if (x === cols - 1 && g.dir === E) result.push([x + 1, y, x + 1, y + 1, g.colors]);
+        if (y === rows - 1 && g.dir === S) result.push([x, y + 1, x + 1, y + 1, g.colors]);
+      }
+    }
+  }
+  return result;
+}
+  
+
+
+
+
+function findPath(sx,sy,tx,ty,withGates=true){
+ if(!isValid(sx,sy)||!isValid(tx,ty))return [];
+ const start=sy*cols+sx,target=ty*cols+tx,seen=new Uint8Array(cols*rows),prev=new Int32Array(cols*rows).fill(-1);
+ const queue=new Int32Array(cols*rows);let head=0,tail=0;queue[tail++]=start;seen[start]=1;
+ while(head<tail){const cur=queue[head++];if(cur===target)break;
+  const x=cur%cols,y=Math.floor(cur/cols);
+  for(const [d,dx,dy] of DIRS){if(!walkable(x,y,d,withGates))continue;
+   const next=(y+dy)*cols+x+dx;if(seen[next])continue;seen[next]=1;prev[next]=cur;queue[tail++]=next;
+  }
+ }
+ if(!seen[target])return [];
+ const path=[];for(let i=target;i!==-1;i=prev[i])path.push([i%cols,Math.floor(i/cols)]);
+ return path.reverse();
+}
+
+
+
+
+function pairColor(i){
+ const palette=['#ef4444','#3b82f6','#10b981','#f59e0b','#a855f7','#ec4899','#06b6d4','#84cc16','#f97316','#e879f9','#14b8a6','#facc15'];
+ return palette[i%palette.length];
+}
+
+
+  
+  
+
+// Region-first generator. Organic connected regions -> ordered region tree ->
+// gate approach network -> random maze branches -> keys on substantial detours.
+let puzzlePlan=null;
+function regionDistances(start,region,geometry=false){
+ const dist=new Int32Array(cols*rows).fill(-1),previous=new Int32Array(cols*rows).fill(-1),queue=[start];dist[start]=0;
+ for(let h=0;h<queue.length;h++){
+  const cell=queue[h],x=cell%cols,y=Math.floor(cell/cols);
+  for(const [d,dx,dy] of DIRS){const nx=x+dx,ny=y+dy,next=ny*cols+nx;
+   if(!isValid(nx,ny)||puzzleZones[next]!==region||dist[next]>=0||(!geometry&&!(grid[y][x]&d)))continue;
+   dist[next]=dist[cell]+1;previous[next]=cell;queue.push(next);
+  }
+ }
+ return {dist,previous,queue};
+}
+function setupGates(){
+ const crossOver=resolveTopologySetting('topoCrossOver'),hub=resolveTopologySetting('topoHub'),count=readNumber('gateCount',3,1,12),total=count+1,size=cols*rows;
+ puzzleTopology={crossOver,hub,wings:false,cycles:false};
+ if(hub&&count<2)throw new Error('Hub & Spokes needs at least two gate pairs.');
+ const xy=cell=>[cell%cols,Math.floor(cell/cols)];
+ const connect=(a,b)=>{const [x,y]=xy(a),[nx,ny]=xy(b);carvePassage(x,y,nx>x?E:nx<x?W:ny>y?S:N);};
+ for(let attempt=0;attempt<(hub?96:48);attempt++){
+  // Spaced random seeds followed by connected randomized growth. Region shapes
+  // and areas change with the seed, rather than following strips or rectangles.
+  const center=hub?[Math.floor(cols*(.38+rng()*.24)),Math.floor(rows*(.38+rng()*.24))]:null;
+  const hubCell=hub?center[1]*cols+center[0]:null,room=new Set();
+  if(hub){const radius=count>=5?2:1;for(let y=center[1]-radius;y<=center[1]+radius;y++)for(let x=center[0]-radius;x<=center[0]+radius;x++)if(isValid(x,y))room.add(y*cols+x);}
+  const seeds=[0];
+  while(seeds.length<total){
+   let best=-1,score=-1;
+   for(let j=0;j<28;j++){
+    const cell=randomInt(size),[x,y]=xy(cell);
+    if(hub&&(room.has(cell)||Math.abs(x-center[0])+Math.abs(y-center[1])<5))continue;
+    const gap=Math.min(...seeds.map(s=>{const [sx,sy]=xy(s);return Math.abs(x-sx)+Math.abs(y-sy);}));
+    if(gap>score){best=cell;score=gap;}
+   }
+   if(score<1)break;seeds.push(best);
+  }
+  if(seeds.length!==total)continue;
+  const raw=new Int16Array(size).fill(-1),fronts=seeds.map(()=>[]),areas=new Int32Array(total);
+  const add=(cell,r)=>{const [x,y]=xy(cell);for(const [,dx,dy] of DIRS){const nx=x+dx,ny=y+dy;if(isValid(nx,ny)&&raw[ny*cols+nx]<0)fronts[r].push(ny*cols+nx);}};
+  seeds.forEach((cell,r)=>{raw[cell]=r;areas[r]++;});
+  if(hub){
+   // Reserve a connected nexus and approach arms BEFORE regions grow.
+   // Each other seed gets a root-owned neighbouring cell, guaranteeing adjacency.
+   for(const cell of room)if(raw[cell]<0){raw[cell]=0;areas[0]++;}
+   for(const target of seeds){
+    const blocked=new Set(seeds.filter(cell=>cell!==target&&cell!==0)),prev=new Int32Array(size).fill(-1),seen=new Uint8Array(size),q=[hubCell];seen[hubCell]=1;
+    for(let h=0;h<q.length&&!seen[target];h++){
+     const cell=q[h],[x,y]=xy(cell),options=DIRS.slice();
+     // Vary the approaches, without hardcoded cardinal corridors.
+     if(rng()<.5)options.reverse();
+     for(const [,dx,dy] of options){const nx=x+dx,ny=y+dy,next=ny*cols+nx;if(!isValid(nx,ny)||seen[next]||blocked.has(next))continue;seen[next]=1;prev[next]=cell;q.push(next);}
+    }
+    for(let cell=prev[target];cell>=0;cell=prev[cell])if(raw[cell]<0){raw[cell]=0;areas[0]++;}
+   }
+   for(let cell=0;cell<size;cell++)if(raw[cell]===0)add(cell,0);
+   seeds.forEach((cell,r)=>{if(r)add(cell,r);});
+  }else seeds.forEach(add);
+  let active=seeds.map((_,r)=>r);
+  while(active.length){
+   const ai=randomInt(active.length),r=active[ai],front=fronts[r];
+   if(!front.length){active[ai]=active.at(-1);active.pop();continue;}
+   const j=randomInt(front.length),cell=front[j];front[j]=front.at(-1);front.pop();
+   if(raw[cell]>=0)continue;raw[cell]=r;areas[r]++;add(cell,r);
+  }
+  if(areas.some(n=>n<35))continue;
+  const boundaries=new Map(),adj=seeds.map(()=>new Set());
+  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)for(const [,dx,dy] of [[E,1,0],[S,0,1]]){
+   const nx=x+dx,ny=y+dy;if(!isValid(nx,ny))continue;
+   const a=y*cols+x,b=ny*cols+nx,ra=raw[a],rb=raw[b];if(ra===rb)continue;
+   adj[ra].add(rb);adj[rb].add(ra);const tag=[ra,rb].sort((a,b)=>a-b).join(':');
+   if(!boundaries.has(tag))boundaries.set(tag,[]);boundaries.get(tag).push([a,b]);
+  }
+  if(hub&&adj[0].size!==count)continue;
+  // Expansion order is random, but teaser mode guarantees a future gate whose
+  // accessible side belongs to an EARLIER region than its key's region.
+  const order=[0],parents=[-1],remaining=new Set(seeds.map((_,i)=>i).slice(1));
+  while(remaining.size){
+   const choices=[];
+   for(let parent=0;parent<order.length;parent++)for(const child of adj[order[parent]])if(remaining.has(child))choices.push({parent,child});
+   let pool=choices;
+   if(hub)pool=choices.filter(v=>v.parent===0);
+   if(!hub&&crossOver&&order.length>1){const early=choices.filter(v=>v.parent<order.length-1);if(early.length&&rng()<.6)pool=early;}
+   else if(!hub&&!crossOver){const onward=choices.filter(v=>v.parent===order.length-1);if(onward.length)pool=onward;}
+   const next=pool[randomInt(pool.length)];order.push(next.child);parents.push(next.parent);remaining.delete(next.child);
+  }
+  if(crossOver&&count>1&&!parents.some((p,i)=>i>1&&p<i-1))continue;
+  const sequence=new Int16Array(total);order.forEach((r,i)=>sequence[r]=i);
+  puzzleZones=Int16Array.from(raw,r=>sequence[r]);
+  grid=Array.from({length:rows},()=>new Uint8Array(cols));gateMap=Array.from({length:rows},()=>Array.from({length:cols},()=>[]));
+  keys=[];const entries=[0],gates=[],ports=seeds.map(()=>[]),usedArms=new Set();
+  const hubTree=hub?regionDistances(hubCell,0,true):null,arm=new Int32Array(size).fill(-1);
+  if(hub)for(const cell of hubTree.queue){if(room.has(cell))continue;const parent=hubTree.previous[cell];arm[cell]=room.has(parent)?cell:arm[parent];}
+  let portFailure=false;
+  for(let region=1;region<total;region++){
+   const parent=parents[region],aRaw=order[parent],bRaw=order[region],tag=[aRaw,bRaw].sort((a,b)=>a-b).join(':');
+   const distances=hub?hubTree.dist:regionDistances(entries[parent],parent,true).dist;
+   let options=boundaries.get(tag).map(([a,b])=>raw[a]===aRaw?[a,b]:[b,a]);
+   if(hub)options=options.filter(([from])=>arm[from]>=0&&!usedArms.has(arm[from]));
+   if(!options.length){portFailure=true;break;}
+   options.sort((a,b)=>distances[a[0]]-distances[b[0]]);
+   const pool=crossOver?options.slice(0,Math.max(1,Math.ceil(options.length*.3))):options;
+   const [from,to]=pool[randomInt(pool.length)];entries[region]=to;ports[parent].push(from);if(hub)usedArms.add(arm[from]);
+   gates.push({number:region,parent,region,from,to,color:'pair'+(region-1)});
+  }
+  if(portFailure)continue;
+  // Connect each region entry to its gate approaches by short organic paths.
+  const reserved=new Uint8Array(size);
+  for(let region=0;region<total;region++){
+   reserved[entries[region]]=1;
+   const {previous}=hub&&region===0?hubTree:regionDistances(entries[region],region,true);
+   if(hub&&region===0){
+    for(const cell of room){reserved[cell]=1;const [x,y]=xy(cell);for(const [,dx,dy] of [[E,1,0],[S,0,1]]){const next=(y+dy)*cols+x+dx;if(room.has(next))connect(cell,next);}}
+   }
+   const destinations=hub&&region===0?[...ports[region],0]:ports[region];
+   for(const port of destinations)for(let cell=port;previous[cell]>=0;cell=previous[cell]){connect(cell,previous[cell]);reserved[cell]=reserved[previous[cell]]=1;}
+   const seen=reserved.slice(),front=[];
+   for(let cell=0;cell<size;cell++)if(puzzleZones[cell]===region&&seen[cell])front.push(cell);
+   for(let i=front.length-1;i>0;i--){const j=randomInt(i+1);[front[i],front[j]]=[front[j],front[i]];}
+   while(front.length){
+    const index=levelSettings.algorithm==='prims'?randomInt(front.length):front.length-1,cell=front[index],[x,y]=xy(cell),options=[];
+    for(const [,dx,dy] of DIRS){const nx=x+dx,ny=y+dy,next=ny*cols+nx;if(isValid(nx,ny)&&puzzleZones[next]===region&&!seen[next])options.push(next);}
+    if(!options.length){front[index]=front.at(-1);front.pop();continue;}
+    const next=options[randomInt(options.length)];connect(cell,next);seen[next]=1;front.push(next);
+   }
+  }
+  // Measure depth off the gate approach network on the finished corridors.
+  const branchDepth=new Int32Array(size).fill(-1),q=[];
+  for(let cell=0;cell<size;cell++)if(reserved[cell]){branchDepth[cell]=0;q.push(cell);}
+  for(let h=0;h<q.length;h++){
+   const cell=q[h],[x,y]=xy(cell);
+   for(const [d,dx,dy] of DIRS)if(grid[y][x]&d){const next=(y+dy)*cols+x+dx;if(branchDepth[next]<0){branchDepth[next]=branchDepth[cell]+1;q.push(next);}}
+  }
+  let failed=false;const metrics=[];
+  for(let region=0;region<count;region++){
+   const {dist,queue}=regionDistances(entries[region],region),minimum=Math.max(4,Math.min(9,Math.floor(Math.sqrt(areas[order[region]])/2)));
+   const maxDistance=queue.reduce((m,cell)=>Math.max(m,dist[cell]),0);
+   let pool=queue.filter(cell=>cell!==0&&(crossOver?branchDepth[cell]>=minimum:hub?(region===0?cell===hubCell:dist[cell]>=Math.max(8,Math.floor(maxDistance*.65))):dist[cell]>=1&&dist[cell]<=3));
+   if(!pool.length){failed=true;break;}
+   if(crossOver){pool.sort((a,b)=>branchDepth[b]-branchDepth[a]);pool=pool.slice(0,Math.max(1,Math.ceil(pool.length*.2)));}
+   const cell=pool[randomInt(pool.length)],[x,y]=xy(cell);keys.push({x,y,color:'pair'+region,collected:false});
+   metrics.push({key:region+1,region,entryDistance:dist[cell],detourDepth:branchDepth[cell],gateRegion:parents[region+1],firstGateStage:parents[region+1]});
+  }
+  if(failed)continue;
+  const last=regionDistances(entries[count],count),exitCell=last.queue.reduce((a,b)=>last.dist[a]>=last.dist[b]?a:b);[exitX,exitY]=xy(exitCell);
+  // Palette order also varies; key identities remain stable for replay/export.
+  const palette=Array.from({length:12},(_,i)=>pairColor(i));for(let i=palette.length-1;i>0;i--){const j=randomInt(i+1);[palette[i],palette[j]]=[palette[j],palette[i]];}
+  gates.forEach((g,i)=>{
+   GATE_COLORS[g.color]=palette[i];connect(g.from,g.to);
+   const [x,y]=xy(g.from),[nx,ny]=xy(g.to),d=nx>x?E:nx<x?W:ny>y?S:N;
+   gateMap[y][x].push({dir:d,colors:[g.color]});gateMap[ny][nx].push({dir:OPPOSITE[d],colors:[g.color]});
+  });
+  puzzlePlan={type:'organic-regions',hub:hub?{cell:hubCell,room:[...room],spokes:count}:null,parents,entries,gates,metrics,regionSizes:order.map(r=>areas[r]),wingSwitches:[],returnLatches:[]};
+  if(!validateMultiTopologySolvability())continue;
+  if(hub){
+   // Removing the nexus must separate EVERY spoke approach from every other.
+   const components=new Int32Array(size).fill(-1);let component=0;
+   for(const gate of gates){if(components[gate.from]>=0)continue;const q=[gate.from];components[gate.from]=component;
+    for(let h=0;h<q.length;h++){const cell=q[h],[x,y]=xy(cell);for(const [d,dx,dy] of DIRS)if(grid[y][x]&d){const next=(y+dy)*cols+x+dx;if(puzzleZones[next]!==0||room.has(next)||components[next]>=0)continue;components[next]=component;q.push(next);}}
+    component++;
+   }
+   if(new Set(gates.map(g=>components[g.from])).size!==count)continue;
+   puzzlePlan.hub.separatedSpokes=component;
+  }
+  const startDistances=regionDistances(0,0).dist;
+  const encounters=gates.filter(g=>g.parent===0).sort((a,b)=>startDistances[a.from]-startDistances[b.from]).map(g=>'G'+g.number+' at '+startDistances[g.from]+' steps');
+  const early=gates.filter(g=>g.parent<g.number-1).map(g=>'G'+g.number+' accessible from R'+g.parent+' before K'+g.number);
+  $('puzzleReport').textContent=[hub?'Hub: '+count+' separate gated spokes. Travel between spokes must cross the central nexus.':'Hub off: free region connection graph.', 'Validated '+count+' ordered keys in varied connected regions.',crossOver?'Teaser gates: '+(early.join('; ')||'single-gate detour'):hub?'Hub-only: first key at the nexus; later keys deep in their spokes.':'Baseline: keys near region entrances.',
+   ...metrics.map(m=>'K'+m.key+' in R'+m.region+': '+m.entryDistance+' steps from entry, '+m.detourDepth+' steps off the gate approach network.'),
+   'Initially approachable gates: '+encounters.join(', '),
+   'Gate connections: '+gates.map(g=>'R'+g.parent+' → G'+g.number+' → R'+g.region).join('; '),
+   'R0 is the starting region. Region numbers indicate unlock order, not position.'].join('\n');
+  debugLog('Region puzzle validated after '+(attempt+1)+' plan(s). '+$('puzzleReport').textContent);return;
+ }
+ throw new Error('No qualifying region plan found for this seed and size. Try a larger grid, fewer pairs, or another seed.');
+}
+
+// Helper to scan outward into side branches and measure depth
+function findDeepestBranchNode(startX, startY, pathSet) {
+  const queue = [[startX, startY, 0]];
+  const visited = new Set([`${startX},${startY}`]);
+  let deepest = { x: startX, y: startY, depth: 0 };
+
+  while (queue.length > 0) {
+    const [x, y, depth] = queue.shift();
+    if (depth > deepest.depth) {
+      deepest = { x, y, depth };
+    }
+    // Limit search depth to prevent excessive looping in large mazes
+    if (depth >= 8) continue;
+
+    for (const [d, dx, dy] of DIRS) {
+      // Check wall existence without gate restrictions
+      if (grid[y][x] & d) {
+        const nx = x + dx, ny = y + dy;
+        const keyStr = `${nx},${ny}`;
+        if (!visited.has(keyStr) && !pathSet.has(keyStr)) {
+          visited.add(keyStr);
+          queue.push([nx, ny, depth + 1]);
+        }
+      }
+    }
+  }
+  return deepest;
+}
+
+
+
+  
+function updateObjectiveControls(){
+ const mode=$('objectiveMode').value;
+ $('gemOptions').hidden=mode!=='collector';
+ $('gateOptions').hidden=mode!=='keys';
+ const available=Math.max(1,readNumber('w',21,3,250)*readNumber('h',21,3,250)-2);
+ const gem=$('gemCount');
+ const wasMax=gem.value===gem.max||gem.dataset.followMax!=='false';
+ gem.max=available;
+ if(wasMax)gem.value=available;
+ else gem.value=Math.min(available,Math.max(1,Number(gem.value)));
+ gem.dataset.followMax=Number(gem.value)===available?'true':'false';
+ $('gemCountLabel').textContent=gem.value+' / '+available;
+ const gate=$('gateCount');
+ $('gateCountLabel').textContent=gate.value+' pairs';
+}
+function generateMaze(seedOverride=null){
+ const previousLevel={cols,rows,activeSeed,rng,generationCount,levelSettings,grid,visitedMap,revealedMap,slimeMap,gateMap,px,py,exitX,exitY,levelObjective,gems,keys,enemies,playerKeys,puzzleZones,puzzleTopology,puzzlePlan,discovered:[...discoveredWalls],lit:[...currentlyLitWalls]};
+ if($('objectiveMode').value==='keys'){
+  const width=readNumber('w',31,3,250),height=readNumber('h',31,3,250),pairs=readNumber('gateCount',3,1,12);
+  if(width<9||height<9||width*height<55*(pairs+1)){
+   const message='The region planner needs both sides at least 9 and at least '+(55*(pairs+1))+' cells for '+pairs+' gate pairs. Increase the grid or reduce the pairs. Your current maze has been kept.';
+   $('puzzleReport').textContent=message;debugLog(message);alert(message);return;
+  }
+ }
+ debugLog('Mazy v'+APP_VERSION+' — generating maze…');
+ updateObjectiveControls();
+ cols=readNumber('w',21,3,250);rows=readNumber('h',21,3,250);
+ $('w').value=cols;$('h').value=rows;
+ const typedSeed=$('seedInput').value.trim();
+ const seedToUse=seedOverride!==null?seedOverride:(generationCount===0||$('keepSeed').checked)?typedSeed:'';
+ initSeed(seedToUse);$('seedInput').value=activeSeed;generationCount++;
+ levelSettings={
+  fog:$('enableFog').checked,type:$('torchType').value,
+  reach:Number($('torchReach').value),ambient:Number($('torchAmbient').value),
+  lineWidth:Number($('lineWidth').value),algorithm:$('algo').value,
+  slime:$('enableSlime').checked,slimeDensity:Number($('slimeDensity').value),
+  enemies:$('enableEnemies').checked,enemyCount:readNumber('enemyCount',4,1,15)
+ };
+ debugLog('Active seed: '+activeSeed+'; fog: '+levelSettings.fog);
+ grid=Array.from({length:rows},()=>new Uint8Array(cols));
+ visitedMap=Array.from({length:rows},()=>new Uint8Array(cols));
+ revealedMap=Array.from({length:rows},()=>new Uint8Array(cols));
+ discoveredWalls.clear();currentlyLitWalls.clear();
+ slimeMap=Array.from({length:rows},()=>new Uint8Array(cols));
+ gateMap=Array.from({length:rows},()=>Array.from({length:cols},()=>[]));
+ if($('objectiveMode').value!=='keys'){if(levelSettings.algorithm==='prims')generatePrims();else generateBacktracker();}
+ px=0;py=0;exitX=cols-1;exitY=rows-1;visitedMap[0][0]=1;
+ // Validate reciprocal passages and overall connectivity after carving.
+ let mismatches=0;
+ for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
+  if(x+1<cols&&Boolean(grid[y][x]&E)!==Boolean(grid[y][x+1]&W))mismatches++;
+  if(y+1<rows&&Boolean(grid[y][x]&S)!==Boolean(grid[y+1][x]&N))mismatches++;
+ }
+ debugLog(($('objectiveMode').value==='keys'?'Preparing regions: ':'Maze carved: ')+cols+' × '+rows+' ('+$('algo').value+'), mismatched walls: '+mismatches);
+
+ levelObjective=$('objectiveMode').value;gems=[];keys=[];enemies=[];playerKeys=new Set();puzzleZones=null;puzzleTopology=null;puzzlePlan=null;$('puzzleReport').textContent='';
+ if(levelObjective==='keys'){
+  try{setupGates();}catch(error){
+   if(previousLevel.grid.length){
+    ({cols,rows,activeSeed,rng,generationCount,levelSettings,grid,visitedMap,revealedMap,slimeMap,gateMap,px,py,exitX,exitY,levelObjective,gems,keys,enemies,playerKeys,puzzleZones,puzzleTopology,puzzlePlan}=previousLevel);
+    discoveredWalls.clear();previousLevel.discovered.forEach(v=>discoveredWalls.add(v));currentlyLitWalls.clear();previousLevel.lit.forEach(v=>currentlyLitWalls.add(v));
+    $('seedInput').value=activeSeed;
+    const message=error.message+' Your previous maze is unchanged.';$('puzzleReport').textContent=message;debugLog(message);alert(message);return;
+   }
+   levelObjective='standard';keys=[];puzzleZones=null;puzzlePlan=null;puzzleTopology=null;
+   gateMap=Array.from({length:rows},()=>Array.from({length:cols},()=>[]));grid=Array.from({length:rows},()=>new Uint8Array(cols));
+   if(levelSettings.algorithm==='prims')generatePrims();else generateBacktracker();exitX=cols-1;exitY=rows-1;
+   const message=error.message+' Showing a STANDARD maze preview, not a teaser puzzle.';
+   $('puzzleReport').textContent=message;debugLog(message);alert(message);
+  }
+ }
+ if(levelObjective==='collector'){
+  const candidates=[];
+  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)
+   if((x!==0||y!==0)&&(x!==exitX||y!==exitY))candidates.push([x,y]);
+  const count=Math.min(candidates.length,readNumber('gemCount',candidates.length,1,candidates.length));
+  for(let i=0;i<count;i++){
+   const j=i+randomInt(candidates.length-i);
+   [candidates[i],candidates[j]]=[candidates[j],candidates[i]];
+   const [x,y]=candidates[i];gems.push({x,y,collected:false});
+  }
+  debugLog('Placed '+gems.length+' gems');
+ }
+ if(levelSettings.slime){const density=levelSettings.slimeDensity;
+  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)if((x||y)&&(x!==exitX||y!==exitY)&&rng()<density)slimeMap[y][x]=1;
+ }
+ if(levelSettings.enemies){const desired=levelSettings.enemyCount,candidates=[];
+  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)if((x+y)>3&&(x!==exitX||y!==exitY))candidates.push([x,y]);
+  for(let i=0;i<Math.min(desired,candidates.length);i++){
+   const k=randomInt(candidates.length),[x,y]=candidates[k];candidates[k]=candidates[candidates.length-1];candidates.pop();
+   enemies.push({x,y,health:1,alive:true});
+  }
+ }
+ isFinished=false;elapsedTime=0;lastMoveTime=0;moveDelay=120;lastEnemyTick=performance.now();
+ hintCache=null;hintKey='';visibilityDirty=true;pointers.clear();dragMode=null;stopHeldDirection();
+ startTime=performance.now();
+ clearInterval(timerInterval);timerInterval=setInterval(tick,100);
+ updateHUD();fitCamera();requestDraw();
+}
+function formatTime(seconds){
+ const total=Math.max(0,Math.floor(seconds));
+ const h=Math.floor(total/3600),m=Math.floor(total%3600/60),sec=total%60;
+ const tenths=Math.floor((seconds-Math.floor(seconds))*10);
+ return (h>0?`${h}:${String(m).padStart(2,'0')}:`:`${m}:`)+`${String(sec).padStart(2,'0')}.${tenths}`;
+}
+function updateHUD(){
+ $('objectiveDisplay').style.display=levelObjective==='collector'?'flex':'none';
+ if(levelObjective==='collector')$('objectiveDisplay').textContent=`Gems: ${gems.filter(g=>g.collected).length}/${gems.length}`;
+ $('keysDisplay').style.display=levelObjective==='keys'?'flex':'none';
+ if(levelObjective==='keys')$('keysDisplay').textContent=`Keys: ${keys.filter(k=>playerKeys.has(k.color)).length}/${keys.length}  ${keys.filter(k=>playerKeys.has(k.color)).map(k=>'●').join('')}${puzzleTopology?.wings?' · Wing switches: '+puzzlePlan.wingSwitches.filter(w=>playerKeys.has(w.token)).length+'/'+puzzlePlan.wingSwitches.length:''}`;
+ $('timerDisplay').textContent=`Time: ${formatTime(elapsedTime)}`;
+}
+function tick(){
+ if(isFinished||!grid.length)return;
+ const now=performance.now();elapsedTime=(now-startTime)/1000;
+ $('timerDisplay').textContent=`Time: ${formatTime(elapsedTime)}`;
+ if(now-lastEnemyTick>=500){updateEnemies((now-lastEnemyTick)/1000);lastEnemyTick=now;}
+ if(dragMode==='move'&&pointers.size===1)handleDragMove();
+ 
+ requestDraw();
+}
+function torchState(){return {fog:levelSettings.fog,type:levelSettings.type,reach:levelSettings.reach,ambient:levelSettings.ambient};}
+function playerScreen(){return {x:(px+.5)*CELL*scale+offsetX,y:(py+.5)*CELL*scale+offsetY};}
+function updateEnemies(dt){
+ if(!$('enableEnemies').checked)return;
+ const torch=torchState(),p=playerScreen();
+ for(const enemy of enemies){if(!enemy.alive)continue;
+  const dirs=DIRS.filter(([d])=>walkable(enemy.x,enemy.y,d));
+  if(dirs.length&&rng()<0.55){const [d,dx,dy]=dirs[randomInt(dirs.length)];enemy.x+=dx;enemy.y+=dy;}
+  if(enemy.x===px&&enemy.y===py){px=0;py=0;visitedMap[0][0]=1;hintCache=null;visibilityDirty=true;}
+  if(torch.fog){const dx=enemy.x-px,dy=enemy.y-py,dist=Math.hypot(dx,dy);
+   let lit=dist<=torch.reach;
+   if(lit&&torch.type==='cone')lit=Math.abs(normalizeAngle(Math.atan2(dy,dx)-aimAngle))<=Math.PI/6;
+   if(lit)lit=hasLineOfSight(px+.5,py+.5,enemy.x+.5,enemy.y+.5);
+   if(lit)enemy.health-=0.35*Math.min(dt,1);
+   if(enemy.health<=0)enemy.alive=false;
+  }
+ }
+}
+function normalizeAngle(a){return Math.atan2(Math.sin(a),Math.cos(a));}
+function requestDraw(){if(renderQueued)return;renderQueued=true;requestAnimationFrame(()=>{renderQueued=false;draw();});}
+
+function hasLineOfSight(ax,ay,bx,by){
+ const dx=bx-ax,dy=by-ay;
+ for(const [x1,y1,x2,y2] of blockingSegments()){
+  const sx=x2-x1,sy=y2-y1,den=dx*sy-dy*sx;
+  if(Math.abs(den)<1e-9)continue;
+  const rx=x1-ax,ry=y1-ay,t=(rx*sy-ry*sx)/den,u=(rx*dy-ry*dx)/den;
+  if(t>1e-7&&t<1-1e-7&&u>=0&&u<=1)return false;
+ }
+ return true;
+}
+function solidWallSegments(){
+ const result=[];
+ for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
+  const mask=grid[y][x];
+  if(!(mask&N))result.push([x,y,x+1,y]);
+  if(!(mask&W))result.push([x,y,x,y+1]);
+  if(x===cols-1&&!(mask&E))result.push([x+1,y,x+1,y+1]);
+  if(y===rows-1&&!(mask&S))result.push([x,y+1,x+1,y+1]);
+ }
+ return result;
+}
+  
+
+
+
+  
+function blockingSegments(){
+ return [...solidWallSegments(),...gateSegments().filter(g=>!g[4].every(c=>playerKeys.has(c)))];
+}
+function wallKey(ax,ay,bx,by){
+ return ax<bx||ax===bx&&ay<=by?`${ax},${ay},${bx},${by}`:`${bx},${by},${ax},${ay}`;
+}
+function drawRememberedGates(dpr){
+ ctx.save();ctx.setTransform(scale*dpr,0,0,scale*dpr,offsetX*dpr,offsetY*dpr);
+ ctx.lineCap='round';
+ for(const [ax,ay,bx,by,colors] of gateSegments()){
+  const id=wallKey(ax,ay,bx,by);
+  if(!discoveredWalls.has(id))continue;
+  const open=colors.every(c=>playerKeys.has(c));
+  ctx.globalAlpha=currentlyLitWalls.has(id)?1:.85;
+  ctx.lineWidth=levelSettings.lineWidth+2;
+  // Open gates retain coloured jambs, leaving an unmistakable gap.
+  colors.forEach((color,i)=>{
+   ctx.strokeStyle=GATE_COLORS[color]||'#fff';
+   const spans=open?[[0,.18],[.82,1]]:[[i/colors.length,(i+1)/colors.length]];
+   for(const [a,b] of spans){ctx.beginPath();ctx.moveTo((ax+(bx-ax)*a)*CELL,(ay+(by-ay)*a)*CELL);ctx.lineTo((ax+(bx-ax)*b)*CELL,(ay+(by-ay)*b)*CELL);ctx.stroke();}
+  });
+  if(open){ctx.fillStyle='#a7f3d0';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('✓',(ax+bx)/2*CELL,(ay+by)/2*CELL);}
+ }
+ ctx.restore();
+}
+function drawDiscoveredWalls(dpr,litOnly=false){
+ ctx.save();ctx.setTransform(scale*dpr,0,0,scale*dpr,offsetX*dpr,offsetY*dpr);
+ ctx.lineCap='round';ctx.lineJoin='round';
+ ctx.lineWidth=levelSettings.lineWidth;
+ const gateEdges=new Set(gateSegments().map(g=>wallKey(...g.slice(0,4))));
+ for(const key of discoveredWalls){
+  if(gateEdges.has(key))continue;
+  const lit=currentlyLitWalls.has(key);
+  if(litOnly&&!lit)continue;
+  const [x1,y1,x2,y2]=key.split(',').map(Number);
+  ctx.strokeStyle=$('colorWall').value;
+  ctx.globalAlpha=lit?1:Math.max(.12,Math.min(.55,levelSettings.ambient+.20));
+  ctx.beginPath();ctx.moveTo(x1*CELL,y1*CELL);ctx.lineTo(x2*CELL,y2*CELL);ctx.stroke();
+ }
+ ctx.restore();
+}
+function computeLightPolygon(torch){
+ const ox=px+.5,oy=py+.5,reach=Math.max(.1,torch.reach);
+ const segments=blockingSegments().filter(([x1,y1,x2,y2])=>Math.max(Math.abs((x1+x2)/2-ox),Math.abs((y1+y2)/2-oy))<reach+2);
+ currentlyLitWalls.clear();
+ const start=torch.type==='cone'?aimAngle-Math.PI/6:0;
+ const sweep=torch.type==='cone'?Math.PI/3:Math.PI*2;
+ const samples=Math.max(180,Math.ceil(reach*85));
+ const points=[];
+ for(let i=0;i<=samples;i++){
+  const angle=start+sweep*i/samples,dx=Math.cos(angle),dy=Math.sin(angle);
+  let best=reach,hit=null;
+  for(const [ax,ay,bx,by] of segments){
+   // Ray/segment intersection, including the nearest wall hit.
+   const sx=bx-ax,sy=by-ay,den=dx*sy-dy*sx;
+   if(Math.abs(den)<1e-9)continue;
+   const rx=ax-ox,ry=ay-oy;
+   const t=(rx*sy-ry*sx)/den,u=(rx*dy-ry*dx)/den;
+   if(t>=0&&t<best&&u>=-1e-8&&u<=1+1e-8){best=t;hit=wallKey(ax,ay,bx,by);}
+  }
+  if(hit){currentlyLitWalls.add(hit);discoveredWalls.add(hit);}
+  points.push([ox+dx*best,oy+dy*best]);
+ }
+ const poly=torch.type==='cone'?[[ox,oy],...points]:points;
+ // Wall discovery uses the same segments as rendering and collision.
+ // Sample both near-side positions to avoid vertical/horizontal orientation bias.
+ for(const [ax,ay,bx,by] of segments){
+  const nx=by-ay,ny=-(bx-ax);
+  for(const t of [.2,.5,.8]){
+   const mx=ax+(bx-ax)*t,my=ay+(by-ay)*t;
+   const side=Math.sign((ox-mx)*nx+(oy-my)*ny)||1;
+   const sx=mx+nx*side*.02,sy=my+ny*side*.02;
+   if(Math.hypot(sx-ox,sy-oy)>reach)continue;
+   if(torch.type==='cone'&&Math.abs(normalizeAngle(Math.atan2(sy-oy,sx-ox)-aimAngle))>Math.PI/6)continue;
+   if(hasLineOfSight(ox,oy,sx,sy)){
+    const key=wallKey(ax,ay,bx,by);currentlyLitWalls.add(key);discoveredWalls.add(key);break;
+   }
+  }
+ }
+ // Record explored tiles whenever any substantial part of the tile is illuminated.
+ for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
+  if(Math.hypot(x+.5-ox,y+.5-oy)>reach+1)continue;
+  // Reveal a floor tile when light reaches ANY part of its surface,
+  // not only when its centre (or the player) enters the tile.
+  const probes=[[.5,.5],[.08,.08],[.92,.08],[.08,.92],[.92,.92],
+                [.5,.08],[.5,.92],[.08,.5],[.92,.5]];
+  const touches=probes.some(([dx,dy])=>pointInPolygon(x+dx,y+dy,poly))
+    ||poly.some(([vx,vy])=>vx>=x&&vx<=x+1&&vy>=y&&vy<=y+1);
+  if(touches)revealedMap[y][x]=1;
+ }
+ revealedMap[py][px]=1;
+ visibilityPolygon=poly;
+ return poly;
+}
+function pointInPolygon(x,y,poly){
+ let inside=false;
+ for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+  const a=poly[i],b=poly[j];
+  if(((a[1]>y)!==(b[1]>y))&&(x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0]))inside=!inside;
+ }
+ return inside;
+}
+function drawLiveEntities(c){
+ if(puzzlePlan?.hub){const cell=puzzlePlan.hub.cell;c.save();c.font='bold 16px sans-serif';c.textAlign='center';c.fillStyle='#66fcf1';c.fillText('HUB',(cell%cols+.5)*CELL,(Math.floor(cell/cols)+.1)*CELL);c.restore();}
+
+ if(levelObjective==='keys'&&puzzlePlan){
+  c.save();c.font='bold 17px sans-serif';c.textAlign='center';c.textBaseline='middle';
+  for(const marker of [...puzzlePlan.returnLatches,...puzzlePlan.wingSwitches]){
+   c.fillStyle=playerKeys.has(marker.token)?'#45a29e':(GATE_COLORS[marker.token]||'#cbd5e1');
+   c.fillText(marker.label||'↩',(marker.x+.5)*CELL,(marker.y+.5)*CELL);
+  }c.restore();
+ }
+
+ c.fillStyle='rgba(34,197,94,.38)';
+ for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)if(slimeMap[y][x]){
+  c.beginPath();c.arc((x+.5)*CELL,(y+.5)*CELL,CELL*.34,0,Math.PI*2);c.fill();
+ }
+ for(const g of gems)if(!g.collected){
+  const x=(g.x+.5)*CELL,y=(g.y+.5)*CELL;c.fillStyle='#f59e0b';c.beginPath();
+  c.moveTo(x,y-CELL*.28);c.lineTo(x+CELL*.24,y);c.lineTo(x,y+CELL*.28);c.lineTo(x-CELL*.24,y);c.closePath();c.fill();
+ }
+ for(const k of keys)if(!k.collected){c.fillStyle=GATE_COLORS[k.color];c.beginPath();c.arc((k.x+.5)*CELL,(k.y+.5)*CELL,CELL*.22,0,Math.PI*2);c.fill();}
+ c.fillStyle='#ef4444';c.beginPath();c.arc((exitX+.5)*CELL,(exitY+.5)*CELL,CELL*.30,0,Math.PI*2);c.fill();
+ for(const enemy of enemies)if(enemy.alive){c.fillStyle=`rgba(239,68,68,${clamp(enemy.health,.2,1)})`;c.beginPath();c.arc((enemy.x+.5)*CELL,(enemy.y+.5)*CELL,CELL*.28,0,Math.PI*2);c.fill();}
+ c.fillStyle='#66fcf1';c.beginPath();c.arc((px+.5)*CELL,(py+.5)*CELL,CELL*.34,0,Math.PI*2);c.fill();
+}
+function drawPuzzlePlan(){
+ const palette=['#203d49','#3c294b','#294630','#4b3826','#253857','#4b2834'];
+ for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
+  ctx.fillStyle=palette[puzzleZones[y*cols+x]%palette.length];ctx.fillRect(x*CELL,y*CELL,CELL,CELL);
+ }
+ ctx.lineWidth=2;ctx.strokeStyle='#99abb4';ctx.beginPath();
+ for(const [ax,ay,bx,by] of solidWallSegments()){ctx.moveTo(ax*CELL,ay*CELL);ctx.lineTo(bx*CELL,by*CELL);}ctx.stroke();
+ const label=(text,x,y,color)=>{ctx.font='bold 16px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineWidth=4;ctx.strokeStyle='#0b0c10';ctx.strokeText(text,x,y);ctx.fillStyle=color;ctx.fillText(text,x,y);};
+ for(const g of puzzlePlan.gates){
+  const x=g.from%cols,y=Math.floor(g.from/cols),nx=g.to%cols,ny=Math.floor(g.to/cols);
+  label('G'+g.number,((x+nx)/2+.5)*CELL,((y+ny)/2+.5)*CELL,GATE_COLORS[g.color]);
+ }
+ keys.forEach((k,i)=>label('K'+(i+1),(k.x+.5)*CELL,(k.y+.5)*CELL,GATE_COLORS[k.color]));
+ if(puzzlePlan.hub)label('HUB',(puzzlePlan.hub.cell%cols+.5)*CELL,(Math.floor(puzzlePlan.hub.cell/cols)+.05)*CELL,'#66fcf1');
+ puzzlePlan.entries.forEach((cell,i)=>label('R'+i,(cell%cols+.5)*CELL,(Math.floor(cell/cols)+.5)*CELL,'#d1d5db'));
+ label('START',CELL*.5,CELL*.5,'#66fcf1');label('EXIT',(exitX+.5)*CELL,(exitY+.5)*CELL,'#fff');
+}
+function draw(){
+ const dpr=canvas.width/Math.max(1,window.innerWidth),W=canvas.width/dpr,H=canvas.height/dpr;
+ ctx.setTransform(dpr,0,0,dpr,0,0);ctx.globalCompositeOperation='source-over';
+ ctx.fillStyle=$('colorBg').value;ctx.fillRect(0,0,W,H);
+ if(!grid.length)return;
+ ctx.setTransform(scale*dpr,0,0,scale*dpr,offsetX*dpr,offsetY*dpr);
+ if($('showPuzzlePlan').checked&&puzzlePlan?.type==='organic-regions'){drawPuzzlePlan();return;}
+ const left=clamp(Math.floor(-offsetX/(scale*CELL))-1,0,cols-1);
+ const right=clamp(Math.ceil((W-offsetX)/(scale*CELL))+1,0,cols);
+ const top=clamp(Math.floor(-offsetY/(scale*CELL))-1,0,rows-1);
+ const bottom=clamp(Math.ceil((H-offsetY)/(scale*CELL))+1,0,rows);
+ // Every carved cell has a subtle floor surface, even before being visited.
+ // The fog mask determines which surfaces are currently visible or remembered.
+ for(let y=top;y<bottom;y++)for(let x=left;x<right;x++){
+  ctx.fillStyle=(x+y)%2===0?'#202b34':'#19232c';
+  ctx.fillRect(x*CELL+.6,y*CELL+.6,CELL-1.2,CELL-1.2);
+  ctx.strokeStyle='rgba(110,145,155,.20)';ctx.lineWidth=.6;
+  ctx.strokeRect(x*CELL+.6,y*CELL+.6,CELL-1.2,CELL-1.2);
+ }
+ ctx.fillStyle=$('colorFill').value+'55';
+ for(let y=top;y<bottom;y++)for(let x=left;x<right;x++)if(visitedMap[y][x])ctx.fillRect(x*CELL,y*CELL,CELL,CELL);
+ if($('showHint').checked){const key=`${px},${py}:${[...playerKeys].sort().join(',')}`;
+  if(key!==hintKey){hintCache=findPath(px,py,exitX,exitY);hintKey=key;}
+  if(hintCache.length){ctx.strokeStyle='#f59e0b';ctx.lineWidth=3;ctx.beginPath();hintCache.forEach(([x,y],i)=>i?ctx.lineTo((x+.5)*CELL,(y+.5)*CELL):ctx.moveTo((x+.5)*CELL,(y+.5)*CELL));ctx.stroke();}
+ }
+ const lineWidth=levelSettings.lineWidth,wall=$('colorWall').value;
+ ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=wall;ctx.lineWidth=lineWidth;ctx.beginPath();
+ for(const [ax,ay,bx,by] of solidWallSegments()){
+  ctx.moveTo(ax*CELL,ay*CELL);ctx.lineTo(bx*CELL,by*CELL);
+ }
+ ctx.stroke();
+  // Gate rendering block
+  for (const [ax, ay, bx, by, colors] of gateSegments()) {
+    if (colors.every(c => playerKeys.has(c))) continue;
+    
+    const missing=colors.filter(c=>!playerKeys.has(c));
+    ctx.lineWidth=lineWidth+2;
+    missing.forEach((color,i)=>{
+     const from=i/missing.length,to=(i+1)/missing.length;
+     ctx.strokeStyle=GATE_COLORS[color];ctx.beginPath();
+     ctx.moveTo((ax+(bx-ax)*from)*CELL,(ay+(by-ay)*from)*CELL);
+     ctx.lineTo((ax+(bx-ax)*to)*CELL,(ay+(by-ay)*to)*CELL);ctx.stroke();
+    });
+  }
+
+
+
+
+ const torch=torchState();
+ if(torch.fog){
+  // Visibility rays stop at the FIRST solid wall. Gate barriers also block light.
+  const polygon=computeLightPolygon(torch);
+  const lc=lightCtx;
+  lc.setTransform(1,0,0,1,0,0);
+  lc.globalCompositeOperation='source-over';
+  lc.clearRect(0,0,lightCanvas.width,lightCanvas.height);
+  // Entire unseen map is hidden, even when ambient lighting is enabled.
+  lc.fillStyle=$('colorBg').value;
+  lc.fillRect(0,0,lightCanvas.width,lightCanvas.height);
+  // Previously illuminated cells remain as a dark map, not a live view.
+  lc.save();
+  lc.setTransform(scale*dpr,0,0,scale*dpr,offsetX*dpr,offsetY*dpr);
+  lc.globalCompositeOperation='destination-out';
+  lc.fillStyle='rgba(0,0,0,1)';
+  for(let y=top;y<bottom;y++)for(let x=left;x<right;x++)if(revealedMap[y][x])
+    lc.fillRect(x*CELL,y*CELL,CELL,CELL);
+  lc.restore();
+  lc.globalCompositeOperation='source-over';
+  lc.fillStyle=`rgba(11,12,16,${1-Math.min(.8,torch.ambient)})`;
+  lc.save();lc.setTransform(scale*dpr,0,0,scale*dpr,offsetX*dpr,offsetY*dpr);
+  for(let y=top;y<bottom;y++)for(let x=left;x<right;x++)if(revealedMap[y][x])
+    lc.fillRect(x*CELL,y*CELL,CELL,CELL);
+  lc.restore();
+  // Remove the overlay only inside the wall-occluded light polygon.
+  lc.globalCompositeOperation='destination-out';
+  lc.fillStyle='#000';
+  lc.beginPath();
+  polygon.forEach(([x,y],i)=>i?lc.lineTo((x*CELL*scale+offsetX)*dpr,(y*CELL*scale+offsetY)*dpr):lc.moveTo((x*CELL*scale+offsetX)*dpr,(y*CELL*scale+offsetY)*dpr));
+  lc.closePath();lc.fill();
+  lc.globalCompositeOperation='source-over';
+  ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(lightCanvas,0,0);
+  // Wall strokes straddle their boundary. Draw discovered edges ABOVE the fog
+  // so the near face is visible even when the ray ends precisely at the wall.
+  drawDiscoveredWalls(dpr);
+  drawRememberedGates(dpr);
+  // Live entities are drawn ONLY inside the light. They cannot show through remembered areas.
+  ctx.save();ctx.setTransform(scale*dpr,0,0,scale*dpr,offsetX*dpr,offsetY*dpr);
+  ctx.beginPath();polygon.forEach(([x,y],i)=>i?ctx.lineTo(x*CELL,y*CELL):ctx.moveTo(x*CELL,y*CELL));ctx.closePath();ctx.clip();
+  drawLiveEntities(ctx);
+  ctx.restore();
+ } else {
+  // Without fog all entities are visible.
+  ctx.setTransform(scale*dpr,0,0,scale*dpr,offsetX*dpr,offsetY*dpr);
+  drawLiveEntities(ctx);
+ }
+
+}
+
+
+  
+function step(dx,dy){
+ if(isFinished||!grid.length||Math.abs(dx)+Math.abs(dy)!==1)return false;
+ const dir=dx===1?E:dx===-1?W:dy===1?S:N;
+ if(!walkable(px,py,dir))return false;
+ px+=dx;py+=dy;visitedMap[py][px]=1;hintKey='';visibilityDirty=true;
+ for(const g of gems)if(!g.collected&&g.x===px&&g.y===py)g.collected=true;
+ for(const latch of [...(puzzlePlan?.returnLatches||[]),...(puzzlePlan?.wingSwitches||[])])if(latch.x===px&&latch.y===py)playerKeys.add(latch.token);
+ for(const k of keys)if(!k.collected&&k.x===px&&k.y===py){k.collected=true;playerKeys.add(k.color);}
+ moveDelay=slimeMap[py][px]?240:120;updateHUD();
+ const done=levelObjective==='standard'||(levelObjective==='collector'&&gems.every(g=>g.collected))||(levelObjective==='keys'&&keys.every(k=>k.collected));
+ if(px===exitX&&py===exitY&&done){
+  isFinished=true;clearInterval(timerInterval);
+  $('modal-stats').textContent=`Cleared in ${formatTime(elapsedTime)} · Seed: ${activeSeed}`;$('modal-overlay').style.display='flex';
+ }
+ requestDraw();return true;
+}
+function move(dx,dy){aimInDirection([dx,dy]);step(dx,dy);}
+function aimInDirection(direction){
+ if(!direction)return;
+ const angle=Math.atan2(direction[1],direction[0]);
+ if(aimAngle!==angle){aimAngle=angle;visibilityDirty=true;requestDraw();}
+}
+// Shared movement rate for held arrows and joystick. Slime slows movement.
+function inputStepInterval(rate=Number($('touchSensitivity').value)){return Math.max(moveDelay,1000/rate);}
+function repeatDirection(direction,rate){
+ if(!direction||isFinished)return;
+ aimInDirection(direction);
+ const now=performance.now();
+ if(now-lastMoveTime<inputStepInterval(rate))return;
+ step(direction[0],direction[1]);lastMoveTime=now;
+}
+// Swipe consumes actual finger travel, rather than distance from the initial touch.
+// Each segment locks to one axis until its movement budget is consumed.
+// A wall consumes the attempted step so it cannot burst through later.
+let swipeAnchor=null,swipeRemainder=0,swipeLockedDirection=null,swipeStarted=false;
+function resetSwipe(){
+ swipeAnchor=null;swipeRemainder=0;swipeLockedDirection=null;swipeStarted=false;
+}
+function updateSwipeMovement(x,y){
+ if(!touchOrigin||isFinished)return;
+ if(!swipeAnchor)swipeAnchor={...touchOrigin};
+ const dx=x-swipeAnchor.x,dy=y-swipeAnchor.y;
+ const threshold=Number($('touchThreshold').value);
+ if(!swipeStarted){
+  if(Math.hypot(x-touchOrigin.x,y-touchOrigin.y)<threshold)return;
+  swipeStarted=true;
+  // The initial threshold is a deadzone, not movement credit.
+  const total=Math.hypot(x-touchOrigin.x,y-touchOrigin.y);
+  const fraction=total?threshold/total:0;
+  swipeAnchor={x:touchOrigin.x+(x-touchOrigin.x)*fraction,
+               y:touchOrigin.y+(y-touchOrigin.y)*fraction};
+ }
+ const vx=x-swipeAnchor.x,vy=y-swipeAnchor.y;
+ let direction=directionFromDelta(vx,vy,0.01);
+ if(!direction)return;
+ // Dominant-axis locking is applied for each completed grid step.
+ // When disabled, direction can be reassessed on every pointer event.
+ if($('touchAxisLock').checked&&swipeLockedDirection)direction=swipeLockedDirection;
+ else if($('touchAxisLock').checked)swipeLockedDirection=direction;
+ aimInDirection(direction);
+ const axis=direction[0]?'x':'y';
+ const distance=Math.abs(axis==='x'?x-swipeAnchor.x:y-swipeAnchor.y);
+ const pixelsPerCell=Number($('touchDistance').value);
+ const steps=Math.min(50,Math.floor(distance/pixelsPerCell));
+ for(let i=0;i<steps;i++){
+  // Consume distance even when blocked, to prevent deferred jumps.
+  step(direction[0],direction[1]);
+  swipeAnchor.x+=direction[0]*pixelsPerCell;
+  swipeAnchor.y+=direction[1]*pixelsPerCell;
+ }
+ if(steps){
+  swipeLockedDirection=null;
+  // Avoid cross-axis drift accumulating after a completed segment.
+  if(axis==='x')swipeAnchor.y=y;
+  else swipeAnchor.x=x;
+ }
+}
+function directionFromDelta(dx,dy,deadzone=12){
+ if(Math.hypot(dx,dy)<deadzone)return null;
+ return Math.abs(dx)>=Math.abs(dy)?[Math.sign(dx),0]:[0,Math.sign(dy)];
+}
+function sameDirection(a,b){return !!a&&!!b&&a[0]===b[0]&&a[1]===b[1];}
+function startHeldDirection(direction,pointerId){
+ stopHeldDirection();
+ heldPointer=pointerId;heldDirection=direction;lastMoveTime=-Infinity;aimInDirection(direction);
+ repeatDirection(direction);
+ heldInterval=setInterval(()=>repeatDirection(heldDirection),35);
+}
+function stopHeldDirection(){
+ if(heldInterval!==null)clearInterval(heldInterval);
+ heldInterval=null;heldDirection=null;heldPointer=null;
+}
+let dragTarget=null,dragTargetInput=null;
+function aimFromPointer(x,y){
+ if(dragMode==='move'&&(!dragTargetInput||Math.hypot(x-dragTargetInput.x,y-dragTargetInput.y)>=2)){
+  dragTargetInput={x,y};
+  dragTarget={x:clamp(Math.floor((x-offsetX)/(CELL*scale)),0,cols-1),y:clamp(Math.floor((y-offsetY)/(CELL*scale)),0,rows-1)};
+ }
+ mousePos={x,y};const p=playerScreen();
+ if(Math.hypot(y-p.y,x-p.x)<1)return;
+ const angle=Math.atan2(y-p.y,x-p.x);
+ if(aimAngle!==angle){aimAngle=angle;visibilityDirty=true;requestDraw();}
+}
+function handleDragMove(){
+ if(dragMode!=='move'||!pointers.size||isFinished)return;
+ const now=performance.now();if(now-lastMoveTime<inputStepInterval())return;
+ if(!dragTarget)return;
+ const dx=dragTarget.x-px,dy=dragTarget.y-py;
+ if(dx===0&&dy===0)return;
+ const choices=Math.abs(dx)>=Math.abs(dy)?[[Math.sign(dx),0],[0,Math.sign(dy)]]:[[0,Math.sign(dy)],[Math.sign(dx),0]];
+ for(const [sx,sy] of choices)if(sx||sy)if(step(sx,sy))break;
+ lastMoveTime=now;
+}
+function zoomAt(factor,x,y){
+ const old=scale;scale=clamp(scale*factor,.08,10);
+ offsetX=x-(x-offsetX)*scale/old;offsetY=y-(y-offsetY)*scale/old;requestDraw();
+}
+canvas.addEventListener('pointerdown',e=>{
+ if(e.button===2){dragMode='pan';lastPointer={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);return;}
+ if(e.pointerType==='mouse'&&e.button!==0)return;
+ dragTarget=null;dragTargetInput=null;
+ pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});canvas.setPointerCapture(e.pointerId);
+ if(pointers.size>=2){relativeDirection=null;touchOrigin=null;resetSwipe();resetNewTouchModes();dragMode='pinch';const [a,b]=[...pointers.values()];pinchDistance=Math.hypot(a.x-b.x,a.y-b.y);pinchMid={x:(a.x+b.x)/2,y:(a.y+b.y)/2};}
+ else {
+  const touchMode=e.pointerType!=='mouse'&&$('clickToMove').checked?$('touchMoveStyle').value:null;
+  const relative=touchMode==='relative'||touchMode==='continuous'||touchMode==='velocity';
+  dragMode=relative?touchMode:$('clickToMove').checked?'move':'pan';
+  lastPointer={x:e.clientX,y:e.clientY};
+  touchOrigin=relative?{x:e.clientX,y:e.clientY}:null;relativeDirection=null;resetSwipe();resetNewTouchModes();
+  if(dragMode==='continuous')continuousPrevious={x:e.clientX,y:e.clientY};
+  if(dragMode==='velocity'){velocityPrevious={x:e.clientX,y:e.clientY,time:performance.now()};velocityLastFrame=performance.now();velocityFrame=requestAnimationFrame(velocityTick);}
+  // The initial touch aims the torch, but does not move the player in swipe mode.
+  aimFromPointer(e.clientX,e.clientY);
+  if(!relative&&dragMode==='move')handleDragMove();
+ }
+});
+canvas.addEventListener('pointermove',e=>{
+ if(pointers.has(e.pointerId))pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(dragMode==='pinch'&&pointers.size>=2){const [a,b]=[...pointers.values()];const dist=Math.hypot(a.x-b.x,a.y-b.y),mid={x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+  if(pinchDistance>0)zoomAt(dist/pinchDistance,pinchMid.x,pinchMid.y);
+  offsetX+=mid.x-pinchMid.x;offsetY+=mid.y-pinchMid.y;pinchDistance=dist;pinchMid=mid;requestDraw();return;
+ }
+ if(dragMode==='pan'&&lastPointer){offsetX+=e.clientX-lastPointer.x;offsetY+=e.clientY-lastPointer.y;lastPointer={x:e.clientX,y:e.clientY};requestDraw();return;}
+ if(pointers.has(e.pointerId)&&touchOrigin){
+  if(dragMode==='relative'){updateSwipeMovement(e.clientX,e.clientY);return;}
+  if(dragMode==='continuous'){continuousDrag(e.clientX,e.clientY);return;}
+  if(dragMode==='velocity'){velocityDrag(e.clientX,e.clientY,performance.now());return;}
+ }
+ aimFromPointer(e.clientX,e.clientY);if(dragMode==='move'&&pointers.has(e.pointerId))handleDragMove();requestDraw();
+});
+function endPointer(e){pointers.delete(e.pointerId);if(!pointers.size){dragMode=null;lastPointer=null;touchOrigin=null;relativeDirection=null;resetSwipe();resetNewTouchModes();}else if(pointers.size===1){dragMode='pan';lastPointer=[...pointers.values()][0];}requestDraw();}
+canvas.addEventListener('pointerup',endPointer);canvas.addEventListener('pointercancel',endPointer);
+canvas.addEventListener('contextmenu',e=>e.preventDefault());
+canvas.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.deltaY>0?.9:1.1,e.clientX,e.clientY);},{passive:false});
+document.addEventListener('keydown',e=>{
+ if(e.target.closest('input,select,textarea,button'))return;
+ const actions={ArrowUp:[0,-1],w:[0,-1],ArrowDown:[0,1],s:[0,1],ArrowLeft:[-1,0],a:[-1,0],ArrowRight:[1,0],d:[1,0]};
+ const choice=actions[e.key]||actions[e.key.toLowerCase()];if(choice){e.preventDefault();move(...choice);}
+});
+for(const [id,dx,dy] of [['btn-up',0,-1],['btn-down',0,1],['btn-left',-1,0],['btn-right',1,0]]){
+ const btn=$(id);
+ btn.addEventListener('pointerdown',e=>{e.preventDefault();btn.setPointerCapture(e.pointerId);startHeldDirection([dx,dy],e.pointerId);});
+ for(const type of ['pointerup','pointercancel','lostpointercapture'])btn.addEventListener(type,e=>{if(heldPointer===e.pointerId)stopHeldDirection();});
+}
+const joystick=$('joystick'),joystickKnob=$('joystickKnob');
+let joystickPointer=null,joystickStrength=1;
+function updateJoystick(e){
+ const rect=joystick.getBoundingClientRect();
+ const dx=e.clientX-(rect.left+rect.width/2),dy=e.clientY-(rect.top+rect.height/2);
+ const radius=rect.width*.28,length=Math.hypot(dx,dy),ratio=length?Math.min(1,radius/length):0;
+ joystickKnob.style.transform=`translate(${dx*ratio}px,${dy*ratio}px)`;
+ joystickStrength=Math.min(1,Math.max(.15,length/(rect.width*.45)));
+ const next=directionFromDelta(dx,dy,rect.width*.14);
+ if(!sameDirection(next,heldDirection)){
+  heldDirection=next;lastMoveTime=-Infinity;if(next)aimInDirection(next);
+ }
+ if(next)repeatDirection(next,Math.max(1,Number($('touchSensitivity').value)*joystickStrength));
+}
+joystick.addEventListener('pointerdown',e=>{
+ e.preventDefault();joystickPointer=e.pointerId;joystick.setPointerCapture(e.pointerId);
+ stopHeldDirection();heldPointer=e.pointerId;heldInterval=setInterval(()=>repeatDirection(heldDirection,Math.max(1,Number($('touchSensitivity').value)*joystickStrength)),35);updateJoystick(e);
+});
+joystick.addEventListener('pointermove',e=>{if(e.pointerId===joystickPointer)updateJoystick(e);});
+for(const type of ['pointerup','pointercancel','lostpointercapture'])joystick.addEventListener(type,e=>{
+ if(e.pointerId!==joystickPointer)return;
+ joystickPointer=null;joystickStrength=1;joystickKnob.style.transform='translate(0,0)';stopHeldDirection();
+});
+$('objectiveMode').addEventListener('change',updateObjectiveControls);
+for(const id of ['w','h'])$(id).addEventListener('input',updateObjectiveControls);
+$('gemCount').addEventListener('input',()=>{
+ $('gemCount').dataset.followMax=Number($('gemCount').value)===Number($('gemCount').max)?'true':'false';
+ updateObjectiveControls();
+});
+$('gateCount').addEventListener('input',updateObjectiveControls);
+updateObjectiveControls();
+$('btnGenerate').onclick=()=>generateMaze();
+$('btnFit').onclick=fitCamera;
+$('btnExportPNG').onclick=()=>{
+ requestDraw();const link=document.createElement('a');link.download=`Mazy_${activeSeed}.png`;link.href=canvas.toDataURL('image/png');link.click();
+};
+$('btnExportJSON').onclick=()=>{
+ const data={format:'Mazy-level',version:APP_VERSION,seed:activeSeed,cols,rows,algorithm:levelSettings.algorithm,objective:levelObjective,
+  settings:{...levelSettings,topology:puzzleTopology,plan:puzzlePlan},zones:puzzleZones?Array.from(puzzleZones):null,
+  grid:grid.map(r=>Array.from(r)),slimeMap:slimeMap.map(r=>Array.from(r)),gems,keys,gateMap,completionTime:elapsedTime,player:profileName};
+ const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
+ const a=document.createElement('a');a.href=url;a.download=`Mazy_Level_${activeSeed}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+function saveVictoryProfile(){
+ profileName=$('usernameInput').value.trim()||'Explorer_1';
+ try{localStorage.setItem(`Mazy_Score_${activeSeed}`,JSON.stringify({user:profileName,time:elapsedTime,objective:levelObjective}));}
+ catch(e){console.warn('Local score could not be saved:',e);}
+}
+$('btnSaveProfile').onclick=()=>{saveVictoryProfile();$('modal-overlay').style.display='none';};
+$('btnRetryMaze').onclick=()=>{saveVictoryProfile();$('modal-overlay').style.display='none';generateMaze(activeSeed);};
+$('btnNewMazeAfterWin').onclick=()=>{saveVictoryProfile();$('modal-overlay').style.display='none';generateMaze('');};
+$('toggle-btn').onclick=()=>{
+ $('controls').classList.toggle('collapsed');
+ $('toggle-btn').textContent=$('controls').classList.contains('collapsed')?'▸ Controls':'▾ Controls';
+};
+for(const id of ['clickToMove','showHint','colorBg','colorWall','colorFill'])$(id).addEventListener('input',()=>{hintKey='';requestDraw();});
+$('showPuzzlePlan').addEventListener('change',requestDraw);
+for(const [id,seed] of [['exampleA','spruce-31'],['exampleB','river-31'],['exampleC','orbit-8']])$(id).onclick=()=>{
+ $('objectiveMode').value='keys';$('algo').value='backtracker';$('w').value=31;$('h').value=31;$('gateCount').value=3;$('topoCrossOver').value='on';$('topoHub').value='off';$('showPuzzlePlan').checked=true;
+ generateMaze(seed);
+};
+for(const [id,teasers] of [['hubAlone','off'],['hubTeasers','on']])$(id).onclick=()=>{
+ $('objectiveMode').value='keys';$('algo').value='backtracker';$('w').value=31;$('h').value=31;$('gateCount').value=3;$('topoCrossOver').value=teasers;$('topoHub').value='on';$('showPuzzlePlan').checked=true;generateMaze('nexus-32');
+};
+window.addEventListener('resize',resize);
+resize();generateMaze();
+
+</script>
+</body>
+</html>
