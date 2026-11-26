@@ -9,6 +9,11 @@
   canvas, #dpad, .dbtn {touch-action:none;}
   #controls {touch-action:pan-y;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
   #controls * {touch-action:auto;}
+  .random-panel {border:1px solid #45a29e;border-radius:8px;padding:10px;margin:12px 0;background:#111a22;}
+  .random-panel summary {cursor:pointer;color:#66fcf1;font-weight:700;}
+  .random-grid {display:grid;grid-template-columns:1fr;gap:5px;margin:10px 0;}
+  .random-grid label {margin:0;text-transform:none;font-size:12px;display:flex;align-items:center;gap:8px;}
+  .random-note {font-size:11px;color:#a8c9cc;line-height:1.5;white-space:pre-line;overflow-wrap:anywhere;}
   input[type="range"] {touch-action:pan-x;}
   html, body { margin:0; height:100%; background:#0b0c10; color:#c5c6c7; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow:hidden; }
 
@@ -88,6 +93,11 @@
   #btn-down { grid-column: 2; grid-row: 3; }
   #btn-right { grid-column: 3; grid-row: 2; }
 
+  #navigationActions {position:fixed;bottom:165px;right:16px;z-index:16;display:flex;gap:5px;background:rgba(31,40,51,.85);padding:5px;border:1px solid #45a29e;border-radius:9px;}
+  #navigationActions button {width:38px;height:38px;background:#1f2833;color:#66fcf1;border:1px solid #45a29e;border-radius:7px;font-size:21px;cursor:pointer;touch-action:manipulation;}
+  #navigationActions button:disabled {opacity:.3;cursor:default;}
+  #navigationActions button.active {background:#405a55;color:#fff;}
+  @media(max-width:600px){#navigationActions{bottom:154px;right:8px}#navigationActions button{width:34px;height:34px}}
   /* Modal Dialog for Victory / Export */
   #modal-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100;
@@ -102,6 +112,62 @@
 
   canvas { display: block; width: 100vw; height: 100vh; cursor: crosshair; touch-action:none; }
   .dbtn { touch-action:none; display:flex;align-items:center;justify-content:center;color:#66fcf1;font-size:22px;user-select:none; }
+
+/* v0.43: independent, non-truncating status groups and collapsible menu */
+.menu-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:10px 0;position:sticky;top:-16px;z-index:2;background:#1f2833;padding:9px 0}
+.menu-nav button,.menu-actions button{background:#263744;color:#bdf9ef;border:1px solid #476c71;border-radius:6px;padding:8px 2px;font-size:11px;cursor:pointer}
+.menu-actions{display:flex;gap:6px}.menu-actions button{flex:1}
+.menu-section{border:1px solid #405b67;border-radius:9px;margin:10px 0;padding:0 10px 10px;background:#18232e}
+.menu-section>summary{list-style:none;cursor:pointer;padding:12px 3px;color:#66fcf1;font-weight:700;font-size:13px;display:flex;justify-content:space-between;gap:8px}
+.menu-section>summary::-webkit-details-marker{display:none}
+.section-help{border:1px solid #39515d;border-radius:6px;padding:6px 8px;margin-bottom:8px;color:#a8c9cc;font-size:11px}.section-help>summary{cursor:pointer}.section-help p{line-height:1.5;margin:6px 0}.menu-section>summary:before{content:'▸';margin-right:6px}.menu-section[open]>summary:before{content:'▾'}
+.menu-status{font-size:10px;color:#a8c9cc;font-weight:400;margin-left:auto}
+.setup-summary{font-size:11px;line-height:1.5;color:#c4d5d9;border:1px solid #3b5662;border-radius:7px;padding:8px;margin:10px 0;overflow-wrap:anywhere}
+#hud{position:fixed;top:12px;right:10px;z-index:10;display:flex;flex-direction:column;align-items:flex-end;gap:6px;background:transparent;border:0;box-shadow:none;padding:0;max-width:min(290px,calc(100vw - 20px));font-size:12px}
+#hud .hud-group{background:rgba(23,36,48,.93);border:1px solid #45a29e;border-radius:8px;min-width:110px;max-width:100%;padding:6px 9px;backdrop-filter:blur(6px);box-shadow:0 3px 12px #0007}
+#hud summary{cursor:pointer;list-style:none;white-space:normal;overflow-wrap:anywhere;font-size:12px}
+#hud summary::-webkit-details-marker{display:none}
+#hud .hud-content{padding-top:6px;line-height:1.6;white-space:normal;overflow-wrap:anywhere}
+#hud .hud-content:empty{display:none}
+#hud .hud-group:not([open]){min-width:0}
+@media(max-width:600px){#hud{top:52px;right:7px;max-width:min(200px,55vw)}#hud .hud-group{padding:5px 7px}#hud summary{font-size:11px}}
+#debugPanel{position:static!important;max-width:100%!important;margin:10px 0}
+
+.preset-panel,.size-shortcuts{border:1px solid #385764;border-radius:9px;padding:10px;margin:8px 0 12px;background:#182731}
+.preset-heading{display:flex;justify-content:space-between;gap:8px;font-weight:700;font-size:13px;margin-bottom:8px}
+#presetState{font-size:11px;color:#8fe5df;font-weight:400}
+.preset-buttons,#sizePresets{display:flex;flex-wrap:wrap;gap:6px}
+.preset-buttons button,#sizePresets button,.preset-reset{cursor:pointer;background:#263f4b;color:#e8f6f5;border:1px solid #4b7780;border-radius:6px;padding:7px 9px;font-size:12px}
+.preset-buttons button.active,#sizePresets button.active{background:#1c766e;border-color:#9cf9e8;color:white}
+.preset-reset{margin-top:8px}
+.size-shortcuts strong{display:block;margin-bottom:7px;font-size:12px}
+.generation-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px}.generation-actions button{min-width:0;white-space:normal;font-size:12px;padding:10px 4px}
+.random-lock-actions{display:flex;gap:7px;margin:7px 0}.random-lock-actions button{flex:1;background:#263f4b;color:#e8f6f5;border:1px solid #4b7780;border-radius:6px;padding:8px}
+#randomLockGrid label{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap}#randomLockGrid label>span:first-child{flex:1;min-width:100px}#randomLockGrid input{width:18px;height:18px}.lock-label{font-size:11px;color:#8ff0dd}.lock-label.is-locked{color:#f2c58a}
+#configurationSeed{width:100%;box-sizing:border-box}
+
+.random-global{border:1px solid #385764;border-radius:9px;padding:9px;margin:8px 0;background:#182731;font-size:12px}
+.random-global .random-lock-actions{flex-wrap:wrap}.random-global .random-lock-actions button{min-width:95px}
+.group-random-tools{display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:7px 0 8px;border-bottom:1px solid #385764;margin-bottom:8px}
+.group-random-tools button,.option-lock{background:#263f4b;color:#e8f6f5;border:1px solid #4b7780;border-radius:6px;cursor:pointer;font-size:11px;padding:6px 8px}
+.group-random-tools .group-status{font-size:11px;color:#f2c58a;margin-right:auto}
+.option-lock{margin-left:7px;min-width:35px;min-height:32px;flex-shrink:0}
+.option-lock[aria-pressed="true"]{color:#ffd18b;border-color:#a87a42;background:#47382b}
+.setting-lock-row{display:flex!important;align-items:center;gap:6px;justify-content:space-between}
+.setting-lock-row>.setting-body{flex:1;min-width:0}
+.setting-lock-row>.setting-body>input:not([type="checkbox"]),.setting-lock-row>.setting-body>select{max-width:100%}
+.random-changed{outline:2px solid #66fcf1!important;outline-offset:2px;border-radius:5px;transition:outline-color .8s}
+#presetChoiceDialog{background:#182731;color:#e8f6f5;border:1px solid #66fcf1;border-radius:12px;max-width:min(440px,90vw);padding:20px}#presetChoiceDialog::backdrop{background:#000b}.preset-choice-buttons{display:flex;gap:8px;flex-wrap:wrap}.preset-choice-buttons button{padding:10px;border-radius:6px;background:#263f4b;color:#fff;border:1px solid #4b7780}
+
+.tierbar{display:flex;gap:4px;margin:12px 0}.tierbar button{flex:1;padding:9px 3px;background:#20333e;color:#c5e5e4;border:1px solid #456;border-radius:6px}.tierbar button.active{background:#45a29e;color:#07131b;font-weight:bold}.themegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0 16px}.themegrid button{padding:5px;background:#20333e;color:#fff;border:1px solid #456;border-radius:6px}.themegrid button.active{border:2px solid #66fcf1}.themegrid svg{display:block;width:100%;height:42px}#controls[data-tier="simple"] > :is(.preset-panel,.random-global,.generation-actions,.menu-nav,.menu-actions,.setup-summary,.locked-title,.menu-section,#btnExportJSON,#btnExportPNG){display:none!important}#controls:not([data-tier="simple"]) #simpleMenu{display:none}#controls[data-tier="advanced"] :is(.random-global,#section-advanced,#velocitySettings,[data-jump="advanced"],.option-lock){display:none!important}#controls[data-tier="advanced"] #section-topology > label:not(#friendlyTopology){display:none}#controls:not([data-tier="advanced"]) #friendlyTopology{display:none}
+
+#controls[data-tier="advanced"] :is(.preset-panel,#btnRandomMaze,#showPuzzlePlan){display:none!important}
+
+#controls .choice-buttons{display:flex;flex-wrap:wrap;gap:5px;margin:5px 0 10px} .choice-buttons button,.subtabs button{flex:1 1 auto;background:#20333e;color:#d4e9e8;border:1px solid #456;border-radius:6px;padding:9px 6px;min-height:38px} .choice-buttons button.active,.subtabs button.active{background:#45a29e;color:#07131b;font-weight:bold} #controls select.choice-source{display:none!important} .subtabs{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0} #controls .menu-section[hidden],#controls .simple-pane[hidden]{display:none!important} #controls .menu-section>summary,#controls .menu-nav,#controls .menu-actions,#controls .setup-summary,#controls>.locked-title,#controls>.preset-panel,#controls>.generation-actions{display:none!important} #controls[data-tier=advanced] .random-global{display:none!important} #controls .section-help{display:none} #controls .info-button{display:inline-flex;border:1px solid #567;border-radius:50%;background:transparent;color:#66fcf1;width:25px;height:25px;align-items:center;justify-content:center;margin:3px 5px} #infoToast{position:fixed;z-index:10000;left:12px;top:12px;max-width:min(310px,85vw);padding:14px;background:#17272d;color:#e4f4f3;border:2px solid transparent;border-radius:9px;box-shadow:0 4px 18px #0008;cursor:pointer} #topStart{width:100%;margin:0 0 8px;position:sticky;top:0;z-index:25;box-shadow:0 4px 10px #0008} #simpleStart{display:none} #controls #debugPanel{position:static!important;max-width:none!important} #controls[data-tier=development] #section-advanced{display:block} #controls[data-tier=development] #section-advanced[hidden]{display:none!important}
+
+#controls[data-tier=advanced] .option-lock,#controls[data-tier=advanced] .group-status,#controls[data-tier=advanced] [data-action=lock],#controls[data-tier=advanced] [data-action=unlock],#controls:not([data-tier=development]) .dev-only{display:none!important}
+#controls .toggle-source{display:none!important} .toggle-choice{min-width:54px;min-height:34px;border:1px solid #456;border-radius:6px;background:#20333e;color:#d4e9e8;cursor:pointer} .toggle-choice.active{background:#45a29e;color:#07131b;font-weight:bold} #cameraTools{position:fixed;bottom:16px;left:12px;z-index:16;display:flex;gap:6px} #cameraTools button,#btnExportPNG{width:40px;height:40px;padding:0;margin:0;border:1px solid #45a29e;border-radius:6px;background:#1f2833;color:#66fcf1;font-size:22px} #btnExportPNG{width:32px;height:32px;font-size:16px;vertical-align:middle;margin-right:8px} #modal-card{max-height:90vh;overflow:auto;max-width:90vw} #modal-card [hidden]{display:none!important} #controls[data-tier=advanced] .setting-lock-row .setting-body{width:100%} .generator-caption{font-weight:normal;text-transform:none} 
+#hudTime{order:-1;color:#66fcf1;cursor:pointer;min-width:0!important;font:inherit}#hudTime[data-mode=paused],#hudTime[data-mode=waiting]{color:#e4b45f}#hudTime [hidden]{display:none!important}#hud{top:10px!important;right:10px!important}#controls[data-tier=advanced] input[type=checkbox]{display:none!important}
 </style>
 </head>
 <body>
@@ -110,113 +176,137 @@
   <div style="font-size: 18px; font-weight: bold; color: #66fcf1; text-align: center; margin-bottom: 4px;"><span id="appVersionHeading">MAZY</span></div>
   <div style="font-size: 11px; text-align: center; color: #c5c6c7; margin-bottom: 12px;">Vector Maze Adventure</div>
 
-  <!-- LOCKED BLUEPRINT SETTINGS -->
-  <button class="btn btn-primary" id="btnGenerate">⚡ Generate New Level</button>
+<div id="menuTier" class="tierbar"><button data-tier="simple">Simple</button><button data-tier="advanced">Advanced</button><button data-tier="development">Development</button></div>
+<div id="simpleMenu"><h3>Explore a maze</h3><label>Challenge<select id="simpleDifficulty"><option value="braided">Easy</option><option value="mixed">Medium</option><option value="balanced" selected>Hard</option><option value="expert">Expert</option></select></label><label>Maze size<select id="simpleSize"><option value="15">Small · 15 × 15</option><option value="31" selected>Medium · 31 × 31</option><option value="61">Large · 61 × 61</option><option value="121">Huge · 121 × 121</option></select></label><strong>Visual theme</strong><div id="themeCards" class="themegrid"></div><button class="btn btn-primary" id="simpleStart">Start maze</button></div>
+  <div class="preset-panel"><div class="preset-heading">Quick start presets <span id="presetState">Custom</span></div>
+    <div class="preset-buttons" id="presetButtons">
+      <button type="button" data-preset="basic">Basic</button><button type="button" data-preset="gate">Gate Puzzle</button><button type="button" data-preset="explorer">Explorer</button><button type="button" data-preset="treasure">Treasure Hunt</button><button type="button" data-preset="challenge">Challenge</button>
+    </div><button type="button" id="resetPreset" class="preset-reset" hidden>Reset to preset</button>
+  </div>
+  <dialog id="presetChoiceDialog" aria-labelledby="presetChoiceTitle"><h3 id="presetChoiceTitle">Apply <span id="presetChoiceName"></span> preset?</h3><p>Choose how existing randomisation locks are handled. Lock states themselves are preserved.</p><div class="preset-choice-buttons"><button type="button" data-preset-choice="respect">Respect locks</button><button type="button" data-preset-choice="override">Override locked values</button><button type="button" data-preset-choice="cancel">Cancel</button></div></dialog>
+  <div class="random-global"><strong>Randomisation locks</strong><div class="random-lock-actions"><button type="button" id="globalUnlock">🔓 Unlock all</button><button type="button" id="globalLock">🔒 Lock all</button><button type="button" id="globalShuffle">🎲 Shuffle unlocked</button></div><div id="randomFeedback" class="random-note" aria-live="polite">Unlocked options can be shuffled; locked options stay unchanged.</div></div>
+  <!-- Generation configuration -->
+  <div class="generation-actions"><button class="btn btn-primary" id="btnGenerate">Start maze</button><button class="btn btn-secondary" id="btnRandomMaze">🎲 Random Maze</button></div>
+  <nav class="menu-nav" aria-label="Settings sections">
+    <button type="button" data-jump="maze">Maze</button><button type="button" data-jump="objectives">Objectives</button><button type="button" data-jump="topology">Topology</button><button type="button" data-jump="lighting">Exploration</button><button type="button" data-jump="movement">Movement</button><button type="button" data-jump="appearance">Colours</button><button type="button" data-jump="advanced">Advanced</button>
+  </nav>
+  <div class="menu-actions"><button type="button" id="expandSections">Expand all</button><button type="button" id="collapseSections">Collapse all</button></div>
+  <div id="setupSummary" class="setup-summary" aria-live="polite"></div>
   <div class="section-title locked-title">
     <span>Blueprint Settings</span>
     <span class="badge">Locked in Play</span>
   </div>
 
+  <details class="menu-section" id="section-maze" open><summary>Maze & Generation<span class="menu-status">Next maze</span></summary><details class="section-help"><summary>ⓘ About this section</summary><p>Grid dimensions, generation algorithm and seed apply to the next maze.</p></details>
+  <div class="size-shortcuts"><strong>Maze size</strong><div id="sizePresets"><button type="button" data-size="15">Small</button><button type="button" data-size="31">Medium</button><button type="button" data-size="51">Large</button><button type="button" data-size="81">Extra Large</button><button type="button" data-size="121">Enormous</button></div></div>
   <label>Columns (Grid Width)
-    <input type="number" id="w" value="31" min="3" max="250">
+    <input type="number" id="w" value="31" min="3" max="121">
   </label>
 
   <label>Rows (Grid Height)
-    <input type="number" id="h" value="31" min="3" max="250">
+    <input type="number" id="h" value="31" min="3" max="121">
   </label>
 
-  <label>Maze Generation Algorithm
+  <label>Generator
     <select id="algo">
-      <option value="backtracker" selected>Recursive Backtracker (Long Paths)</option>
-      <option value="prims">Prim's Algorithm (Short Branches)</option>
+      <option value="backtracker">Recursive</option>
+      <option value="prims">Prim’s</option><option value="mixed">Mixed Growing Tree</option><option value="balanced" selected>Balanced Branches</option><option value="braided">Braided Junctions</option><option value="expert">Expert</option>
     </select>
   </label>
 
   <label>Seed (Optional for Replays)
-    <input type="text" id="seedInput" placeholder="Auto-generated if blank">
+    <input type="text" id="seedInput" value="" placeholder="Auto-generated if blank">
   </label>
   <label class="checkbox-group"><input type="checkbox" id="keepSeed"><span>Keep seed for next generation</span></label>
 
+  </details>
+  <details class="menu-section" id="section-objectives"><summary>Objectives & Gates<span class="menu-status">Next maze</span></summary><details class="section-help"><summary>ⓘ About this section</summary><p>Choose Standard or Keys & Gates. Gems are an optional extra completion requirement in either mode.</p></details>
   <label>Objective Mode
     <select id="objectiveMode">
-      <option value="standard">Standard (Start to Exit)</option>
-      <option value="collector">Gem Collector (Collect All Gems)</option>
-      <option value="keys" selected>Keys & Color Gates (Unlock Barriers)</option>
+      <option value="standard" selected>Standard (Start to Exit)</option>
+      <option value="keys">Keys & Color Gates (Unlock Barriers)</option>
     </select>
   </label>
 
+  <label class="checkbox-group"><input type="checkbox" id="requireGems"><span>Require gem collection to finish</span></label>
   <div id="gemOptions" class="objective-extra" hidden>
     <label>Gems to collect: <span id="gemCountLabel"></span>
-      <input type="range" id="gemCount" min="1" max="100" value="100" step="1">
+      <input type="range" id="gemCount" min="1" max="31" value="1" step="1">
     </label>
   </div>
   <div id="gateOptions" class="objective-extra" hidden>
 
-<!-- ADVANCED PUZZLE TOPOLOGY CONTROLS -->
+    <label>Gate and key pairs: <span id="gateCountLabel"></span>
+      <input type="range" id="gateCount" min="1" max="12" value="1" step="1">
+    </label>
+  </div>
+  <label class="checkbox-group"><input type="checkbox" id="universalEnabled"><span>Add universal keys and doors (independent of coloured gates)</span></label>
+  <label>Universal keys <input type="number" id="universalCount" min="1" max="30" value="1"></label>
+  <label>Universal locked doors <input type="number" id="universalDoorCount" min="1" max="30" value="1"></label>
+  <small>Each universal key unlocks one chosen universal door permanently. No solvability guarantee for these choices.</small>
+  </details>
+  <details class="menu-section" id="section-topology"><summary>Topology<span class="menu-status">Next maze</span></summary><details class="section-help"><summary>ⓘ About this section</summary><p>Teasers, hubs, wings and cycles change puzzle structure. Some combinations need larger grids.</p></details>
+<label id="friendlyTopology">Puzzle structure<select id="topologyChoice"><option value="classic">Classic</option><option value="hub">Hub</option><option value="branches">Branches</option><option value="shortcuts">Shortcuts</option><option value="mixed">Mixed</option><option value="custom">Custom (Development)</option></select></label>
 <div class="section-title locked-title"><span>Puzzle Topologies</span><span class="badge">Modular</span></div>
-<label>Metroidvania Cross-Overs (Teaser Gates)
+<label>Teaser gates
   <select id="topoCrossOver">
     <option value="off">Off</option>
-    <option value="on" selected>Forced On</option>
+    <option value="on">Forced On</option>
     <option value="random">Random (Seed-driven)</option>
   </select>
 </label>
 
-<label>Central Hub & Spokes Nexus
+<label>Hub
   <select id="topoHub">
-    <option value="off" selected>Off</option>
+    <option value="off">Off</option>
     <option value="on">Forced On</option>
     <option value="random">Random (Seed-driven)</option>
   </select>
 </label>
 
-<label>Parallel Wing Bifurcation
-  <select id="topoWings" disabled title="Paused while the new region planner is tested">
-    <option value="off" selected>Off</option>
+<label>Branches
+  <select id="topoWings">
+    <option value="off">Off</option>
     <option value="on">Forced On</option>
     <option value="random">Random (Seed-driven)</option>
   </select>
 </label>
 
-<label>Cyclic Shortcut Loops
-  <select id="topoCycles" disabled title="Paused while the new region planner is tested">
-    <option value="off" selected>Off</option>
+<label>Shortcuts
+  <select id="topoCycles">
+    <option value="off">Off</option>
     <option value="on">Forced On</option>
     <option value="random">Random (Seed-driven)</option>
   </select>
 </label>
     
-    <p style="font-size:12px;line-height:1.4;color:#a8c9cc">Region planner: Teaser Gates and Hub & Spokes. Wings and Cycles remain paused. Hub creates a shared central nexus with separate gated spokes (at least 2 pairs; start with 3). Requests that cannot fit distinct spokes are rejected, keeping your current maze. Minimum 9 × 9, with at least 55 cells per region. Keys remain ordered; later gates can be found in earlier regions.</p>
-    <label class="checkbox-group"><input type="checkbox" id="showPuzzlePlan"><span>Reveal puzzle plan (spoilers)</span></label>
-    <div style="display:flex;gap:4px;margin-bottom:8px"><button type="button" id="exampleA">Example A</button><button type="button" id="exampleB">Example B</button><button type="button" id="exampleC">Example C</button></div>
-    <p style="font-size:11px;color:#a8c9cc">Examples use 31 × 31, 3 pairs, Backtracker, Teasers On and Hub Off. Plan labels: K = key, G = gate, R = region.</p>
-    <div style="display:flex;gap:4px;margin-bottom:8px"><button type="button" id="hubAlone">Hub only</button><button type="button" id="hubTeasers">Hub + Teasers</button></div>
-    <div id="puzzleReport" style="font-size:12px;line-height:1.5;white-space:pre-line;color:#a8c9cc" aria-live="polite"></div>
-    <label>Gate and key pairs: <span id="gateCountLabel"></span>
-      <input type="range" id="gateCount" min="1" max="12" value="3" step="1">
-    </label>
-  </div>
-  <div class="checkbox-group">
-    <input type="checkbox" id="enableSlime">
-    <span>Enable Slime Hazards</span>
-  </div>
-  <label>Slime Density
-    <input type="range" id="slimeDensity" min="0.05" max="0.35" step="0.05" value="0.15">
-  </label>
 
-  <div class="checkbox-group">
-    <input type="checkbox" id="enableEnemies">
-    <span>Enable Shadow Enemies</span>
-  </div>
-  <label>Enemy Count
-    <input type="range" id="enemyCount" min="1" max="15" step="1" value="4">
-  </label>
+  </details>
 
-  <div class="section-title locked-title"><span>Next Level Lighting & Walls</span><span class="badge">Next Generate</span></div>
-  <div class="checkbox-group">
-    <input type="checkbox" id="enableFog">
-    <span>Torch / Fog of War</span>
-  </div>
+<details class="menu-section" id="section-lighting"><summary>Exploration & markers <span class="menu-status">Live</span></summary>
+<label class="checkbox-group"><input type="checkbox" id="enableCrumbs"> Breadcrumbs</label><label class="checkbox-group"><input type="checkbox" id="enableNavMarker"> Navigation marker</label><label class="checkbox-group"><input type="checkbox" id="enableFog"> Fog of explore</label>
+<label>Fog of explore style <select id="fogStyle"><option value="background">Match background</option><option value="outline">Separate colour</option></select></label><label>Fog colour <input type="color" id="fogColor" value="#303944"></label>
+<small>Discovery follows straight passages up to five cells. Tap the breadcrumb button to place or collect a marker; hold for automation.</small><label>Wall Line Thickness <input type="range" id="lineWidth" min="1" max="12" value="4"></label><div hidden><label>Explorer torch <select id="explorerTorch"><option value="on" selected>On</option><option value="off">Off</option><option value="random">Random (seed-driven)</option></select></label>
+  <label>Permanent torch points <select id="fixedTorches"><option value="off">Off</option><option value="on" selected>On</option><option value="random">Random (seed-driven)</option></select></label>
+  <label>Permanent points (% of grid): <output id="fixedPctLabel">1%</output><input type="range" id="fixedPct" min="0.1" max="20" step="0.1" value="1"></label>
+  <label class="checkbox-group"><input type="checkbox" id="requireFixed"><span>Require all permanent points activated to finish</span></label>
+  <label>Portable torches <select id="portableTorches"><option value="off">Off</option><option value="on" selected>On</option><option value="random">Random (seed-driven)</option></select></label>
+  <label>Portable supply (% of grid): <output id="portablePctLabel">0.5%</output><input type="range" id="portablePct" min="0.1" max="15" step="0.1" value="0.5"></label>
+  <label>Visibility memory <select id="lightMemory"><option value="temporary" selected>Hide outside current light</option><option value="remembered">Keep illuminated areas revealed</option></select></label>
+  <label>Movement glow (recent steps): <output id="glowStepsLabel">3</output><input type="range" id="glowSteps" min="1" max="8" step="1" value="3"></label>
+  <small>Lighting modes work independently when Fog of explore is enabled. Permanent points activate when stepped on; portable lights are placed or picked up at your position. The explorer always retains a short movement glow.</small>
+  <div class="section-title">Lighting effort (next maze)</div>
+  <label>Lighting detail <select id="lightingEffort"><option value="performance" selected>Performance (recommended)</option><option value="balanced" selected>Balanced</option><option value="detail">High detail</option><option value="original">Original engine (comparison)</option><option value="custom">Custom (advanced)</option></select></label>
+  <small>Performance uses the cached adjustable raycast engine with the lowest ray/probe budget. Grid visibility remains available under Advanced lighting controls for comparison; distance dimming and corner spill apply to grid visibility only. Changes apply when generating the next maze.</small>
+  <label class="checkbox-group"><input type="checkbox" id="cornerSpill"><span>Allow dim light to spill around corners</span></label>
+  <label>Corner spill strength <select id="cornerSpillStrength"><option value="0.15">Subtle</option><option value="0.3" selected>Normal</option><option value="0.45">Strong</option></select></label>
+  <details id="advancedLighting"><summary>Advanced lighting controls</summary>
+  <label>Lighting engine <select id="lightingEngine"><option value="grid">Grid visibility</option><option value="baseline">Original raycast</option><option value="tuned" selected>Adjustable raycast</option></select></label>
+  <label>Ray density: <output id="rayDensityLabel">12</output> rays / reach unit<input type="range" id="rayDensity" min="12" max="120" step="1" value="12"></label>
+  <label>Minimum rays: <output id="minRaysLabel">48</output><input type="range" id="minRays" min="24" max="360" step="12" value="48"></label>
+  <label>Cell visibility probes <select id="lightProbes"><option value="1" selected>1 (centre, fastest)</option><option value="5">5 (corners and centre)</option><option value="9">9 (original)</option></select></label>
+  <small>Editing these advanced settings selects Custom. The original engine ignores custom ray/probe settings.</small>
+  </details>
   <label>Torch Type
     <select id="torchType">
       <option value="cone" selected>Directional Beam (Points to Cursor)</option>
@@ -229,9 +319,8 @@
   <label>Ambient Light (Fog Darkness)
     <input type="range" id="torchAmbient" min="0" max="0.8" step="0.05" value="0.05">
   </label>
-  <label>Wall Line Thickness
-    <input type="range" id="lineWidth" min="1" max="12" step="1" value="4">
-  </label>
+  </div></details>
+  <details class="menu-section" id="section-movement"><summary>Movement & Navigation<span class="menu-status">Live</span></summary><details class="section-help"><summary>ⓘ About this section</summary><p>These settings apply live. Trails and automatic return help with navigation.</p></details>
   <div class="section-title"><span>Live Gameplay Settings</span><span class="badge">Live Edit</span></div>
   <div class="checkbox-group">
     <input type="checkbox" id="clickToMove" checked>
@@ -279,11 +368,19 @@
     <input type="range" id="touchSensitivity" min="1" max="12" step="1" value="12">
   </label>
   <small>Continuous drag: every distance increment moves one square and turns can happen without lifting. Drag speed: movement continues while held at the latest drag speed; use its tuning sliders to control the response and limits. Original swipe preserves v0.18 behaviour. Arrows: tap for one step or hold to repeat. Joystick: farther tilt repeats faster. Torch follows input even against walls.</small>
+  <div class="section-title"><span>Navigation Trails</span><span class="badge">Live Edit</span></div>
+  <label class="checkbox-group"><input type="checkbox" id="showStartTrail"><span>Highlight trail back to start</span></label>
+  <label>Start trail colour<input type="color" id="colorStartTrail" value="#facc15"></label>
+  <label class="checkbox-group"><input type="checkbox" id="showMarkerTrail"><span>Highlight drop-marker trail</span></label>
+  <label>Marker trail colour<input type="color" id="colorMarkerTrail" value="#fb7185"></label>
+  <small>Tap your character's square to place or remove the drop marker. You can also use the marker button in the navigation toolbar. Trails show routes, not extra revealed squares.</small>
   <div class="checkbox-group">
     <input type="checkbox" id="showHint">
     <span>Show BFS Solution Hint</span>
   </div>
 
+  </details>
+  <details class="menu-section" id="section-appearance"><summary>Appearance<span class="menu-status">Live</span></summary><details class="section-help"><summary>ⓘ About this section</summary><p>Colours and line thickness are adjustable without rebuilding the maze.</p></details>
   <label>Background Color
     <input type="color" id="colorBg" value="#0b0c10">
   </label>
@@ -294,20 +391,44 @@
     <input type="color" id="colorFill" value="#45a29e">
   </label>
 
+  <div class="section-title">Wing Circuit Colours</div>
+  <small>Circuits use the matching gate colour, a numbered diamond and two switch dots. Activated switches and opened gates have separate colours.</small>
+  <label>Inactive switch / circuit accent<input type="color" id="colorWingInactive" value="#a855f7"></label>
+  <label>Activated switch<input type="color" id="colorWingActive" value="#22c55e"></label>
+  <label>Opened circuit gate<input type="color" id="colorWingOpen" value="#38bdf8"></label>
+  </details>
+  <details class="menu-section" id="section-advanced"><summary>Advanced & Diagnostics<span class="menu-status">Spoilers</span></summary>
+    <p style="font-size:12px;line-height:1.4;color:#a8c9cc">Region planner: Teasers, Hub & Spokes, parallel wing objectives and cyclic shortcuts. Hub creates a shared central nexus with separate gated spokes (at least 2 pairs; start with 3). Requests that cannot fit distinct spokes are rejected, keeping your current maze. Minimum 9 × 9, with at least 55 cells per region. Keys remain ordered; later gates can be found in earlier regions.</p>
+    <label class="checkbox-group"><input type="checkbox" id="showPuzzlePlan"><span>Reveal puzzle plan (spoilers)</span></label>
+    <div style="display:flex;gap:4px;margin-bottom:8px"><button type="button" id="exampleA">Example A</button><button type="button" id="exampleB">Example B</button><button type="button" id="exampleC">Example C</button></div>
+    <p style="font-size:11px;color:#a8c9cc">Examples use 31 × 31, 3 pairs, Backtracker, Teasers On and Hub Off. Plan labels: K = key, G = gate, R = region.</p>
+    <div style="display:flex;gap:4px;margin-bottom:8px"><button type="button" id="hubAlone">Hub only</button><button type="button" id="hubTeasers">Hub + Teasers</button></div>
+    <div id="puzzleReport" style="font-size:12px;line-height:1.5;white-space:pre-line;color:#a8c9cc" aria-live="polite"></div>
+<details id="debugPanel" style="position:fixed;bottom:8px;left:8px;z-index:30;background:#151b24;color:#b9f5ed;border:1px solid #45a29e;border-radius:6px;padding:7px;max-width:min(420px,85vw);font:12px monospace"><summary style="cursor:pointer">Diagnostics</summary><div id="debugStatus">Waiting for startup…</div><button id="debugCopy" style="margin-top:6px">Copy diagnostics</button><div id="performanceTests" style="margin-top:9px;border-top:1px solid #456;padding-top:8px"><strong>Performance capture (pan / zoom / movement)</strong><div><label><input type="checkbox" id="perfEnabled"> Record frame samples</label> <label>Threshold <input id="perfThreshold" type="number" min="16" max="2000" value="50" style="width:65px"> ms</label></div><div id="perfStatus">Profiler off</div><button type="button" id="perfExport">Export full JSON</button> <button type="button" id="perfCompact">Export analysis JSON</button> <button type="button" id="perfClear">Clear</button></div><div id="generationTests" style="margin-top:9px;border-top:1px solid #456;padding-top:8px"><strong>Generation checks</strong><div style="margin:5px 0"><button id="testCurrentMaze" type="button">Validate current maze</button> <button id="testBatchMazes" type="button">Test 25 seeds</button> <button id="testExport" type="button">Export results</button></div><div id="testStatus" aria-live="polite">No tests run</div></div><pre id="debugLog" style="max-height:150px;overflow:auto;white-space:pre-wrap"></pre></details>
+  </details>
   <button class="btn btn-secondary" id="btnFit">⊞ Fit Maze to Screen</button>
+  <button class="btn btn-secondary" id="btnCentre">◎ Centre on Explorer</button>
+  <button class="btn btn-secondary" id="btnFullscreen">⛶ Fullscreen</button>
   <button class="btn btn-secondary" id="btnExportJSON">💾 Export Level Package (.json)</button>
   <button class="btn btn-secondary" id="btnExportPNG">📷 Save Canvas Screenshot</button>
 </div>
 
-<button id="toggle-btn">▾ Controls</button>
+<button id="toggle-btn">☰</button>
 
-<!-- HUD Bar -->
-<div id="hud">
-  <div class="hud-item" id="timerDisplay">Time: 0.0s</div>
-  <div class="hud-item" id="objectiveDisplay">Gems: 0/0</div>
-  <div class="hud-item" id="keysDisplay" style="display:none;">Keys: </div>
+<!-- Independent expandable HUD groups -->
+<div id="hud" aria-label="Game status">
+  <details class="hud-group" id="hudObjectives" open><summary>🎯 Objectives <span id="hudObjectiveShort"></span></summary><div class="hud-content"><div id="objectiveDisplay"></div><div id="keysDisplay"></div><div id="wingDisplay"></div></div></details>
+  <details class="hud-group" id="hudLights"><summary>• Markers <span id="hudLightShort"></span></summary><div class="hud-content" id="lightDisplay"></div></details>
+  <button type="button" class="hud-group" id="hudTime" aria-label="Timer">⏱ <span id="timerDisplay">Time: 0.0s</span></button>
 </div>
-
+<!-- Navigation actions (work with keyboard, mouse and touch) -->
+<div id="navigationActions" aria-label="Navigation actions">
+ <button id="btnPortableTorch" title="Place or update breadcrumb" aria-label="Place breadcrumb">•</button>
+ <button id="btnDropMarker" title="Place or remove marker at your position" aria-label="Toggle drop marker">⚑</button>
+ <button id="btnUndoMove" title="Rewind one movement step" aria-label="Undo one movement">↶</button>
+ <button id="btnReturnStart" title="Automatically walk back to start" aria-label="Return to start">⌂</button>
+ <button id="btnReturnMarker" title="Automatically walk back to marker" aria-label="Return to marker">↩</button>
+</div>
 <!-- Touch D-Pad -->
 <div id="dpad">
   <div class="dbtn" id="btn-up" aria-label="Up">▲</div>
@@ -331,7 +452,7 @@
   </div>
 </div>
 
-<details id="debugPanel" style="position:fixed;bottom:8px;left:8px;z-index:30;background:#151b24;color:#b9f5ed;border:1px solid #45a29e;border-radius:6px;padding:7px;max-width:min(420px,85vw);font:12px monospace"><summary style="cursor:pointer">Diagnostics</summary><div id="debugStatus">Waiting for startup…</div><button id="debugCopy" style="margin-top:6px">Copy diagnostics</button><pre id="debugLog" style="max-height:150px;overflow:auto;white-space:pre-wrap"></pre></details>
+
 <canvas id="canvas"></canvas>
 
 <script>
@@ -339,7 +460,7 @@
 // VERSION AND FILE NAMING RULE:
 // Update APP_VERSION here only. Release the HTML as MazyV#.##.html
 // (for example, MazyV0.16.html). Do not hard-code versions elsewhere.
-const APP_VERSION='0.33';
+const APP_VERSION='0.76';
 document.title=`Mazy v${APP_VERSION} - Offline Vector Maze Adventure`;
 document.getElementById('appVersionHeading').textContent=`MAZY v${APP_VERSION}`;
 const $ = id => document.getElementById(id);
@@ -375,13 +496,21 @@ const N=1,E=2,S=4,W=8, DIRS=[[N,0,-1],[E,1,0],[S,0,1],[W,-1,0]];
 const OPPOSITE={[N]:S,[E]:W,[S]:N,[W]:E};
 const GATE_COLORS={red:'#ef4444',blue:'#3b82f6',green:'#10b981',yellow:'#f59e0b'};
 const CELL=36;
-let grid=[],cols=21,rows=21,visitedMap=[],slimeMap=[],gateMap=[];
-let gems=[],keys=[],enemies=[],playerKeys=new Set();
+let grid=[],cols=21,rows=21,visitedMap=[],gateMap=[];
+let gems=[],keys=[],playerKeys=new Set();
+let universalKeys=[],universalDoors=[],universalHeld=0;
 let px=0,py=0,exitX=0,exitY=0,scale=1,offsetX=0,offsetY=0;
 let activeSeed='',rng=Math.random,levelObjective='standard';
-let levelSettings={fog:true,type:'cone',reach:5.5,ambient:.05,lineWidth:4,algorithm:'backtracker',slime:false,slimeDensity:.15,enemies:true,enemyCount:4};
+let levelSettings={fog:true,type:'cone',reach:5.5,ambient:.05,lineWidth:4,algorithm:'backtracker'};
 let generationCount=0;
-let isFinished=false,elapsedTime=0,startTime=0,timerInterval=null,lastEnemyTick=0;
+// Navigation history changes position only. Picked-up items, opened gates and
+// visited/revealed cells remain persistent when walking backward.
+let movementHistory=[{x:0,y:0}],dropMarker=null,autoNavigation=null;
+let rememberedKeys=new Set(),rememberedExit=false,rememberedWingSwitches=new Set();
+let fixedLightPoints=[],portableLights=[],portableSupply=0,lightSteps=[{x:0,y:0}],activeLightPolygons=[];
+
+let clockMode="waiting",clockUnscored=false;
+let winningConfig=null;let isFinished=false,elapsedTime=0,startTime=0,timerInterval=null;
 let moveDelay=120,lastMoveTime=0,mousePos={x:0,y:0},aimAngle=-Math.PI/2;
 let pointers=new Map(),dragMode=null,lastPointer=null,pinchDistance=0,pinchMid=null;
 let touchOrigin=null,relativeDirection=null,heldDirection=null,heldPointer=null,heldInterval=null;
@@ -535,6 +664,7 @@ function initSeed(value){
  for(let i=0;i<activeSeed.length;i++)a=Math.imul(a^activeSeed.charCodeAt(i),16777619);
  rng=()=>{a+=0x6D2B79F5;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};
 }
+function centreExplorer(){offsetX=window.innerWidth/2-(px+.5)*CELL*scale;offsetY=window.innerHeight/2-(py+.5)*CELL*scale;requestDraw();}
 function fitCamera(){
  scale=clamp(Math.min((window.innerWidth-36)/(cols*CELL),(window.innerHeight-36)/(rows*CELL)),0.08,6);
  offsetX=(window.innerWidth-cols*CELL*scale)/2;offsetY=(window.innerHeight-rows*CELL*scale)/2;
@@ -569,10 +699,13 @@ function generatePrims(){
 }
 
 
+function growthIndex(n){const a=levelSettings.algorithm;if(a==='backtracker')return n-1;if(a==='prims')return randomInt(n);if(a==='mixed')return rng()<.7?n-1:randomInt(n);if(a==='expert')return rng()<.65?Math.max(0,n-1-randomInt(Math.min(n,24))):n-1;return rng()<.45?n-1:Math.max(0,n-1-randomInt(Math.min(n,12)));}
+function generateSelected(){const a=levelSettings.algorithm;if(a==='prims')return generatePrims();if(a==='backtracker')return generateBacktracker();const seen=new Uint8Array(cols*rows),front=[0];seen[0]=1;while(front.length){const i=growthIndex(front.length),v=front[i],x=v%cols,y=Math.floor(v/cols),opts=DIRS.filter(([d,dx,dy])=>isValid(x+dx,y+dy)&&!seen[(y+dy)*cols+x+dx]);if(!opts.length){front.splice(i,1);continue;}const [d,dx,dy]=opts[randomInt(opts.length)],nx=x+dx,ny=y+dy;grid[y][x]|=d;grid[ny][nx]|=OPPOSITE[d];seen[ny*cols+nx]=1;front.push(ny*cols+nx);}if(a==='braided'){for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){const degree=DIRS.filter(([d])=>grid[y][x]&d).length;if(degree!==1||rng()>.35)continue;const opts=DIRS.filter(([d,dx,dy])=>isValid(x+dx,y+dy)&&!(grid[y][x]&d));if(opts.length){const [d,dx,dy]=opts[randomInt(opts.length)];grid[y][x]|=d;grid[y+dy][x+dx]|=OPPOSITE[d];}}}}
 function walkable(x, y, d, withGates = true) {
   const edge=DIRS.find(v=>v[0]===d);
   if (!edge || !isValid(x,y) || !isValid(x+edge[1],y+edge[2]) || !(grid[y][x]&d) || !(grid[y+edge[2]][x+edge[1]]&OPPOSITE[d])) return false;
   if (withGates && gateMap[y][x].some(g => g.dir === d && !g.colors.every(c => playerKeys.has(c)))) return false;
+ if(withGates&&universalDoors.some(g=>!g.open&&((g.x===x&&g.y===y&&g.dir===d)||(g.x===x+edge[1]&&g.y===y+edge[2]&&g.dir===OPPOSITE[d]))))return false;
   return true;
 }
 
@@ -637,8 +770,9 @@ function regionDistances(start,region,geometry=false){
  return {dist,previous,queue};
 }
 function setupGates(){
+ const wings=resolveTopologySetting('topoWings'),cycles=resolveTopologySetting('topoCycles');
  const crossOver=resolveTopologySetting('topoCrossOver'),hub=resolveTopologySetting('topoHub'),count=readNumber('gateCount',3,1,12),total=count+1,size=cols*rows;
- puzzleTopology={crossOver,hub,wings:false,cycles:false};
+ puzzleTopology={crossOver,hub,wings,cycles,cycleDensity:35,wingMode:'random-per-junction',cycleMode:'mixed'};
  if(hub&&count<2)throw new Error('Hub & Spokes needs at least two gate pairs.');
  const xy=cell=>[cell%cols,Math.floor(cell/cols)];
  const connect=(a,b)=>{const [x,y]=xy(a),[nx,ny]=xy(b);carvePassage(x,y,nx>x?E:nx<x?W:ny>y?S:N);};
@@ -696,19 +830,26 @@ function setupGates(){
    if(!boundaries.has(tag))boundaries.set(tag,[]);boundaries.get(tag).push([a,b]);
   }
   if(hub&&adj[0].size!==count)continue;
-  // Expansion order is random, but teaser mode guarantees a future gate whose
-  // accessible side belongs to an EARLIER region than its key's region.
+  // Distinct topology contracts:
+  // baseline: strict region chain; teasers: an early-parent shortcut;
+  // hub: all gates lead from R0 into physically separate spokes.
   const order=[0],parents=[-1],remaining=new Set(seeds.map((_,i)=>i).slice(1));
+  let orderFailure=false;
   while(remaining.size){
    const choices=[];
    for(let parent=0;parent<order.length;parent++)for(const child of adj[order[parent]])if(remaining.has(child))choices.push({parent,child});
    let pool=choices;
    if(hub)pool=choices.filter(v=>v.parent===0);
-   if(!hub&&crossOver&&order.length>1){const early=choices.filter(v=>v.parent<order.length-1);if(early.length&&rng()<.6)pool=early;}
-   else if(!hub&&!crossOver){const onward=choices.filter(v=>v.parent===order.length-1);if(onward.length)pool=onward;}
+   else if(!crossOver)pool=choices.filter(v=>v.parent===order.length-1);
+   else if(order.length>1){
+    const early=choices.filter(v=>v.parent<order.length-1);
+    if(early.length&&rng()<.7)pool=early;
+   }
+   if(!pool.length){orderFailure=true;break;}
    const next=pool[randomInt(pool.length)];order.push(next.child);parents.push(next.parent);remaining.delete(next.child);
   }
-  if(crossOver&&count>1&&!parents.some((p,i)=>i>1&&p<i-1))continue;
+  if(orderFailure)continue;
+  if(!hub&&crossOver&&count>1&&!parents.some((p,i)=>i>1&&p<i-1))continue;
   const sequence=new Int16Array(total);order.forEach((r,i)=>sequence[r]=i);
   puzzleZones=Int16Array.from(raw,r=>sequence[r]);
   grid=Array.from({length:rows},()=>new Uint8Array(cols));gateMap=Array.from({length:rows},()=>Array.from({length:cols},()=>[]));
@@ -742,7 +883,7 @@ function setupGates(){
    for(let cell=0;cell<size;cell++)if(puzzleZones[cell]===region&&seen[cell])front.push(cell);
    for(let i=front.length-1;i>0;i--){const j=randomInt(i+1);[front[i],front[j]]=[front[j],front[i]];}
    while(front.length){
-    const index=levelSettings.algorithm==='prims'?randomInt(front.length):front.length-1,cell=front[index],[x,y]=xy(cell),options=[];
+    const index=growthIndex(front.length),cell=front[index],[x,y]=xy(cell),options=[];
     for(const [,dx,dy] of DIRS){const nx=x+dx,ny=y+dy,next=ny*cols+nx;if(isValid(nx,ny)&&puzzleZones[next]===region&&!seen[next])options.push(next);}
     if(!options.length){front[index]=front.at(-1);front.pop();continue;}
     const next=options[randomInt(options.length)];connect(cell,next);seen[next]=1;front.push(next);
@@ -759,13 +900,29 @@ function setupGates(){
   for(let region=0;region<count;region++){
    const {dist,queue}=regionDistances(entries[region],region),minimum=Math.max(4,Math.min(9,Math.floor(Math.sqrt(areas[order[region]])/2)));
    const maxDistance=queue.reduce((m,cell)=>Math.max(m,dist[cell]),0);
-   let pool=queue.filter(cell=>cell!==0&&(crossOver?branchDepth[cell]>=minimum:hub?(region===0?cell===hubCell:dist[cell]>=Math.max(8,Math.floor(maxDistance*.65))):dist[cell]>=1&&dist[cell]<=3));
+   let pool=queue.filter(cell=>cell!==0&&(crossOver?branchDepth[cell]>=minimum:hub?(region===0?cell===hubCell:dist[cell]>=Math.max(8,Math.floor(maxDistance*.65))):dist[cell]>=Math.max(1,Math.ceil(maxDistance*.15))&&dist[cell]<=maxDistance));
    if(!pool.length){failed=true;break;}
    if(crossOver){pool.sort((a,b)=>branchDepth[b]-branchDepth[a]);pool=pool.slice(0,Math.max(1,Math.ceil(pool.length*.2)));}
    const cell=pool[randomInt(pool.length)],[x,y]=xy(cell);keys.push({x,y,color:'pair'+region,collected:false});
    metrics.push({key:region+1,region,entryDistance:dist[cell],detourDepth:branchDepth[cell],gateRegion:parents[region+1],firstGateStage:parents[region+1]});
   }
   if(failed)continue;
+  // Hub + Teasers must create an actual early encounter, not merely the
+  // same star-shaped region graph with different key coordinates.
+  // Before K1, the player can reach a later locked spoke gate from R0;
+  // K1 is deliberately deeper than that gate's approach, so the player
+  // must return toward the nexus to unlock the newly available spoke.
+  let teaserEncounter=null;
+  if(hub&&crossOver&&count>1){
+   const approach=regionDistances(hubCell,0).dist;
+   const firstKey=keys[0].y*cols+keys[0].x;
+   const keyDistance=approach[firstKey];
+   const later=gates.slice(1).filter(g=>approach[g.from]>=0)
+    .sort((a,b)=>approach[a.from]-approach[b.from]);
+   const early=later.find(g=>approach[g.from]+Math.max(4,Math.floor(Math.sqrt(size)/3))<keyDistance);
+   if(!early)continue;
+   teaserEncounter={gate:early.number,approachDistance:approach[early.from],firstKeyDistance:keyDistance,minimumReturn:keyDistance-approach[early.from]};
+  }
   const last=regionDistances(entries[count],count),exitCell=last.queue.reduce((a,b)=>last.dist[a]>=last.dist[b]?a:b);[exitX,exitY]=xy(exitCell);
   // Palette order also varies; key identities remain stable for replay/export.
   const palette=Array.from({length:12},(_,i)=>pairColor(i));for(let i=palette.length-1;i>0;i--){const j=randomInt(i+1);[palette[i],palette[j]]=[palette[j],palette[i]];}
@@ -774,7 +931,70 @@ function setupGates(){
    const [x,y]=xy(g.from),[nx,ny]=xy(g.to),d=nx>x?E:nx<x?W:ny>y?S:N;
    gateMap[y][x].push({dir:d,colors:[g.color]});gateMap[ny][nx].push({dir:OPPOSITE[d],colors:[g.color]});
   });
-  puzzlePlan={type:'organic-regions',hub:hub?{cell:hubCell,room:[...room],spokes:count}:null,parents,entries,gates,metrics,regionSizes:order.map(r=>areas[r]),wingSwitches:[],returnLatches:[]};
+  // Wings: two spatially separated objectives within an unlocked region.
+  // Seed-driven junctions either require both tokens or make one optional.
+  // A required wing token is attached to the NEXT gate, never a prior gate.
+  const wingSwitches=[],returnLatches=[];
+  if(wings){
+   for(let region=0;region<count;region++){
+    const gate=gates[region],entry=entries[region],{dist,queue}=regionDistances(entry,region);
+    const eligible=queue.filter(c=>c!==entry&&c!==keys[region].y*cols+keys[region].x&&dist[c]>=Math.max(5,Math.floor(Math.sqrt(areas[order[region]])*.65)));
+    if(eligible.length<2)continue;
+    const first=eligible[randomInt(eligible.length)];
+    const firstDist=regionDistances(first,region).dist;
+    const second=eligible.reduce((best,c)=>firstDist[c]>firstDist[best]?c:best,eligible[0]);
+    if(first===second||firstDist[second]<6)continue;
+    const required=rng()<.5;
+    for(const [j,cell] of [first,second].entries()){
+     const token='wing:'+region+':'+j;
+     wingSwitches.push({x:cell%cols,y:Math.floor(cell/cols),token,label:String(region+1),switchIndex:j,region,required});
+     if(required)gate.wingTokens=(gate.wingTokens||[]).concat(token);
+    }
+   }
+   if(!wingSwitches.length)continue;
+  }
+  // Cycles: add open loops INSIDE regions and gated shortcuts ACROSS
+  // existing region boundaries. A cross-region shortcut inherits the
+  // destination's original key requirement, so no locked region is bypassed.
+  const cycleLinks=[];
+  if(cycles){
+   const intra=[],inter=[];
+   for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)for(const [d,dx,dy] of [[E,1,0],[S,0,1]]){
+    const nx=x+dx,ny=y+dy;if(!isValid(nx,ny)||(grid[y][x]&d))continue;
+    const a=y*cols+x,b=ny*cols+nx,ra=puzzleZones[a],rb=puzzleZones[b];
+    if(ra===rb)intra.push({a,b,d});
+    else if(ra!==rb&&Math.max(ra,rb)>0)inter.push({a,b,d,ra,rb});
+   }
+   const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=randomInt(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;};
+   shuffle(intra);shuffle(inter);
+   // 35% is relative to a conservative loop budget, not 35% of all walls.
+   const budget=Math.max(1,Math.round(size*.035*.35));
+   for(const edge of intra.slice(0,budget)){
+    connect(edge.a,edge.b);cycleLinks.push({from:edge.a,to:edge.b,type:'open'});
+   }
+   let locked=0;
+   for(const edge of inter){
+    if(locked>=Math.max(1,Math.floor(budget/3)))break;
+    const target=Math.max(edge.ra,edge.rb),source=Math.min(edge.ra,edge.rb);
+    // Only join regions already adjacent in the progression tree;
+    // shortcut uses the SAME key as their original gate.
+    const original=gates.find(g=>g.region===target&&g.parent===source);
+    if(!original|| (edge.a===original.from&&edge.b===original.to)||(edge.b===original.from&&edge.a===original.to))continue;
+    connect(edge.a,edge.b);
+    const color=original.color,colors=[color,...(original.wingTokens||[])];
+    const [ax,ay]=xy(edge.a),[bx,by]=xy(edge.b);
+    gateMap[ay][ax].push({dir:edge.d,colors});gateMap[by][bx].push({dir:OPPOSITE[edge.d],colors});
+    cycleLinks.push({from:edge.a,to:edge.b,type:'locked',color});locked++;
+   }
+   if(!cycleLinks.some(l=>l.type==='open'))continue;
+  }
+  // Add wing requirements to the original gates (and their reciprocal edges).
+  for(const gate of gates)if(gate.wingTokens?.length){
+   const [ax,ay]=xy(gate.from),[bx,by]=xy(gate.to);
+   for(const item of gateMap[ay][ax])if(item.colors.includes(gate.color))item.colors.push(...gate.wingTokens);
+   for(const item of gateMap[by][bx])if(item.colors.includes(gate.color))item.colors.push(...gate.wingTokens);
+  }
+  puzzlePlan={type:'organic-regions',hub:hub?{cell:hubCell,room:[...room],spokes:count}:null,parents,entries,gates,metrics,regionSizes:order.map(r=>areas[r]),wingSwitches,returnLatches,cycleLinks,teaserEncounter};
   if(!validateMultiTopologySolvability())continue;
   if(hub){
    // Removing the nexus must separate EVERY spoke approach from every other.
@@ -789,11 +1009,11 @@ function setupGates(){
   const startDistances=regionDistances(0,0).dist;
   const encounters=gates.filter(g=>g.parent===0).sort((a,b)=>startDistances[a.from]-startDistances[b.from]).map(g=>'G'+g.number+' at '+startDistances[g.from]+' steps');
   const early=gates.filter(g=>g.parent<g.number-1).map(g=>'G'+g.number+' accessible from R'+g.parent+' before K'+g.number);
-  $('puzzleReport').textContent=[hub?'Hub: '+count+' separate gated spokes. Travel between spokes must cross the central nexus.':'Hub off: free region connection graph.', 'Validated '+count+' ordered keys in varied connected regions.',crossOver?'Teaser gates: '+(early.join('; ')||'single-gate detour'):hub?'Hub-only: first key at the nexus; later keys deep in their spokes.':'Baseline: keys near region entrances.',
+  $('puzzleReport').textContent=[hub?'Hub: '+count+' separate gated spokes. Travel between spokes must cross the central nexus.':'Hub off: free region connection graph.', 'Validated '+count+' ordered keys in varied connected regions.',hub&&crossOver?'Hub + Teasers: early G'+teaserEncounter.gate+' approach at '+teaserEncounter.approachDistance+' steps from nexus, K1 at '+teaserEncounter.firstKeyDistance+'; return detour at least '+teaserEncounter.minimumReturn+' steps.':crossOver?'Teaser gates: '+early.join('; '):hub?'Hub-only: first key at the nexus; later keys deep in their spokes.':'Baseline: strict sequential gate chain; keys near region entrances.',
    ...metrics.map(m=>'K'+m.key+' in R'+m.region+': '+m.entryDistance+' steps from entry, '+m.detourDepth+' steps off the gate approach network.'),
    'Initially approachable gates: '+encounters.join(', '),
    'Gate connections: '+gates.map(g=>'R'+g.parent+' → G'+g.number+' → R'+g.region).join('; '),
-   'R0 is the starting region. Region numbers indicate unlock order, not position.'].join('\n');
+   wings?'Wings: '+wingSwitches.length+' objectives ('+wingSwitches.filter(w=>w.required).length+' required, '+wingSwitches.filter(w=>!w.required).length+' optional). Circuits: '+gates.filter(g=>g.wingTokens?.length).map(g=>'Circuit '+g.number+' / G'+g.number+': '+g.wingTokens.length+' required switches').join('; ')+'.':'Wings off.',cycles?'Cycles: '+cycleLinks.filter(l=>l.type==='open').length+' open loops, '+cycleLinks.filter(l=>l.type==='locked').length+' gated shortcuts (35% budget).':'Cycles off.', 'R0 is the starting region. Region numbers indicate unlock order, not position.'].join('\n');
   debugLog('Region puzzle validated after '+(attempt+1)+' plan(s). '+$('puzzleReport').textContent);return;
  }
  throw new Error('No qualifying region plan found for this seed and size. Try a larger grid, fewer pairs, or another seed.');
@@ -833,23 +1053,148 @@ function findDeepestBranchNode(startX, startY, pathSet) {
   
 function updateObjectiveControls(){
  const mode=$('objectiveMode').value;
- $('gemOptions').hidden=mode!=='collector';
+ $('gemOptions').hidden=!$('requireGems').checked;
  $('gateOptions').hidden=mode!=='keys';
- const available=Math.max(1,readNumber('w',21,3,250)*readNumber('h',21,3,250)-2);
- const gem=$('gemCount');
- const wasMax=gem.value===gem.max||gem.dataset.followMax!=='false';
- gem.max=available;
- if(wasMax)gem.value=available;
- else gem.value=Math.min(available,Math.max(1,Number(gem.value)));
- gem.dataset.followMax=Number(gem.value)===available?'true':'false';
+ const width=readNumber('w',31,3,121),height=readNumber('h',31,3,121);
+ const available=Math.max(1,Math.min(width,width*height-2));
+ const gem=$('gemCount');gem.max=available;gem.value=Math.min(available,Math.max(1,Number(gem.value)||1));
  $('gemCountLabel').textContent=gem.value+' / '+available;
- const gate=$('gateCount');
+ const gate=$('gateCount');gate.max=Math.max(1,Math.min(12,Math.floor(width*height/55)-1));gate.value=Math.min(Number(gate.max),Math.max(1,Number(gate.value)||1));
  $('gateCountLabel').textContent=gate.value+' pairs';
+ for(const id of ['universalCount','universalDoorCount']){const e=$(id);e.value=Math.max(1,Math.min(30,Number(e.value)||1));}
+
+}
+// Separate seed-derived streams prevent UI randomisation from changing maze RNG order.
+const RANDOM_GROUPS=['algorithm','size','topology','lighting','objectives','appearance'];
+const SETTINGS_GROUPS={algorithm:['algo'],size:['w','h'],topology:['topoCrossOver','topoHub','topoWings','topoCycles'],lighting:['enableFog'],objectives:['objectiveMode','requireGems','gateCount','gemCount'],appearance:['colorBg','colorWall','colorFill','colorWingInactive','colorWingActive','colorWingOpen','lineWidth']};
+const RANDOM_OPTION_GROUPS=SETTINGS_GROUPS; // Backward-compatible alias: one authoritative group registry.
+const randomOptionIds=Object.values(SETTINGS_GROUPS).flat();
+const optionLocks=Object.fromEntries(randomOptionIds.map(id=>[id,id==='w'||id==='h']));
+const LOCK_STORAGE_KEY='mazy-random-option-locks-v1';
+try{const stored=JSON.parse(localStorage.getItem(LOCK_STORAGE_KEY)||'null');if(stored&&typeof stored==='object')for(const id of randomOptionIds)if(typeof stored[id]==='boolean')optionLocks[id]=stored[id];}catch(e){}
+function persistOptionLocks(){try{localStorage.setItem(LOCK_STORAGE_KEY,JSON.stringify(optionLocks));}catch(e){}if(typeof queueConfigSave==='function'&&typeof configSaveTimer!=='undefined')queueConfigSave();}
+function groupOptionIds(group){return RANDOM_OPTION_GROUPS[group]||[];}
+function optionIsLocked(id){return $('controls').dataset.tier==='advanced'?false:!!optionLocks[id];}
+function setOptionLock(id,locked){if(!(id in optionLocks))return;optionLocks[id]=!!locked;persistOptionLocks();updateRandomLockUI();}
+function setGroupLocks(group,locked){for(const id of groupOptionIds(group))optionLocks[id]=!!locked;persistOptionLocks();updateRandomLockUI();}
+function flashChanged(ids){for(const id of ids){const el=$(id);if(!el)continue;const target=el.closest('.setting-lock-row')||el;target.classList.remove('random-changed');void target.offsetWidth;target.classList.add('random-changed');setTimeout(()=>target.classList.remove('random-changed'),1600);}}
+function buildOptionLockUI(){
+ for(const group of RANDOM_GROUPS){const section=$('section-'+(group==='algorithm'||group==='size'?'maze':group));if(!section)continue;
+  let tools=section.querySelector('.group-random-tools[data-group="'+group+'"]');if(!tools){tools=document.createElement('div');tools.className='group-random-tools';tools.dataset.group=group;tools.innerHTML='<span class="group-status"></span><button type="button" data-action="shuffle">🎲 Shuffle</button><button type="button" data-action="unlock">🔓 Unlock all</button><button type="button" data-action="lock">🔒 Lock all</button>';
+   if(group==='algorithm'){section.insertBefore(tools,section.querySelector('.size-shortcuts'));}else if(group==='size'){section.insertBefore(tools,section.querySelector('label'));}else{section.insertBefore(tools,section.querySelector('.section-help')?.nextSibling||section.firstChild.nextSibling);}
+   tools.addEventListener('click',e=>{const action=e.target.dataset.action;if(action==='shuffle')shuffleUnlocked('config-'+freshSeed()+'-'+(++previewCounter),[group]);else if(action==='lock'||action==='unlock')setGroupLocks(group,action==='lock');});}
+  for(const id of groupOptionIds(group)){const el=$(id);if(!el||el.dataset.hasRandomLock)continue;let parent=el.closest('label');if(!parent){parent=el.closest('.checkbox-group');}if(!parent)continue;
+   // An entire label remains clickable except for the lock button; preserve existing input layout.
+   const wrap=document.createElement('div');wrap.className='setting-lock-row';parent.parentNode.insertBefore(wrap,parent);wrap.appendChild(parent);parent.classList.add('setting-body');
+   const btn=document.createElement('button');btn.type='button';btn.className='option-lock';btn.dataset.lockOption=id;btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();setOptionLock(id,!optionIsLocked(id));});wrap.appendChild(btn);el.dataset.hasRandomLock='1';
+  }
+ }
+ updateRandomLockUI();
+}
+
+let lastRandomConfiguration=null;
+let previewCounter=0, previewBaseSeed="";
+function selectedRandomGroups(){return RANDOM_GROUPS.filter(g=>groupOptionIds(g).some(id=>!optionIsLocked(id)));}
+function seededSettingsRandom(seed,group){
+ let h=2166136261>>>0;
+ for(const ch of String(seed)+'|mazy-random-v1|'+group)h=Math.imul(h^ch.charCodeAt(0),16777619);
+ return ()=>{h+=0x6D2B79F5;let t=h;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};
+}
+function setRandomValue(id,value){const el=$(id);if(!el||optionIsLocked(id))return; if(el.type==='checkbox')el.checked=!!value;else el.value=String(value);el.dispatchEvent(new Event(el.type==='checkbox'||el.tagName==='SELECT'?'change':'input',{bubbles:false}));}
+function applyGroupedRandomisation(seed,groups){
+ const before=Object.fromEntries(randomOptionIds.map(id=>[id,$(id)?.type==='checkbox'?$(id).checked:$(id)?.value]));
+ const report=[];
+ for(const group of groups){
+  const rand=seededSettingsRandom(seed,group),pick=arr=>arr[Math.floor(rand()*arr.length)];
+  if(group==='size'){const n=pick([15,21,31,41,51,61,81,101,121]);setRandomValue('w',n);setRandomValue('h',n);report.push('Size: '+n+'×'+n);
+  }else if(group==='algorithm'){
+   setRandomValue('algo',pick(['backtracker','prims','mixed','balanced','braided']));report.push('Algorithm: '+$('algo').selectedOptions[0].textContent);
+  }else if(group==='topology'){
+   const values=[];
+   for(const id of ['topoCrossOver','topoHub','topoWings','topoCycles']){setRandomValue(id,pick(['on','off']));values.push(id.replace('topo','')+' '+$(id).value);}
+   report.push('Topology: '+values.join(', '));
+  }else if(group==='lighting'){
+   setRandomValue('enableFog',rand()<.85);
+   report.push('Fog: '+($('enableFog').checked?'On':'Off'));
+  }else if(group==='objectives'){
+   setRandomValue('objectiveMode',pick(['standard','keys']));setRandomValue('requireGems',rand()<.5);
+   // Keep generated key count within the minimum region-size budget.
+   const maxPairs=Math.max(1,Math.min(12,Math.floor(Number($('w').value)*Number($('h').value)/55)-1));
+   setRandomValue('gateCount',1+Math.floor(rand()*Math.min(maxPairs,5)));
+   const gemMax=Number($('gemCount').max)||100;
+   setRandomValue('gemCount',Math.max(1,Math.round(gemMax*(.2+rand()*.8))));
+   report.push('Objective: '+$('objectiveMode').value+', gate pairs '+$('gateCount').value+', gems '+($('requireGems').checked?$('gemCount').value:'off'));
+  }else if(group==='appearance'){
+   const palettes=[['#0b0c10','#66fcf1','#45a29e','#a855f7','#22c55e','#38bdf8'],['#101827','#fbbf24','#60a5fa','#e879f9','#4ade80','#7dd3fc'],['#17131c','#f0abfc','#c084fc','#fb7185','#34d399','#22d3ee'],['#091a17','#a7f3d0','#2dd4bf','#f59e0b','#86efac','#67e8f9'],['#201711','#fdba74','#fca5a5','#c4b5fd','#bef264','#93c5fd']];
+   const palette=pick(palettes);
+   ['colorBg','colorWall','colorFill','colorWingInactive','colorWingActive','colorWingOpen'].forEach((id,i)=>setRandomValue(id,palette[i]));
+   setRandomValue('lineWidth',pick([2,3,4,5,6]));report.push('Appearance: palette '+(palettes.indexOf(palette)+1)+', wall thickness '+$('lineWidth').value);
+  }
+  // Every registered control gets a chance to randomise, including future options.
+  for(const id of groupOptionIds(group)){if(optionIsLocked(id)||before[id]!==($(id)?.type==='checkbox'?$(id).checked:$(id)?.value))continue;
+   const el=$(id);if(!el)continue;let candidates=[];
+   if(el.type==='checkbox')candidates=[true,false];
+   else if(el.tagName==='SELECT')candidates=[...el.options].map(o=>o.value).filter(v=>v!==''&&v!=='random');
+   else if(el.type==='range'||el.type==='number'){const lo=Number(el.min),hi=Number(el.max),step=Number(el.step)||1;if(Number.isFinite(lo)&&Number.isFinite(hi)&&hi>=lo){const count=Math.floor((hi-lo)/step)+1;if(count<=300)candidates=Array.from({length:count},(_,i)=>String(Number((lo+i*step).toFixed(6))));else candidates=Array.from({length:30},(_,i)=>String(Number((lo+Math.round(rand()*(count-1))*step).toFixed(6))));}}
+   candidates=candidates.filter(v=>String(v)!==String(before[id]));if(candidates.length)setRandomValue(id,candidates[Math.floor(rand()*candidates.length)]);
+  }
+ }
+ updateObjectiveControls();
+ const changed=randomOptionIds.filter(id=>!optionIsLocked(id)&&before[id]!==($(id)?.type==='checkbox'?$(id).checked:$(id)?.value));
+ flashChanged(changed);$('randomFeedback').textContent=changed.length?changed.length+' setting'+(changed.length===1?'':'s')+' changed · '+groups.join(', '):'No unlocked settings changed.';
+ lastRandomConfiguration={seed,groups:[...groups],report,changed};
+ // Detailed randomisation report remains available in diagnostics. 
+ updateSizeButtons();updateSetupSummary();queueConfigSave();
+ debugLog('Random settings '+JSON.stringify(lastRandomConfiguration));
+}
+function nextConfigurationSeed(seedOverride){
+ const typed=$('seedInput').value.trim();
+ return seedOverride!==null?String(seedOverride).trim():(generationCount===0||$('keepSeed').checked)?typed:'';
+}
+function freshSeed(){return Math.random().toString(36).slice(2,10);}
+function updateRandomLockUI(){
+ for(const id of randomOptionIds){const btn=document.querySelector('[data-lock-option="'+id+'"]');if(btn){btn.textContent=optionIsLocked(id)?'🔒':'🔓';btn.setAttribute('aria-pressed',String(optionIsLocked(id)));btn.title=(optionIsLocked(id)?'Unlock':'Lock')+' '+id+' for randomisation';btn.setAttribute('aria-label',btn.title);}}
+ for(const tools of document.querySelectorAll('.group-random-tools[data-group]')){const ids=groupOptionIds(tools.dataset.group),count=ids.filter(optionIsLocked).length;tools.querySelector('.group-status').textContent=count===0?'🔓 All unlocked':count===ids.length?'🔒 All locked':'◐ '+count+'/'+ids.length+' locked';}
+ updateSetupSummary();
+}
+function lockGroup(group){setGroupLocks(group,true);}
+function shuffleUnlocked(configSeed,scope=null){const groups=(scope||RANDOM_GROUPS).filter(g=>groupOptionIds(g).some(id=>!optionIsLocked(id)));if(!groups.length){$('randomFeedback').textContent='All settings in this selection are locked.';return false;}
+ presetApplying=true;try{applyGroupedRandomisation(configSeed,groups);}finally{presetApplying=false;}
+ markCustom();return true;
+}
+$('globalShuffle').onclick=()=>shuffleUnlocked('config-'+freshSeed()+'-'+(++previewCounter));
+$('globalLock').onclick=()=>{for(const id of randomOptionIds)optionLocks[id]=true;persistOptionLocks();updateRandomLockUI();};
+$('globalUnlock').onclick=()=>{for(const id of randomOptionIds)optionLocks[id]=false;persistOptionLocks();updateRandomLockUI();};
+const structureIds=['topoCrossOver','topoHub','topoWings','topoCycles'];
+function normalizePuzzleOptions(){
+ const active=structureIds.filter(id=>$(id).value!=='off');
+ if(active.length)$('objectiveMode').value='keys';
+ if($('objectiveMode').value==='keys'){
+  const minimum=active.some(id=>id==='topoHub'||id==='topoCrossOver')?2:1;
+  let w=Math.max(9,readNumber('w',31,3,121)),h=Math.max(9,readNumber('h',31,3,121));
+  const pairs=Math.max(minimum,Math.min(12,Number($('gateCount').value)||1));
+  h=Math.max(h,Math.ceil(55*(minimum+1)/w));
+  $('w').value=w;$('h').value=h;
+  const max=Math.min(12,Math.floor(w*h/55)-1);
+  $('gateCount').max=max;$('gateCount').min=minimum;$('gateCount').value=Math.min(max,pairs);
+ }else $('gateCount').min=1;
+ if($('universalEnabled').checked){$('universalCount').value=Math.max(Number($('universalDoorCount').value)||1,Number($('universalCount').value)||1);}
+ updateObjectiveControls();
 }
 function generateMaze(seedOverride=null){
- const previousLevel={cols,rows,activeSeed,rng,generationCount,levelSettings,grid,visitedMap,revealedMap,slimeMap,gateMap,px,py,exitX,exitY,levelObjective,gems,keys,enemies,playerKeys,puzzleZones,puzzleTopology,puzzlePlan,discovered:[...discoveredWalls],lit:[...currentlyLitWalls]};
+ normalizePuzzleOptions();
  if($('objectiveMode').value==='keys'){
-  const width=readNumber('w',31,3,250),height=readNumber('h',31,3,250),pairs=readNumber('gateCount',3,1,12);
+  $('w').value=Math.max(9,readNumber('w',31,3,121));$('h').value=Math.max(9,readNumber('h',31,3,121));
+  if(Number($('w').value)*Number($('h').value)<110)$('h').value=Math.ceil(110/Number($('w').value));
+ }
+ updateObjectiveControls();
+
+ const requestedSeed=nextConfigurationSeed(seedOverride)||freshSeed();
+ // Normal generation always respects the currently displayed rules.
+ lightGeneration++;lightCache.clear();
+ const previousLevel={universalKeys:universalKeys.map(k=>({...k})),universalDoors:universalDoors.map(g=>({...g})),universalHeld,fixedLightPoints:fixedLightPoints.map(p=>({...p})),portableLights:portableLights.map(p=>({...p})),portableSupply,lightSteps:lightSteps.map(p=>({...p})),movementHistory:movementHistory.map(v=>({...v})),dropMarker:dropMarker&&{...dropMarker},rememberedKeys:new Set(rememberedKeys),rememberedWingSwitches:new Set(rememberedWingSwitches),rememberedExit,cols,rows,activeSeed,rng,generationCount,levelSettings,grid,visitedMap,revealedMap,gateMap,px,py,exitX,exitY,levelObjective,gems,keys,playerKeys,puzzleZones,puzzleTopology,puzzlePlan,discovered:[...discoveredWalls],lit:[...currentlyLitWalls]};
+ if($('objectiveMode').value==='keys'){
+  const width=readNumber('w',31,3,121),height=readNumber('h',31,3,121),pairs=readNumber('gateCount',3,1,12);
   if(width<9||height<9||width*height<55*(pairs+1)){
    const message='The region planner needs both sides at least 9 and at least '+(55*(pairs+1))+' cells for '+pairs+' gate pairs. Increase the grid or reduce the pairs. Your current maze has been kept.';
    $('puzzleReport').textContent=message;debugLog(message);alert(message);return;
@@ -857,26 +1202,27 @@ function generateMaze(seedOverride=null){
  }
  debugLog('Mazy v'+APP_VERSION+' — generating maze…');
  updateObjectiveControls();
- cols=readNumber('w',21,3,250);rows=readNumber('h',21,3,250);
+ cols=readNumber('w',21,3,121);rows=readNumber('h',21,3,121);
  $('w').value=cols;$('h').value=rows;
  const typedSeed=$('seedInput').value.trim();
- const seedToUse=seedOverride!==null?seedOverride:(generationCount===0||$('keepSeed').checked)?typedSeed:'';
+ const seedToUse=requestedSeed;
  initSeed(seedToUse);$('seedInput').value=activeSeed;generationCount++;
  levelSettings={
   fog:$('enableFog').checked,type:$('torchType').value,
+  ...selectedLightingQuality(),cornerSpill:$('cornerSpill').checked,cornerSpillStrength:Number($('cornerSpillStrength').value),
+  explorer:false,fixed:false,portable:false,memory:$('lightMemory').value,
+  glowSteps:Number($('glowSteps').value),requireFixed:$('requireFixed').checked,
+  fixedPct:Number($('fixedPct').value),portablePct:Number($('portablePct').value),
   reach:Number($('torchReach').value),ambient:Number($('torchAmbient').value),
   lineWidth:Number($('lineWidth').value),algorithm:$('algo').value,
-  slime:$('enableSlime').checked,slimeDensity:Number($('slimeDensity').value),
-  enemies:$('enableEnemies').checked,enemyCount:readNumber('enemyCount',4,1,15)
  };
- debugLog('Active seed: '+activeSeed+'; fog: '+levelSettings.fog);
+ levelSettings.explorer=false;levelSettings.fixed=false;levelSettings.portable=false;levelSettings.requireFixed=false;levelSettings.memory='remembered';
  grid=Array.from({length:rows},()=>new Uint8Array(cols));
  visitedMap=Array.from({length:rows},()=>new Uint8Array(cols));
  revealedMap=Array.from({length:rows},()=>new Uint8Array(cols));
  discoveredWalls.clear();currentlyLitWalls.clear();
- slimeMap=Array.from({length:rows},()=>new Uint8Array(cols));
  gateMap=Array.from({length:rows},()=>Array.from({length:cols},()=>[]));
- if($('objectiveMode').value!=='keys'){if(levelSettings.algorithm==='prims')generatePrims();else generateBacktracker();}
+ if($('objectiveMode').value!=='keys'){generateSelected();}
  px=0;py=0;exitX=cols-1;exitY=rows-1;visitedMap[0][0]=1;
  // Validate reciprocal passages and overall connectivity after carving.
  let mismatches=0;
@@ -886,23 +1232,35 @@ function generateMaze(seedOverride=null){
  }
  debugLog(($('objectiveMode').value==='keys'?'Preparing regions: ':'Maze carved: ')+cols+' × '+rows+' ('+$('algo').value+'), mismatched walls: '+mismatches);
 
- levelObjective=$('objectiveMode').value;gems=[];keys=[];enemies=[];playerKeys=new Set();puzzleZones=null;puzzleTopology=null;puzzlePlan=null;$('puzzleReport').textContent='';
+ levelObjective=$('objectiveMode').value;gems=[];keys=[];playerKeys=new Set();universalKeys=[];universalDoors=[];universalHeld=0;puzzleZones=null;puzzleTopology=null;puzzlePlan=null;$('puzzleReport').textContent='';
  if(levelObjective==='keys'){
   try{setupGates();}catch(error){
    if(previousLevel.grid.length){
-    ({cols,rows,activeSeed,rng,generationCount,levelSettings,grid,visitedMap,revealedMap,slimeMap,gateMap,px,py,exitX,exitY,levelObjective,gems,keys,enemies,playerKeys,puzzleZones,puzzleTopology,puzzlePlan}=previousLevel);
+    ({cols,rows,activeSeed,rng,generationCount,levelSettings,grid,visitedMap,revealedMap,gateMap,px,py,exitX,exitY,levelObjective,gems,keys,playerKeys,puzzleZones,puzzleTopology,puzzlePlan}=previousLevel);
+    ({universalKeys,universalDoors,universalHeld}=previousLevel);
+    ({movementHistory,dropMarker,rememberedKeys,rememberedWingSwitches,rememberedExit,fixedLightPoints,portableLights,portableSupply,lightSteps}=previousLevel);
     discoveredWalls.clear();previousLevel.discovered.forEach(v=>discoveredWalls.add(v));currentlyLitWalls.clear();previousLevel.lit.forEach(v=>currentlyLitWalls.add(v));
     $('seedInput').value=activeSeed;
     const message=error.message+' Your previous maze is unchanged.';$('puzzleReport').textContent=message;debugLog(message);alert(message);return;
    }
    levelObjective='standard';keys=[];puzzleZones=null;puzzlePlan=null;puzzleTopology=null;
    gateMap=Array.from({length:rows},()=>Array.from({length:cols},()=>[]));grid=Array.from({length:rows},()=>new Uint8Array(cols));
-   if(levelSettings.algorithm==='prims')generatePrims();else generateBacktracker();exitX=cols-1;exitY=rows-1;
+   generateSelected();exitX=cols-1;exitY=rows-1;
    const message=error.message+' Showing a STANDARD maze preview, not a teaser puzzle.';
    $('puzzleReport').textContent=message;debugLog(message);alert(message);
   }
  }
- if(levelObjective==='collector'){
+ if($('universalEnabled').checked){
+  // Use carved passages only. Universal doors are independent from coloured-gate progression.
+  const occupied=new Set(keys.map(k=>k.x+','+k.y));
+  const edges=[];for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)for(const [d,dx,dy] of [[E,1,0],[S,0,1]])if(walkable(x,y,d,false)&&!gateMap[y][x].some(g=>g.dir===d))edges.push({x,y,dir:d});
+  for(let i=edges.length-1;i>0;i--){const j=randomInt(i+1);[edges[i],edges[j]]=[edges[j],edges[i]];}
+  universalDoors=edges.slice(0,Math.min(edges.length,readNumber('universalDoorCount',4,1,30))).map(g=>({...g,open:false}));
+  const cells=[];for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)if((x||y)&&(x!==exitX||y!==exitY)&&!occupied.has(x+','+y))cells.push({x,y,collected:false});
+  for(let i=cells.length-1;i>0;i--){const j=randomInt(i+1);[cells[i],cells[j]]=[cells[j],cells[i]];}
+  universalKeys=cells.slice(0,Math.min(cells.length,readNumber('universalCount',3,1,30)));
+ }
+ if($('requireGems').checked){
   const candidates=[];
   for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)
    if((x!==0||y!==0)&&(x!==exitX||y!==exitY))candidates.push([x,y]);
@@ -914,22 +1272,16 @@ function generateMaze(seedOverride=null){
   }
   debugLog('Placed '+gems.length+' gems');
  }
- if(levelSettings.slime){const density=levelSettings.slimeDensity;
-  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)if((x||y)&&(x!==exitX||y!==exitY)&&rng()<density)slimeMap[y][x]=1;
- }
- if(levelSettings.enemies){const desired=levelSettings.enemyCount,candidates=[];
-  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)if((x+y)>3&&(x!==exitX||y!==exitY))candidates.push([x,y]);
-  for(let i=0;i<Math.min(desired,candidates.length);i++){
-   const k=randomInt(candidates.length),[x,y]=candidates[k];candidates[k]=candidates[candidates.length-1];candidates.pop();
-   enemies.push({x,y,health:1,alive:true});
-  }
- }
- isFinished=false;elapsedTime=0;lastMoveTime=0;moveDelay=120;lastEnemyTick=performance.now();
+ fixedLightPoints=[];portableLights=[];portableSupply=0;lightSteps=[];crumbs.clear();lastPlaced=lastPassed=null;lastRevealKey='';
+ movementHistory=[{x:0,y:0}];dropMarker=null;autoNavigation=null;rememberedKeys.clear();rememberedWingSwitches.clear();rememberedExit=false;updateNavigationButtons();
+ isFinished=false;elapsedTime=0;winningConfig=captureRunConfig();lastMoveTime=0;moveDelay=120;
  hintCache=null;hintKey='';visibilityDirty=true;pointers.clear();dragMode=null;stopHeldDirection();
- startTime=performance.now();
+ clockUnscored=clockMode==='hidden';clockMode=clockUnscored?'hidden':'waiting';startTime=0;renderClock();
  clearInterval(timerInterval);timerInterval=setInterval(tick,100);
  updateHUD();fitCamera();requestDraw();
 }
+function renderClock(){const b=$('hudTime');$('timerDisplay').hidden=clockMode==='hidden';b.dataset.mode=clockMode;b.title=clockMode==='hidden'?'Show timer':clockMode==='paused'||clockMode==='waiting'?'Hide timer': 'Pause timer';b.setAttribute('aria-label',b.title);}
+$('hudTime').onclick=()=>{if(clockMode==='hidden'){clockMode='waiting';}else if(clockMode==='running'){if(!isFinished)elapsedTime=(performance.now()-startTime)/1000;clockMode='paused';}else{clockMode='hidden';clockUnscored=true;}renderClock();updateHUD();};
 function formatTime(seconds){
  const total=Math.max(0,Math.floor(seconds));
  const h=Math.floor(total/3600),m=Math.floor(total%3600/60),sec=total%60;
@@ -937,45 +1289,147 @@ function formatTime(seconds){
  return (h>0?`${h}:${String(m).padStart(2,'0')}:`:`${m}:`)+`${String(sec).padStart(2,'0')}.${tenths}`;
 }
 function updateHUD(){
- $('objectiveDisplay').style.display=levelObjective==='collector'?'flex':'none';
- if(levelObjective==='collector')$('objectiveDisplay').textContent=`Gems: ${gems.filter(g=>g.collected).length}/${gems.length}`;
- $('keysDisplay').style.display=levelObjective==='keys'?'flex':'none';
- if(levelObjective==='keys')$('keysDisplay').textContent=`Keys: ${keys.filter(k=>playerKeys.has(k.color)).length}/${keys.length}  ${keys.filter(k=>playerKeys.has(k.color)).map(k=>'●').join('')}${puzzleTopology?.wings?' · Wing switches: '+puzzlePlan.wingSwitches.filter(w=>playerKeys.has(w.token)).length+'/'+puzzlePlan.wingSwitches.length:''}`;
- $('timerDisplay').textContent=`Time: ${formatTime(elapsedTime)}`;
+ const found=keys.filter(k=>playerKeys.has(k.color)).length;
+ $('objectiveDisplay').textContent=gems.length?`Gems: ${gems.filter(g=>g.collected).length}/${gems.length}`:'';
+ $('keysDisplay').textContent=(levelObjective==='keys'?`Keys: ${found}/${keys.length}  ${keys.map(k=>playerKeys.has(k.color)?'●':'○').join(' ')}`:'Exit: Reach the goal')+(universalKeys.length?` · Universal: ${universalHeld} held / ${universalKeys.filter(k=>k.collected).length} collected · Doors ${universalDoors.filter(g=>g.open).length}/${universalDoors.length}`:'');
+ const switches=puzzlePlan?.wingSwitches||[];
+ $('wingDisplay').textContent=switches.length?`Wing switches: ${switches.filter(w=>playerKeys.has(w.token)).length}/${switches.length}`:'';
+ $('hudObjectiveShort').textContent=(levelObjective==='keys'?`${found}/${keys.length} keys`:'Exit')+(gems.length?` · ${gems.filter(g=>g.collected).length}/${gems.length} gems`:'');
+ $('lightDisplay').textContent=`${crumbs.size} breadcrumbs`; $('hudLightShort').textContent=String(crumbs.size);$('timerDisplay').textContent=`Time: ${formatTime(elapsedTime)}`;
+
 }
 function tick(){
  if(isFinished||!grid.length)return;
- const now=performance.now();elapsedTime=(now-startTime)/1000;
+ const now=performance.now();advanceAutoNavigation(now);if(clockMode==='running'&&!isFinished)elapsedTime=(now-startTime)/1000;
  $('timerDisplay').textContent=`Time: ${formatTime(elapsedTime)}`;
- if(now-lastEnemyTick>=500){updateEnemies((now-lastEnemyTick)/1000);lastEnemyTick=now;}
  if(dragMode==='move'&&pointers.size===1)handleDragMove();
  
  requestDraw();
 }
+// Permanent per-placement lighting results. Only the changed torch is
+// recalculated; a topology revision invalidates results lazily.
+const placedTorchCache=new Map();
+let placedTorchCacheTopology='',placedTorchHits=0,placedTorchMisses=0;
+function stationaryTorchLight(torch,p){
+ const topology=lightTopologyKey();
+ if(topology!==placedTorchCacheTopology){
+  placedTorchCache.clear();placedTorchCacheTopology=topology;
+ }
+ const key=p.x+','+p.y+':'+torch.reach;
+ if(placedTorchCache.has(key)){placedTorchHits++;return placedTorchCache.get(key);}
+ placedTorchMisses++;
+ const result=cachedLight(torch,p.x,p.y);
+ placedTorchCache.set(key,result);
+ return result;
+}
+function torchIntersectsViewport(p,reach){
+ return p.x+reach>=visibleBounds.left&&p.x-reach<=visibleBounds.right
+  &&p.y+reach>=visibleBounds.top&&p.y-reach<=visibleBounds.bottom;
+}
+// Tiled stationary illumination index: rebuild only tiles touched by a changed
+// stationary torch. Geometry remains cached per source. Tiles use 12x12 cells.
+const STATIONARY_TILE=12;
+const stationaryTiles=new Map();
+let stationaryTopology='',stationarySignature='';
+let stationaryRebuilds=0,stationaryTileUpdates=0;
+function stationaryKey(tx,ty){return tx+','+ty;}
+function stationaryEntries(){
+ const radial={...torchState(),type:'radial'};
+ const result=[];
+ for(const p of fixedLightPoints)if(p.active)result.push({p,light:stationaryTorchLight(radial,p)});
+ for(const p of portableLights)result.push({p,light:stationaryTorchLight(radial,p)});
+ return result;
+}
+function stationaryTileRange(p,reach){
+ return [Math.max(0,Math.floor((p.x-reach-2)/STATIONARY_TILE)),
+ Math.max(0,Math.floor((p.y-reach-2)/STATIONARY_TILE)),
+ Math.min(Math.ceil(cols/STATIONARY_TILE)-1,Math.floor((p.x+reach+2)/STATIONARY_TILE)),
+ Math.min(Math.ceil(rows/STATIONARY_TILE)-1,Math.floor((p.y+reach+2)/STATIONARY_TILE))];
+}
+function stationaryRefreshTile(tx,ty,entries){
+ const x0=tx*STATIONARY_TILE,y0=ty*STATIONARY_TILE;
+ const x1=Math.min(cols,x0+STATIONARY_TILE),y1=Math.min(rows,y0+STATIONARY_TILE);
+ const cells=new Set(),walls=new Set(),polys=[];
+ for(const entry of entries){
+  const {p,light}=entry;
+  if(!torchIntersectsBox(p,torchState().reach,x0,y0,x1,y1))continue;
+  if(light.polys)polys.push(...light.polys);else polys.push(light.poly);
+  for(const cell of light.tiles){
+   const x=cell%cols,y=Math.floor(cell/cols);
+   if(x>=x0&&x<x1&&y>=y0&&y<y1)cells.add(cell);
+  }
+  // Wall sets are retained at source granularity to avoid losing visibility.
+  for(const w of light.walls)walls.add(w);
+ }
+ stationaryTiles.set(stationaryKey(tx,ty),{cells:[...cells],walls:[...walls],polys});
+ stationaryTileUpdates++;
+}
+function torchIntersectsBox(p,r,x0,y0,x1,y1){
+ return p.x+r+2>=x0&&p.x-r-2<=x1&&p.y+r+2>=y0&&p.y-r-2<=y1;
+}
+function refreshStationaryCache(force=false,changed=null){
+ const topology=lightTopologyKey();
+ const signature=JSON.stringify([levelSettings?.fog,levelSettings?.portable,levelSettings?.fixed,
+  torchState().reach,fixedLightPoints.map(p=>[p.x,p.y,p.active]),portableLights.map(p=>[p.x,p.y])]);
+ if(!force&&topology===stationaryTopology&&signature===stationarySignature)return;
+ const full=force||topology!==stationaryTopology||!changed;
+ const entries=stationaryEntries();
+ if(full){
+  stationaryTiles.clear();
+  const maxX=Math.ceil(cols/STATIONARY_TILE),maxY=Math.ceil(rows/STATIONARY_TILE);
+  for(let ty=0;ty<maxY;ty++)for(let tx=0;tx<maxX;tx++)stationaryRefreshTile(tx,ty,entries);
+ }else{
+  const [x0,y0,x1,y1]=stationaryTileRange(changed,torchState().reach);
+  for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++)stationaryRefreshTile(tx,ty,entries);
+ }
+ stationaryTopology=topology;stationarySignature=signature;stationaryRebuilds++;
+}
+function stationaryVisibleLighting(left,top,right,bottom){
+ const cells=new Set(),walls=new Set(),polys=new Set();
+ const x0=Math.max(0,Math.floor(left/STATIONARY_TILE)),x1=Math.min(Math.ceil(cols/STATIONARY_TILE)-1,Math.floor(right/STATIONARY_TILE));
+ const y0=Math.max(0,Math.floor(top/STATIONARY_TILE)),y1=Math.min(Math.ceil(rows/STATIONARY_TILE)-1,Math.floor(bottom/STATIONARY_TILE));
+ for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){
+  const tile=stationaryTiles.get(stationaryKey(tx,ty));if(!tile)continue;
+  for(const c of tile.cells)cells.add(c);
+  for(const w of tile.walls)walls.add(w);
+  for(const p of tile.polys)polys.add(p);
+ }
+ return {cells,walls,polys};
+}
+function togglePortableTorch(){
+ if(isFinished||!levelSettings.fog||!levelSettings.portable)return;
+ const i=portableLights.findIndex(p=>p.x===px&&p.y===py);
+ if(i>=0){portableLights.splice(i,1);placedTorchCache.delete(px+','+py+':'+torchState().reach);refreshStationaryCache(false,{x:px,y:py});}
+ else if(portableLights.length<portableSupply){portableLights.push({x:px,y:py});refreshStationaryCache(false,{x:px,y:py});}
+ updateHUD();requestDraw();
+}
+function updateFixedLightAtPlayer(){
+ for(const p of fixedLightPoints)if(p.x===px&&p.y===py)p.active=true;
+}
 function torchState(){return {fog:levelSettings.fog,type:levelSettings.type,reach:levelSettings.reach,ambient:levelSettings.ambient};}
 function playerScreen(){return {x:(px+.5)*CELL*scale+offsetX,y:(py+.5)*CELL*scale+offsetY};}
-function updateEnemies(dt){
- if(!$('enableEnemies').checked)return;
- const torch=torchState(),p=playerScreen();
- for(const enemy of enemies){if(!enemy.alive)continue;
-  const dirs=DIRS.filter(([d])=>walkable(enemy.x,enemy.y,d));
-  if(dirs.length&&rng()<0.55){const [d,dx,dy]=dirs[randomInt(dirs.length)];enemy.x+=dx;enemy.y+=dy;}
-  if(enemy.x===px&&enemy.y===py){px=0;py=0;visitedMap[0][0]=1;hintCache=null;visibilityDirty=true;}
-  if(torch.fog){const dx=enemy.x-px,dy=enemy.y-py,dist=Math.hypot(dx,dy);
-   let lit=dist<=torch.reach;
-   if(lit&&torch.type==='cone')lit=Math.abs(normalizeAngle(Math.atan2(dy,dx)-aimAngle))<=Math.PI/6;
-   if(lit)lit=hasLineOfSight(px+.5,py+.5,enemy.x+.5,enemy.y+.5);
-   if(lit)enemy.health-=0.35*Math.min(dt,1);
-   if(enemy.health<=0)enemy.alive=false;
-  }
- }
-}
 function normalizeAngle(a){return Math.atan2(Math.sin(a),Math.cos(a));}
-function requestDraw(){if(renderQueued)return;renderQueued=true;requestAnimationFrame(()=>{renderQueued=false;draw();});}
+let perfAction='other',perfFrameGap=0,perfLastRaf=0,perfLastEvent=0;
+const perfActionStats={pan:[],zoom:[],movement:[],other:[]};
+function markPerfAction(action){
+ if(!perfEnabled)return;
+ perfAction=action;perfLastEvent=performance.now();
+}
+function requestDraw(reason){
+ if(reason)markPerfAction(reason);
+ if(renderQueued)return;
+ renderQueued=true;
+ requestAnimationFrame(t=>{
+  if(perfEnabled){perfFrameGap=perfLastRaf?t-perfLastRaf:0;perfLastRaf=t;}
+  renderQueued=false;draw();
+ });
+}
 
 function hasLineOfSight(ax,ay,bx,by){
  const dx=bx-ax,dy=by-ay;
- for(const [x1,y1,x2,y2] of blockingSegments()){
+ // Only edges in the segment bounding box can obstruct this ray.
+ const edges=nearbyBlockingSegments(Math.min(ax,bx)-1,Math.min(ay,by)-1,Math.max(ax,bx)+1,Math.max(ay,by)+1);
+ for(const [x1,y1,x2,y2] of edges){
   const sx=x2-x1,sy=y2-y1,den=dx*sy-dy*sx;
   if(Math.abs(den)<1e-9)continue;
   const rx=x1-ax,ry=y1-ay,t=(rx*sy-ry*sx)/den,u=(rx*dy-ry*dx)/den;
@@ -983,7 +1437,15 @@ function hasLineOfSight(ax,ay,bx,by){
  }
  return true;
 }
+// Reuse immutable wall geometry across rendering, movement and lighting queries.
+// A new grid object or generation revision invalidates this cache.
+let staticWallsCache=null,staticWallsGrid=null,staticWallsGeneration=-1;
+let staticWallCacheHits=0,staticWallCacheMisses=0;
 function solidWallSegments(){
+ if(staticWallsCache&&staticWallsGrid===grid&&staticWallsGeneration===lightGeneration){
+  staticWallCacheHits++;return staticWallsCache;
+ }
+ staticWallCacheMisses++;
  const result=[];
  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
   const mask=grid[y][x];
@@ -992,6 +1454,7 @@ function solidWallSegments(){
   if(x===cols-1&&!(mask&E))result.push([x+1,y,x+1,y+1]);
   if(y===rows-1&&!(mask&S))result.push([x,y+1,x+1,y+1]);
  }
+ staticWallsCache=result;staticWallsGrid=grid;staticWallsGeneration=lightGeneration;
  return result;
 }
   
@@ -999,12 +1462,87 @@ function solidWallSegments(){
 
 
   
+function universalEdge(g){const ax=g.x+(g.dir===E?1:0),ay=g.y+(g.dir===S?1:0);return [ax,ay,ax+(g.dir===S?1:0),ay+(g.dir===E?1:0)];}
 function blockingSegments(){
- return [...solidWallSegments(),...gateSegments().filter(g=>!g[4].every(c=>playerKeys.has(c)))];
+ return [...solidWallSegments(),...gateSegments().filter(g=>!g[4].every(c=>playerKeys.has(c))),...universalDoors.filter(g=>!g.open).map(universalEdge)];
+}
+// Spatial buckets make local visibility checks independent of total maze size.
+let wallBucketGrid=null,wallBucketGeneration=-1,wallBuckets=null;
+const WALL_BUCKET_SIZE=12;
+function nearbyBlockingSegments(minX,minY,maxX,maxY){
+ if(wallBucketGrid!==grid||wallBucketGeneration!==lightGeneration||!wallBuckets){
+  wallBuckets=new Map();wallBucketGrid=grid;wallBucketGeneration=lightGeneration;
+  for(const edge of solidWallSegments()){
+   const [ax,ay,bx,by]=edge;
+   const x0=Math.floor(Math.min(ax,bx)/WALL_BUCKET_SIZE),x1=Math.floor(Math.max(ax,bx)/WALL_BUCKET_SIZE);
+   const y0=Math.floor(Math.min(ay,by)/WALL_BUCKET_SIZE),y1=Math.floor(Math.max(ay,by)/WALL_BUCKET_SIZE);
+   for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
+    const k=x+','+y;if(!wallBuckets.has(k))wallBuckets.set(k,[]);wallBuckets.get(k).push(edge);
+   }
+  }
+ }
+ const result=[],seen=new Set();
+ const x0=Math.max(0,Math.floor(minX/WALL_BUCKET_SIZE)),x1=Math.min(Math.ceil(cols/WALL_BUCKET_SIZE),Math.floor(maxX/WALL_BUCKET_SIZE));
+ const y0=Math.max(0,Math.floor(minY/WALL_BUCKET_SIZE)),y1=Math.min(Math.ceil(rows/WALL_BUCKET_SIZE),Math.floor(maxY/WALL_BUCKET_SIZE));
+ for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)for(const edge of wallBuckets.get(x+','+y)||[]){
+  if(seen.has(edge))continue;seen.add(edge);
+  if(Math.max(edge[0],edge[2])>=minX&&Math.min(edge[0],edge[2])<=maxX&&Math.max(edge[1],edge[3])>=minY&&Math.min(edge[1],edge[3])<=maxY)result.push(edge);
+ }
+ // Universal doors are also real light blockers until opened.
+ for(const g of universalDoors)if(!g.open){const edge=universalEdge(g);if(Math.max(edge[0],edge[2])>=minX&&Math.min(edge[0],edge[2])<=maxX&&Math.max(edge[1],edge[3])>=minY&&Math.min(edge[1],edge[3])<=maxY)result.push(edge);}
+ // Gate state changes frequently, so query these separately.
+ for(const edge of gateSegments())if(!edge[4].every(c=>playerKeys.has(c))&&Math.max(edge[0],edge[2])>=minX&&Math.min(edge[0],edge[2])<=maxX&&Math.max(edge[1],edge[3])>=minY&&Math.min(edge[1],edge[3])<=maxY)result.push(edge);
+ return result;
 }
 function wallKey(ax,ay,bx,by){
  return ax<bx||ax===bx&&ay<=by?`${ax},${ay},${bx},${by}`:`${bx},${by},${ax},${ay}`;
 }
+function circuitForGate(colors){
+ const tokens=colors.filter(v=>v.startsWith('wing:'));
+ if(!tokens.length)return null;
+ const region=Number(tokens[0].split(':')[1]);
+ const switches=(puzzlePlan?.wingSwitches||[]).filter(w=>w.region===region&&w.required);
+ return {number:region+1,required:switches.length,active:switches.filter(w=>playerKeys.has(w.token)).length};
+}
+function drawCircuitGate(c,ax,ay,bx,by,colors){
+ const circuit=circuitForGate(colors);if(!circuit)return false;
+ const open=colors.every(v=>playerKeys.has(v));
+ const x1=ax*CELL,y1=ay*CELL,x2=bx*CELL,y2=by*CELL;
+ const cx=(x1+x2)/2,cy=(y1+y2)/2;
+ const accent=open?$('colorWingOpen').value:$('colorWingInactive').value;
+ c.save();c.strokeStyle=accent;c.lineWidth=3;c.lineCap='round';
+ if(open){
+  for(const [a,b] of [[0,.18],[.82,1]]){c.beginPath();c.moveTo(x1+(x2-x1)*a,y1+(y2-y1)*a);c.lineTo(x1+(x2-x1)*b,y1+(y2-y1)*b);c.stroke();}
+ }else{
+  c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();
+  const vx=x2-x1,vy=y2-y1,nx=-vy*.20,ny=vx*.20;
+  c.beginPath();c.moveTo(cx-vx*.35+nx,cy-vy*.35+ny);c.lineTo(cx+vx*.35-nx,cy+vy*.35-ny);
+  c.moveTo(cx-vx*.35-nx,cy-vy*.35-ny);c.lineTo(cx+vx*.35+nx,cy+vy*.35+ny);c.stroke();
+ }
+ // Diamond with circuit number and discrete progress dots.
+ c.beginPath();c.moveTo(cx,cy-9);c.lineTo(cx+10,cy);c.lineTo(cx,cy+9);c.lineTo(cx-10,cy);c.closePath();
+ c.fillStyle='#14202a';c.fill();c.strokeStyle=accent;c.lineWidth=2;c.stroke();
+ c.font='bold 10px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillStyle=open?$('colorWingOpen').value:'#fff';c.fillText(open?'✓':String(circuit.number),cx,cy);
+ for(let i=0;i<circuit.required;i++){
+  const dx=(i-(circuit.required-1)/2)*8;
+  c.beginPath();c.arc(cx+dx,cy+15,2.8,0,Math.PI*2);
+  c.fillStyle=i<circuit.active?$('colorWingActive').value:'#14202a';c.fill();c.strokeStyle=accent;c.lineWidth=1;c.stroke();
+ }
+ c.restore();return true;
+}
+function drawWingSwitch(c,marker){
+ const x=(marker.x+.5)*CELL,y=(marker.y+.5)*CELL,active=playerKeys.has(marker.token);
+ const color=active?$('colorWingActive').value:$('colorWingInactive').value;
+ c.save();c.translate(x,y);c.strokeStyle=color;c.lineWidth=2.5;
+ const r=CELL*.27;c.beginPath();c.moveTo(0,-r);c.lineTo(r,0);c.lineTo(0,r);c.lineTo(-r,0);c.closePath();
+ c.fillStyle=active?color:'#14202a';c.fill();c.stroke();
+ c.font='bold 12px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillStyle=active?'#08141c':'#fff';c.fillText(active?'✓':marker.label,0,0);
+ // Hollow dot means optional; filled centre dot means required.
+ c.beginPath();c.arc(r*.85,-r*.85,3,0,Math.PI*2);c.fillStyle=marker.required?color:'#14202a';c.fill();c.stroke();
+ c.restore();
+}
+function drawUniversalKeys(c){c.save();c.textAlign="center";c.textBaseline="middle";c.font="bold 19px sans-serif";for(const k of universalKeys)if(!k.collected){c.fillStyle="#e5e7eb";c.fillText("◆",(k.x+.5)*CELL,(k.y+.5)*CELL);}c.restore();}
+function drawUniversalDoors(c,onlyDiscovered=false,doors=universalDoors){c.save();c.lineWidth=levelSettings.lineWidth+3;for(const g of doors){const ax=g.x+(g.dir===E?1:0),ay=g.y+(g.dir===S?1:0),bx=ax+(g.dir===S?1:0),by=ay+(g.dir===E?1:0);const id=wallKey(ax,ay,bx,by);if(onlyDiscovered&&!discoveredWalls.has(id))continue;c.strokeStyle=g.open?"#9ca3af":"#f8fafc";for(const [a,b] of (g.open?[[0,.18],[.82,1]]:[[0,1]])){c.beginPath();c.moveTo((ax+(bx-ax)*a)*CELL,(ay+(by-ay)*a)*CELL);c.lineTo((ax+(bx-ax)*b)*CELL,(ay+(by-ay)*b)*CELL);c.stroke();}if(g.open){c.fillStyle="#a7f3d0";c.font="bold 12px sans-serif";c.fillText("✓",(ax+bx)/2*CELL,(ay+by)/2*CELL);}}c.restore();}
 function drawRememberedGates(dpr){
  ctx.save();ctx.setTransform(scale*dpr,0,0,scale*dpr,offsetX*dpr,offsetY*dpr);
  ctx.lineCap='round';
@@ -1014,6 +1552,7 @@ function drawRememberedGates(dpr){
   const open=colors.every(c=>playerKeys.has(c));
   ctx.globalAlpha=currentlyLitWalls.has(id)?1:.85;
   ctx.lineWidth=levelSettings.lineWidth+2;
+  if(drawCircuitGate(ctx,ax,ay,bx,by,colors))continue;
   // Open gates retain coloured jambs, leaving an unmistakable gap.
   colors.forEach((color,i)=>{
    ctx.strokeStyle=GATE_COLORS[color]||'#fff';
@@ -1022,8 +1561,10 @@ function drawRememberedGates(dpr){
   });
   if(open){ctx.fillStyle='#a7f3d0';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('✓',(ax+bx)/2*CELL,(ay+by)/2*CELL);}
  }
+ drawUniversalDoors(ctx,true);
  ctx.restore();
 }
+let visibleBounds={left:0,right:Infinity,top:0,bottom:Infinity};
 function drawDiscoveredWalls(dpr,litOnly=false){
  ctx.save();ctx.setTransform(scale*dpr,0,0,scale*dpr,offsetX*dpr,offsetY*dpr);
  ctx.lineCap='round';ctx.lineJoin='round';
@@ -1034,37 +1575,192 @@ function drawDiscoveredWalls(dpr,litOnly=false){
   const lit=currentlyLitWalls.has(key);
   if(litOnly&&!lit)continue;
   const [x1,y1,x2,y2]=key.split(',').map(Number);
+  if(Math.max(x1,x2)<visibleBounds.left||Math.min(x1,x2)>visibleBounds.right||Math.max(y1,y2)<visibleBounds.top||Math.min(y1,y2)>visibleBounds.bottom)continue;
   ctx.strokeStyle=$('colorWall').value;
   ctx.globalAlpha=lit?1:Math.max(.12,Math.min(.55,levelSettings.ambient+.20));
   ctx.beginPath();ctx.moveTo(x1*CELL,y1*CELL);ctx.lineTo(x2*CELL,y2*CELL);ctx.stroke();
  }
  ctx.restore();
 }
-function computeLightPolygon(torch){
- const ox=px+.5,oy=py+.5,reach=Math.max(.1,torch.reach);
- const segments=blockingSegments().filter(([x1,y1,x2,y2])=>Math.max(Math.abs((x1+x2)/2-ox),Math.abs((y1+y2)/2-oy))<reach+2);
- currentlyLitWalls.clear();
+// Light visibility is calculated in maze coordinates and reused across frames.
+// Gate/key state is part of the cache key: opening a gate changes occlusion.
+const lightCache=new Map();
+let lightCacheTopology='',lightCacheHits=0,lightCacheMisses=0,lightGeneration=0;
+let lightCalculationMs=0,lightDrawingMs=0;
+let lightCacheEvictions=0,lightFrameCacheMissMs=0,lightFrameCacheMissMaxMs=0;
+let perfMoveRequested=0,perfMoveSucceeded=0,perfMoveBlocked=0,perfInputStart=0,perfInputToDrawMs=0;
+const lightMissDetails=[];
+const LIGHT_CACHE_LIMIT=640;
+
+// Per-frame cache diagnostics distinguish a new player position, a new facing,
+// a topology change and a stationary-light rebuild from routine redraws.
+let lightFrameReasons={},lightFrameHits=0,lightFrameMisses=0;
+let lightFramePlayerMs=0,lightFrameStationaryMs=0,lightFrameGlowMs=0;
+let lastPlayerLightPosition='',lastPlayerLightFacing='',lastPlayerLightTopology='';
+function lightReason(reason){lightFrameReasons[reason]=(lightFrameReasons[reason]||0)+1;}
+
+// Lighting quality is fixed for the lifetime of a generated maze. Camera-only
+// changes must never change the ray/probe budget or invalidate visibility.
+function selectedLightingQuality(){
+ const mode=$('lightingEffort').value;
+ if(mode==='performance')return {lightingEngine:'tuned',rayDensity:12,minRays:48,lightProbes:1,lightingEffort:mode};
+ if(mode==='balanced')return {lightingEngine:'tuned',rayDensity:30,minRays:96,lightProbes:5,lightingEffort:mode};
+ if(mode==='detail')return {lightingEngine:'tuned',rayDensity:85,minRays:180,lightProbes:9,lightingEffort:mode};
+ if(mode==='original')return {lightingEngine:'baseline',rayDensity:85,minRays:180,lightProbes:9,lightingEffort:mode};
+ return {lightingEngine:$('lightingEngine').value,rayDensity:Number($('rayDensity').value),minRays:Number($('minRays').value),lightProbes:Number($('lightProbes').value),lightingEffort:'custom'};
+}
+function lightTopologyKey(){
+ return `${lightGeneration}:${cols}x${rows}:${activeSeed}:${[...playerKeys].sort().join('|')}`;
+}
+
+// Grid visibility: trace through cell boundaries, testing only the edge crossed.
+// This replaces O(rays * nearby walls) work with O(cells * reach) and avoids
+// the expensive polygon scanline and wall-probe stages entirely.
+function gridLight(torch,sx,sy){
+ const reach=Math.max(.1,torch.reach),ox=sx+.5,oy=sy+.5;
+ const x0=Math.max(0,Math.floor(ox-reach-1)),x1=Math.min(cols-1,Math.ceil(ox+reach));
+ const y0=Math.max(0,Math.floor(oy-reach-1)),y1=Math.min(rows-1,Math.ceil(oy+reach));
+ const blockers=new Set();
+ for(const e of nearbyBlockingSegments(x0,y0,x1+1,y1+1))blockers.add(wallKey(...e.slice(0,4)));
+ function edgeBlocked(x,y,dx,dy){
+  if(dx===1)return blockers.has(wallKey(x+1,y,x+1,y+1));
+  if(dx===-1)return blockers.has(wallKey(x,y,x,y+1));
+  if(dy===1)return blockers.has(wallKey(x,y+1,x+1,y+1));
+  return blockers.has(wallKey(x,y,x+1,y));
+ }
+ function visible(tx,ty){
+  if(tx===sx&&ty===sy)return true;
+  // Amanatides-Woo grid traversal from centre to centre. On exact corner
+  // crossings both adjoining edges must be open, preventing corner leaks.
+  const dx=tx-sx,dy=ty-sy,stepX=Math.sign(dx),stepY=Math.sign(dy);
+  const deltaX=dx?1/Math.abs(dx):Infinity,deltaY=dy?1/Math.abs(dy):Infinity;
+  let crossX=deltaX*.5,crossY=deltaY*.5,x=sx,y=sy;
+  while(x!==tx||y!==ty){
+   if(Math.abs(crossX-crossY)<1e-9){
+    if(edgeBlocked(x,y,stepX,0)||edgeBlocked(x,y,0,stepY))return false;
+    x+=stepX;y+=stepY;crossX+=deltaX;crossY+=deltaY;
+   }else if(crossX<crossY){if(edgeBlocked(x,y,stepX,0))return false;x+=stepX;crossX+=deltaX;}
+   else{if(edgeBlocked(x,y,0,stepY))return false;y+=stepY;crossY+=deltaY;}
+  }
+  return true;
+ }
+ const lit=new Map(),direct=new Set();
+ for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
+  const distance=Math.hypot(x-sx,y-sy);
+  if(distance>reach)continue;
+  if(torch.type==='cone'&&Math.abs(normalizeAngle(Math.atan2(y-sy,x-sx)-aimAngle))>Math.PI/6)continue;
+  if(!visible(x,y))continue;
+  const index=y*cols+x;direct.add(index);
+  lit.set(index,1-.5*distance/reach);
+ }
+ // One-cell secondary bounce. Only reachable through an open edge and never
+ // allowed to propagate further; preserves opaque gates and closed doors.
+ if(levelSettings.cornerSpill&&reach>1.5){
+  const strength=levelSettings.cornerSpillStrength||.3;
+  for(const index of direct){
+   const x=index%cols,y=Math.floor(index/cols),base=lit.get(index);
+   for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+    const nx=x+dx,ny=y+dy,ni=ny*cols+nx;
+    if(nx<0||ny<0||nx>=cols||ny>=rows||direct.has(ni)||edgeBlocked(x,y,dx,dy))continue;
+    if(Math.hypot(nx-sx,ny-sy)>reach)continue;
+    if(torch.type==='cone'&&Math.abs(normalizeAngle(Math.atan2(ny-sy,nx-sx)-aimAngle))>Math.PI/6)continue;
+    lit.set(ni,Math.max(lit.get(ni)||0,base*strength));
+   }
+  }
+ }
+ const walls=new Set(),polys=[],tiles=[];
+ for(const [index,brightness] of lit){
+  const x=index%cols,y=Math.floor(index/cols);tiles.push(index);
+  polys.push([[x,y],[x+1,y],[x+1,y+1],[x,y+1]]);
+  for(const [ax,ay,bx,by] of [[x,y,x+1,y],[x+1,y,x+1,y+1],[x,y+1,x+1,y+1],[x,y,x,y+1]]){
+   const key=wallKey(ax,ay,bx,by);if(blockers.has(key))walls.add(key);
+  }
+ }
+ return {poly:null,polys,walls:[...walls],tiles,brightness:[...lit]};
+}
+
+function cachedLight(torch,sourceX,sourceY){
+ const topology=lightTopologyKey();
+ if(topology!==lightCacheTopology){lightCache.clear();lightCacheTopology=topology;lightReason('topologyChanged');}
+ const key=`${sourceX},${sourceY}:${torch.type}:${torch.reach}:${torch.type==='cone'?aimAngle.toFixed(7):''}:${levelSettings.lightingEngine}:${levelSettings.cornerSpill}:${levelSettings.cornerSpillStrength}`;
+ let result=lightCache.get(key);
+ if(result){lightCache.delete(key);lightCache.set(key,result);lightCacheHits++;lightFrameHits++;return result;}
+ const missStart=performance.now();
+ lightCacheMisses++;lightFrameMisses++;lightReason(torch.type==='cone'?'coneCacheMiss':'radialCacheMiss');
+ if(levelSettings.lightingEngine==='grid'){
+  result=gridLight(torch,sourceX,sourceY);
+  if(lightCache.size>=LIGHT_CACHE_LIMIT){lightCache.delete(lightCache.keys().next().value);lightCacheEvictions++;}
+  lightCache.set(key,result);
+  const ms=performance.now()-missStart;lightFrameCacheMissMs+=ms;lightFrameCacheMissMaxMs=Math.max(lightFrameCacheMissMaxMs,ms);
+  if(perfEnabled){lightMissDetails.push({ms:+ms.toFixed(2),type:torch.type,reach:torch.reach,source:[sourceX,sourceY],wallCount:0,rayCount:0,tiles:result.tiles.length,engine:'grid'});if(lightMissDetails.length>100)lightMissDetails.shift();}
+  return result;
+ }
+ const ox=sourceX+.5,oy=sourceY+.5,reach=Math.max(.1,torch.reach);
+ const segments=nearbyBlockingSegments(ox-reach-2,oy-reach-2,ox+reach+2,oy+reach+2)
+  .filter(([x1,y1,x2,y2])=>Math.max(Math.abs((x1+x2)/2-ox),Math.abs((y1+y2)/2-oy))<reach+2);
+ // Maze walls and gates are axis-aligned. Precompute their bounds once per
+ // source, then use direct horizontal/vertical ray intersections instead of
+ // a general determinant and multiple divisions for every ray-wall pair.
+ const rayWalls=segments.map(([ax,ay,bx,by])=>({
+  vertical:Math.abs(ax-bx)<1e-9,axis:Math.abs(ax-bx)<1e-9?ax:ay,
+  low:Math.min(Math.abs(ax-bx)<1e-9?ay:ax,Math.abs(ax-bx)<1e-9?by:bx),
+  high:Math.max(Math.abs(ax-bx)<1e-9?ay:ax,Math.abs(ax-bx)<1e-9?by:bx),
+  key:wallKey(ax,ay,bx,by)
+ }));
  const start=torch.type==='cone'?aimAngle-Math.PI/6:0;
  const sweep=torch.type==='cone'?Math.PI/3:Math.PI*2;
- const samples=Math.max(180,Math.ceil(reach*85));
- const points=[];
+ const samples=levelSettings.lightingEngine==='tuned'?Math.max(levelSettings.minRays,Math.ceil(reach*levelSettings.rayDensity)):Math.max(180,Math.ceil(reach*85));
+ // Per-source spatial index: each ray visits only buckets along its path.
+ // Bucket edges are inclusive so walls lying exactly on boundaries are retained.
+ const RAY_BUCKET=2,rayBuckets=new Map();
+ for(const w of rayWalls){
+  const x0=w.vertical?w.axis:w.low,x1=w.vertical?w.axis:w.high;
+  const y0=w.vertical?w.low:w.axis,y1=w.vertical?w.high:w.axis;
+  for(let by=Math.floor(y0/RAY_BUCKET);by<=Math.floor(y1/RAY_BUCKET);by++)
+   for(let bx=Math.floor(x0/RAY_BUCKET);bx<=Math.floor(x1/RAY_BUCKET);bx++){
+    const key=bx+','+by;
+    if(!rayBuckets.has(key))rayBuckets.set(key,[]);
+    rayBuckets.get(key).push(w);
+   }
+ }
+ const points=[],walls=new Set(),tiles=[];
  for(let i=0;i<=samples;i++){
   const angle=start+sweep*i/samples,dx=Math.cos(angle),dy=Math.sin(angle);
   let best=reach,hit=null;
-  for(const [ax,ay,bx,by] of segments){
-   // Ray/segment intersection, including the nearest wall hit.
-   const sx=bx-ax,sy=by-ay,den=dx*sy-dy*sx;
-   if(Math.abs(den)<1e-9)continue;
-   const rx=ax-ox,ry=ay-oy;
-   const t=(rx*sy-ry*sx)/den,u=(rx*dy-ry*dx)/den;
-   if(t>=0&&t<best&&u>=-1e-8&&u<=1+1e-8){best=t;hit=wallKey(ax,ay,bx,by);}
+  let bx=Math.floor(ox/RAY_BUCKET),by=Math.floor(oy/RAY_BUCKET);
+  const stepX=dx>0?1:-1,stepY=dy>0?1:-1;
+  const deltaX=Math.abs(dx)>1e-10?RAY_BUCKET/Math.abs(dx):Infinity;
+  const deltaY=Math.abs(dy)>1e-10?RAY_BUCKET/Math.abs(dy):Infinity;
+  let nextX=Number.isFinite(deltaX)?((dx>0?(bx+1)*RAY_BUCKET:bx*RAY_BUCKET)-ox)/dx:Infinity;
+  let nextY=Number.isFinite(deltaY)?((dy>0?(by+1)*RAY_BUCKET:by*RAY_BUCKET)-oy)/dy:Infinity;
+  const checked=new Set();
+  for(let steps=0;steps<Math.ceil(reach/RAY_BUCKET)*2+5;steps++){
+   for(const w of rayBuckets.get(bx+','+by)||[]){
+    if(checked.has(w))continue;checked.add(w);
+    let t,along;
+    if(w.vertical){
+     if(Math.abs(dx)<1e-9)continue;
+     t=(w.axis-ox)/dx;if(t<0||t>=best)continue;
+     along=oy+t*dy;
+    }else{
+     if(Math.abs(dy)<1e-9)continue;
+     t=(w.axis-oy)/dy;if(t<0||t>=best)continue;
+     along=ox+t*dx;
+    }
+    if(along>=w.low-1e-8&&along<=w.high+1e-8){best=t;hit=w.key;}
+   }
+   const boundary=Math.min(nextX,nextY);
+   if(boundary>best+1e-8)break;
+   // At exact bucket corners, visit both adjoining buckets to avoid light leaks.
+   if(Math.abs(nextX-nextY)<1e-9){
+    bx+=stepX;by+=stepY;nextX+=deltaX;nextY+=deltaY;
+   }else if(nextX<nextY){bx+=stepX;nextX+=deltaX;}
+   else{by+=stepY;nextY+=deltaY;}
   }
-  if(hit){currentlyLitWalls.add(hit);discoveredWalls.add(hit);}
+  if(hit)walls.add(hit);
   points.push([ox+dx*best,oy+dy*best]);
  }
  const poly=torch.type==='cone'?[[ox,oy],...points]:points;
- // Wall discovery uses the same segments as rendering and collision.
- // Sample both near-side positions to avoid vertical/horizontal orientation bias.
  for(const [ax,ay,bx,by] of segments){
   const nx=by-ay,ny=-(bx-ax);
   for(const t of [.2,.5,.8]){
@@ -1073,25 +1769,53 @@ function computeLightPolygon(torch){
    const sx=mx+nx*side*.02,sy=my+ny*side*.02;
    if(Math.hypot(sx-ox,sy-oy)>reach)continue;
    if(torch.type==='cone'&&Math.abs(normalizeAngle(Math.atan2(sy-oy,sx-ox)-aimAngle))>Math.PI/6)continue;
-   if(hasLineOfSight(ox,oy,sx,sy)){
-    const key=wallKey(ax,ay,bx,by);currentlyLitWalls.add(key);discoveredWalls.add(key);break;
-   }
+   if(hasLineOfSight(ox,oy,sx,sy)){walls.add(wallKey(ax,ay,bx,by));break;}
   }
  }
- // Record explored tiles whenever any substantial part of the tile is illuminated.
- for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
-  if(Math.hypot(x+.5-ox,y+.5-oy)>reach+1)continue;
-  // Reveal a floor tile when light reaches ANY part of its surface,
-  // not only when its centre (or the player) enters the tile.
-  const probes=[[.5,.5],[.08,.08],[.92,.08],[.08,.92],[.92,.92],
-                [.5,.08],[.5,.92],[.08,.5],[.92,.5]];
-  const touches=probes.some(([dx,dy])=>pointInPolygon(x+dx,y+dy,poly))
-    ||poly.some(([vx,vy])=>vx>=x&&vx<=x+1&&vy>=y&&vy<=y+1);
-  if(touches)revealedMap[y][x]=1;
+ const minX=Math.max(0,Math.floor(ox-reach-1)),maxX=Math.min(cols-1,Math.ceil(ox+reach));
+ const minY=Math.max(0,Math.floor(oy-reach-1)),maxY=Math.min(rows-1,Math.ceil(oy+reach));
+ // Precompute polygon scanline crossings once per row and probe height.
+ // Parity matches pointInPolygon(), but avoids traversing hundreds of polygon
+ // edges for every cell and every probe (the main moving-light bottleneck).
+ const fullProbes=[[.5,.5],[.08,.08],[.92,.08],[.08,.92],[.92,.92],[.5,.08],[.5,.92],[.08,.5],[.92,.5]];
+ const probes=levelSettings.lightingEngine==='tuned'?(levelSettings.lightProbes===1?fullProbes.slice(0,1):levelSettings.lightProbes===5?fullProbes.slice(0,5):fullProbes):fullProbes;
+ const probeYs=[.5,.08,.92],probeXs=[.5,.08,.92];
+ const vertexCells=new Set();
+ for(const [vx,vy] of poly){const ix=Math.floor(vx),iy=Math.floor(vy);if(ix>=minX&&ix<=maxX&&iy>=minY&&iy<=maxY)vertexCells.add(iy*cols+ix);}
+ function upperBound(a,v){let lo=0,hi=a.length;while(lo<hi){const m=(lo+hi)>>1;if(a[m]<=v)lo=m+1;else hi=m;}return lo;}
+ for(let y=minY;y<=maxY;y++){
+  const scans=(probes.length===1?[.5]:probes.length===5?[.5,.08,.92]:probeYs).map(dy=>{
+   const pyProbe=y+dy,crossings=[];
+   for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+    const a=poly[i],b=poly[j];
+    if((a[1]>pyProbe)!==(b[1]>pyProbe))crossings.push((b[0]-a[0])*(pyProbe-a[1])/(b[1]-a[1])+a[0]);
+   }
+   crossings.sort((a,b)=>a-b);return crossings;
+  });
+  for(let x=minX;x<=maxX;x++){
+   if(Math.hypot(x+.5-ox,y+.5-oy)>reach+1)continue;
+   const cell=y*cols+x;
+   let touches=vertexCells.has(cell);
+   if(!touches)for(const [dx,dy] of probes){
+    const scan=scans[(probes.length===1?0:probeYs.indexOf(dy))];
+    if((scan.length-upperBound(scan,x+dx))%2){touches=true;break;}
+   }
+   if(touches)tiles.push(cell);
+  }
  }
- revealedMap[py][px]=1;
- visibilityPolygon=poly;
- return poly;
+ tiles.push(sourceY*cols+sourceX);
+ result={poly,walls:[...walls],tiles};
+ // Bound cache growth for long sessions, while preserving stationary sources.
+ if(lightCache.size>=LIGHT_CACHE_LIMIT){const oldest=lightCache.keys().next().value;lightCache.delete(oldest);lightCacheEvictions++;}
+ lightCache.set(key,result);
+ const missMs=performance.now()-missStart;
+ lightFrameCacheMissMs+=missMs;lightFrameCacheMissMaxMs=Math.max(lightFrameCacheMissMaxMs,missMs);
+ if(perfEnabled){lightMissDetails.push({ms:+missMs.toFixed(2),type:torch.type,reach:torch.reach,source:[sourceX,sourceY],wallCount:segments.length,rayCount:samples,tiles:tiles.length});if(lightMissDetails.length>100)lightMissDetails.shift();}
+ return result;
+}
+function applyCachedLight(result){
+ for(const wall of result.walls){currentlyLitWalls.add(wall);discoveredWalls.add(wall);}
+ for(const cell of result.tiles)revealedMap[Math.floor(cell/cols)][cell%cols]=1;
 }
 function pointInPolygon(x,y,poly){
  let inside=false;
@@ -1107,23 +1831,42 @@ function drawLiveEntities(c){
  if(levelObjective==='keys'&&puzzlePlan){
   c.save();c.font='bold 17px sans-serif';c.textAlign='center';c.textBaseline='middle';
   for(const marker of [...puzzlePlan.returnLatches,...puzzlePlan.wingSwitches]){
-   c.fillStyle=playerKeys.has(marker.token)?'#45a29e':(GATE_COLORS[marker.token]||'#cbd5e1');
-   c.fillText(marker.label||'↩',(marker.x+.5)*CELL,(marker.y+.5)*CELL);
+   if(marker.token.startsWith('wing:'))drawWingSwitch(c,marker);
+   else {c.fillStyle=playerKeys.has(marker.token)?'#45a29e':'#cbd5e1';c.fillText(marker.label||'↩',(marker.x+.5)*CELL,(marker.y+.5)*CELL);}
   }c.restore();
  }
 
- c.fillStyle='rgba(34,197,94,.38)';
- for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)if(slimeMap[y][x]){
-  c.beginPath();c.arc((x+.5)*CELL,(y+.5)*CELL,CELL*.34,0,Math.PI*2);c.fill();
- }
  for(const g of gems)if(!g.collected){
   const x=(g.x+.5)*CELL,y=(g.y+.5)*CELL;c.fillStyle='#f59e0b';c.beginPath();
   c.moveTo(x,y-CELL*.28);c.lineTo(x+CELL*.24,y);c.lineTo(x,y+CELL*.28);c.lineTo(x-CELL*.24,y);c.closePath();c.fill();
  }
  for(const k of keys)if(!k.collected){c.fillStyle=GATE_COLORS[k.color];c.beginPath();c.arc((k.x+.5)*CELL,(k.y+.5)*CELL,CELL*.22,0,Math.PI*2);c.fill();}
+ drawUniversalKeys(c);
  c.fillStyle='#ef4444';c.beginPath();c.arc((exitX+.5)*CELL,(exitY+.5)*CELL,CELL*.30,0,Math.PI*2);c.fill();
- for(const enemy of enemies)if(enemy.alive){c.fillStyle=`rgba(239,68,68,${clamp(enemy.health,.2,1)})`;c.beginPath();c.arc((enemy.x+.5)*CELL,(enemy.y+.5)*CELL,CELL*.28,0,Math.PI*2);c.fill();}
- c.fillStyle='#66fcf1';c.beginPath();c.arc((px+.5)*CELL,(py+.5)*CELL,CELL*.34,0,Math.PI*2);c.fill();
+ drawExplorer(c);
+}
+function drawExplorer(c){
+ // High-contrast explorer: a bright core, dark separation ring and heading arrow.
+ // Rendered in world coordinates after the fog and navigation overlays.
+ const x=(px+.5)*CELL,y=(py+.5)*CELL,r=CELL*.34;
+ c.save();
+ c.shadowColor='rgba(255,255,255,.85)';c.shadowBlur=CELL*.22;
+ c.fillStyle='#ffffff';c.strokeStyle='#07131b';c.lineWidth=Math.max(2,CELL*.105);
+ c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();c.stroke();
+ c.shadowBlur=0;
+ c.fillStyle='#063c47';c.beginPath();c.arc(x,y,r*.55,0,Math.PI*2);c.fill();
+ const facing=(typeof torchFacing!=='undefined'?torchFacing:null);
+ let dx=0,dy=-1;
+ if(typeof facing==='number'){dx=[0,1,0,-1][((facing%4)+4)%4];dy=[-1,0,1,0][((facing%4)+4)%4];}
+ else if(facing&&typeof facing==='object'){dx=Number(facing.x)||0;dy=Number(facing.y)||0;}
+ const mag=Math.hypot(dx,dy)||1;dx/=mag;dy/=mag;
+ const sideX=-dy,sideY=dx;
+ c.fillStyle='#ffb703';c.strokeStyle='#07131b';c.lineWidth=Math.max(1,CELL*.055);
+ c.beginPath();c.moveTo(x+dx*r*.9,y+dy*r*.9);
+ c.lineTo(x-dx*r*.16+sideX*r*.43,y-dy*r*.16+sideY*r*.43);
+ c.lineTo(x-dx*r*.16-sideX*r*.43,y-dy*r*.16-sideY*r*.43);
+ c.closePath();c.fill();c.stroke();
+ c.restore();
 }
 function drawPuzzlePlan(){
  const palette=['#203d49','#3c294b','#294630','#4b3826','#253857','#4b2834'];
@@ -1137,44 +1880,158 @@ function drawPuzzlePlan(){
   const x=g.from%cols,y=Math.floor(g.from/cols),nx=g.to%cols,ny=Math.floor(g.to/cols);
   label('G'+g.number,((x+nx)/2+.5)*CELL,((y+ny)/2+.5)*CELL,GATE_COLORS[g.color]);
  }
+ for(const marker of puzzlePlan.wingSwitches)drawWingSwitch(ctx,marker);
  keys.forEach((k,i)=>label('K'+(i+1),(k.x+.5)*CELL,(k.y+.5)*CELL,GATE_COLORS[k.color]));
  if(puzzlePlan.hub)label('HUB',(puzzlePlan.hub.cell%cols+.5)*CELL,(Math.floor(puzzlePlan.hub.cell/cols)+.05)*CELL,'#66fcf1');
  puzzlePlan.entries.forEach((cell,i)=>label('R'+i,(cell%cols+.5)*CELL,(Math.floor(cell/cols)+.5)*CELL,'#d1d5db'));
  label('START',CELL*.5,CELL*.5,'#66fcf1');label('EXIT',(exitX+.5)*CELL,(exitY+.5)*CELL,'#fff');
 }
+// Slow-frame recorder, deliberately bounded to avoid adding its own lag.
+const perfFrames=[];
+const perfAggregate={};
+let perfTotal=0,perfDiscardedSamples=0,perfDiscardedSlow=0,perfStartTime=null;
+const PERF_FIELDS=['frameMs','frameIntervalMs','lightingMs','lightDrawMs','playerLightMs','stationaryLightMs','glowLightMs','lightFrameCacheMissMs','inputToDrawMs'];
+const PERF_BINS=[0,4,8,16.67,25,33.33,50,75,100,150,250,500,1000,Infinity];
+function perfBucket(v){for(let i=1;i<PERF_BINS.length;i++)if(v<PERF_BINS[i])return i-1;return PERF_BINS.length-2;}
+function perfAddAggregate(item){
+ const keys=['all',item.action,'zoom:'+Math.floor(item.zoom*4)/4,'torches:'+Math.floor(item.placedTorches/10)*10];
+ for(const key of keys){
+  let a=perfAggregate[key];if(!a){a=perfAggregate[key]={count:0,fields:{},reasons:{},slowFrames:0,cacheMisses:0,cacheHits:0};}
+  a.count++;if(item.frameMs>=perfThreshold)a.slowFrames++;a.cacheMisses+=item.lightFrameMisses;a.cacheHits+=item.lightFrameHits;
+  for(const [k,v] of Object.entries(item.lightReasons||{}))a.reasons[k]=(a.reasons[k]||0)+v;
+  for(const field of PERF_FIELDS){const value=item[field];if(!Number.isFinite(value))continue;
+   let f=a.fields[field];if(!f)f=a.fields[field]={count:0,sum:0,min:Infinity,max:-Infinity,bins:Array(PERF_BINS.length-1).fill(0)};
+   f.count++;f.sum+=value;f.min=Math.min(f.min,value);f.max=Math.max(f.max,value);f.bins[perfBucket(value)]++;
+  }
+ }
+}
+function perfPercentileBins(f,p){if(!f||!f.count)return null;const target=Math.ceil(f.count*p),bins=f.bins;let n=0;for(let i=0;i<bins.length;i++){n+=bins[i];if(n>=target)return Number.isFinite(PERF_BINS[i+1])?PERF_BINS[i+1]:'>=1000';}return null;}
+function perfCompactAggregates(){return Object.fromEntries(Object.entries(perfAggregate).map(([key,a])=>[key,{...a,fields:Object.fromEntries(Object.entries(a.fields).map(([k,f])=>[k,{count:f.count,mean:+(f.sum/f.count).toFixed(3),min:f.min,max:f.max,p50UpperBound:perfPercentileBins(f,.5),p95UpperBound:perfPercentileBins(f,.95),p99UpperBound:perfPercentileBins(f,.99),histogram:f.bins}]))}]));}
+function perfAnalysisPayload(){
+ const sorted=[...perfSamples,...perfFrames].sort((a,b)=>b.frameMs-a.frameMs);
+ const unique=new Set();const worst=[];
+ for(const f of sorted){const key=f.time+':'+f.frameMs+':'+f.action;if(unique.has(key))continue;unique.add(key);worst.push(f);if(worst.length===30)break;}
+ return {format:'Mazy-performance-analysis',schema:1,version:APP_VERSION,created:new Date().toISOString(),thresholdMs:perfThreshold,
+  capture:{frames:perfTotal,started:perfStartTime,ended:new Date().toISOString(),rollingSamples:perfSamples.length,discardedSamples:perfDiscardedSamples,rollingSlowFrames:perfFrames.length,discardedSlowFrames:perfDiscardedSlow},
+  device:{userAgent:navigator.userAgent,devicePixelRatio:window.devicePixelRatio,viewport:[window.innerWidth,window.innerHeight]},
+  maze:{size:[cols,rows],seed:activeSeed,torchCount:portableLights.length,lighting:{...torchState()},explorer:levelSettings.explorer},
+  testSettings:{seedLocked:$('keepSeed').checked,visibilityMemory:$('lightMemory').value,permanentTorches:$('fixedTorches').value,portableTorches:$('portableTorches').value,explorerTorch:$('explorerTorch').value,lightingEffort:$('lightingEffort').value,lightingEngine:$('lightingEngine').value},
+  histogramEdgesMs:PERF_BINS.map(x=>Number.isFinite(x)?x:'Infinity'),aggregates:perfCompactAggregates(),
+  movement:{requested:perfMoveRequested,succeeded:perfMoveSucceeded,blocked:perfMoveBlocked},
+  lighting:{hits:lightCacheHits,misses:lightCacheMisses,evictions:lightCacheEvictions,stationaryRebuilds,stationaryTileUpdates},
+  worstFrames:worst,expensiveCacheMissExamples:[...lightMissDetails].sort((a,b)=>b.ms-a.ms).slice(0,30),
+  notes:['Histogram percentiles are conservative bucket upper bounds, not exact percentiles.','Worst frames and cache-miss examples are drawn from bounded rolling buffers; aggregate statistics include the entire recording.','Frame interval FPS measures request scheduling and input cadence, not solely render throughput.']};
+}
+function perfDownload(payload,name){const blob=new Blob([JSON.stringify(payload)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}
+
+const perfSamples=[];
+let perfWorst=0,perfLast=0,perfThreshold=50,perfEnabled=false;
+function perfTrackFrame(ms){
+ if(!perfEnabled)return;
+ const action=performance.now()-perfLastEvent<350?perfAction:'other';
+ perfLast=ms;perfWorst=Math.max(ms,perfWorst);
+ const item={time:new Date().toISOString(),action,frameMs:+ms.toFixed(2),
+  frameIntervalMs:+perfFrameGap.toFixed(2),zoom:+scale.toFixed(4),
+  visibleCells:Math.max(0,visibleBounds.right-visibleBounds.left)*Math.max(0,visibleBounds.bottom-visibleBounds.top),
+  lightingMs:+lightCalculationMs.toFixed(2),lightDrawMs:+lightDrawingMs.toFixed(2),
+  lightReasons:{...lightFrameReasons},lightFrameHits,lightFrameMisses,
+  lightFrameCacheMissMs:+lightFrameCacheMissMs.toFixed(2),lightFrameCacheMissMaxMs:+lightFrameCacheMissMaxMs.toFixed(2),inputToDrawMs:+perfInputToDrawMs.toFixed(2),
+  playerLightMs:+lightFramePlayerMs.toFixed(2),stationaryLightMs:+lightFrameStationaryMs.toFixed(2),
+  glowLightMs:+lightFrameGlowMs.toFixed(2),
+  placedTorches:portableLights.length,stationaryCacheEntries:placedTorchCache.size,
+  stationaryTiles:stationaryTiles.size,stationaryRebuilds,stationaryTileUpdates,
+  stationaryHits:placedTorchHits,stationaryMisses:placedTorchMisses,
+  lightingCacheHits:lightCacheHits,lightingCacheMisses:lightCacheMisses,
+  historySteps:movementHistory.length,maze:[cols,rows],player:[px,py]};
+ // Include all actions in bounded sampling, even if draw() is quick but
+ // browser frame presentation is slow.
+ perfTotal++;if(!perfStartTime)perfStartTime=item.time;perfAddAggregate(item);
+ perfSamples.push(item);if(perfSamples.length>1200){perfSamples.shift();perfDiscardedSamples++;}
+ const stats=perfActionStats[action];stats.push({drawMs:ms,intervalMs:perfFrameGap});
+ if(stats.length>1200)stats.shift();
+ if(ms>=perfThreshold||perfFrameGap>=perfThreshold){
+  perfFrames.push(item);if(perfFrames.length>200){perfFrames.shift();perfDiscardedSlow++;}
+ }
+ const el=document.getElementById('perfStatus');
+ if(el&&(!perfTrackFrame.lastUpdate||performance.now()-perfTrackFrame.lastUpdate>350)){
+  perfTrackFrame.lastUpdate=performance.now();
+  const summary=Object.entries(perfActionStats).map(([key,arr])=>{
+   if(!arr.length)return key+': —';
+   const mean=arr.reduce((sum,x)=>sum+x.drawMs,0)/arr.length;
+   const interval=arr.filter(x=>x.intervalMs>0);
+   const fps=interval.length?1000/(interval.reduce((sum,x)=>sum+x.intervalMs,0)/interval.length):0;
+   return key+': '+mean.toFixed(0)+'ms draw / '+fps.toFixed(1)+' FPS ('+arr.length+')';
+  });
+  el.textContent=`Last ${ms.toFixed(1)}ms · worst ${perfWorst.toFixed(1)}ms · slow ${perfFrames.length} · zoom ${scale.toFixed(2)} · torches ${portableLights.length} | ${summary.join(' | ')}`;
+ }
+}
+function perfSummaries(){
+ return Object.fromEntries(Object.entries(perfActionStats).map(([name,arr])=>{
+  const intervals=arr.filter(x=>x.intervalMs>0);
+  return [name,{frames:arr.length,meanDrawMs:arr.length?arr.reduce((n,x)=>n+x.drawMs,0)/arr.length:null,
+   meanFrameIntervalMs:intervals.length?intervals.reduce((n,x)=>n+x.intervalMs,0)/intervals.length:null,
+   estimatedFps:intervals.length?1000/(intervals.reduce((n,x)=>n+x.intervalMs,0)/intervals.length):null}];
+ }));
+}
+function exportPerfReport(){
+ perfDownload({format:'Mazy-performance-full',schema:1,version:APP_VERSION,thresholdMs:perfThreshold,analysis:perfAnalysisPayload(),summary:perfSummaries(),frames:perfFrames,samples:perfSamples},'Mazy-performance-full-v'+APP_VERSION+'.json');
+}
+function exportPerfCompact(){perfDownload(perfAnalysisPayload(),'Mazy-performance-analysis-v'+APP_VERSION+'.json');}
+let cachedMazeFloorPattern=null;
+function mazeFloorPattern(){
+ if(cachedMazeFloorPattern)return cachedMazeFloorPattern;
+ const tile=document.createElement('canvas');tile.width=CELL*2;tile.height=CELL*2;
+ const c=tile.getContext('2d');
+ for(let y=0;y<2;y++)for(let x=0;x<2;x++){
+  c.fillStyle=(x+y)%2===0?'#202b34':'#19232c';
+  c.fillRect(x*CELL+.6,y*CELL+.6,CELL-1.2,CELL-1.2);
+  c.strokeStyle='rgba(110,145,155,.20)';c.lineWidth=.6;
+  c.strokeRect(x*CELL+.6,y*CELL+.6,CELL-1.2,CELL-1.2);
+ }
+ cachedMazeFloorPattern=ctx.createPattern(tile,'repeat');
+ return cachedMazeFloorPattern;
+}
 function draw(){
+ const frameStart=performance.now();
+ perfInputToDrawMs=perfInputStart?Math.max(0,frameStart-perfInputStart):0;perfInputStart=0;
+ lightFrameReasons={};lightFrameHits=0;lightFrameMisses=0;
+ lightFramePlayerMs=0;lightFrameStationaryMs=0;lightFrameGlowMs=0;
+ lightCalculationMs=0;lightDrawingMs=0;lightFrameCacheMissMs=0;lightFrameCacheMissMaxMs=0;
  const dpr=canvas.width/Math.max(1,window.innerWidth),W=canvas.width/dpr,H=canvas.height/dpr;
  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.globalCompositeOperation='source-over';
  ctx.fillStyle=$('colorBg').value;ctx.fillRect(0,0,W,H);
  if(!grid.length)return;
+ revealCells();
  ctx.setTransform(scale*dpr,0,0,scale*dpr,offsetX*dpr,offsetY*dpr);
  if($('showPuzzlePlan').checked&&puzzlePlan?.type==='organic-regions'){drawPuzzlePlan();return;}
  const left=clamp(Math.floor(-offsetX/(scale*CELL))-1,0,cols-1);
  const right=clamp(Math.ceil((W-offsetX)/(scale*CELL))+1,0,cols);
  const top=clamp(Math.floor(-offsetY/(scale*CELL))-1,0,rows-1);
  const bottom=clamp(Math.ceil((H-offsetY)/(scale*CELL))+1,0,rows);
- // Every carved cell has a subtle floor surface, even before being visited.
- // The fog mask determines which surfaces are currently visible or remembered.
- for(let y=top;y<bottom;y++)for(let x=left;x<right;x++){
-  ctx.fillStyle=(x+y)%2===0?'#202b34':'#19232c';
-  ctx.fillRect(x*CELL+.6,y*CELL+.6,CELL-1.2,CELL-1.2);
-  ctx.strokeStyle='rgba(110,145,155,.20)';ctx.lineWidth=.6;
-  ctx.strokeRect(x*CELL+.6,y*CELL+.6,CELL-1.2,CELL-1.2);
- }
+ visibleBounds={left:left-1,right:right+1,top:top-1,bottom:bottom+1};
+ const fogOn=$('enableFog').checked;
+ if(fogOn){ctx.fillStyle=$('fogStyle').value==='background'?$('colorBg').value:$('fogColor').value;ctx.fillRect(0,0,cols*CELL,rows*CELL);ctx.save();ctx.beginPath();for(let y=top;y<bottom;y++){let x=left;while(x<right){if(!revealedMap[y][x]){x++;continue;}const start=x;while(x<right&&revealedMap[y][x])x++;ctx.rect(start*CELL,y*CELL,(x-start)*CELL,CELL);}}ctx.clip();}
+ // Cached floor texture avoids thousands of fill/stroke calls when zoomed out.
+ // Temporary fog still hides unlit discovered areas as before.
+ ctx.fillStyle=mazeFloorPattern();
+ ctx.fillRect(left*CELL,top*CELL,(right-left)*CELL,(bottom-top)*CELL);
  ctx.fillStyle=$('colorFill').value+'55';
- for(let y=top;y<bottom;y++)for(let x=left;x<right;x++)if(visitedMap[y][x])ctx.fillRect(x*CELL,y*CELL,CELL,CELL);
+ if(!levelSettings.fog||levelSettings.memory==='remembered')for(let y=top;y<bottom;y++)for(let x=left;x<right;x++)if(visitedMap[y][x])ctx.fillRect(x*CELL,y*CELL,CELL,CELL);
  if($('showHint').checked){const key=`${px},${py}:${[...playerKeys].sort().join(',')}`;
   if(key!==hintKey){hintCache=findPath(px,py,exitX,exitY);hintKey=key;}
   if(hintCache.length){ctx.strokeStyle='#f59e0b';ctx.lineWidth=3;ctx.beginPath();hintCache.forEach(([x,y],i)=>i?ctx.lineTo((x+.5)*CELL,(y+.5)*CELL):ctx.moveTo((x+.5)*CELL,(y+.5)*CELL));ctx.stroke();}
  }
  const lineWidth=levelSettings.lineWidth,wall=$('colorWall').value;
  ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=wall;ctx.lineWidth=lineWidth;ctx.beginPath();
- for(const [ax,ay,bx,by] of solidWallSegments()){
+ for(const [ax,ay,bx,by] of nearbyBlockingSegments(left-1,top-1,right+1,bottom+1).filter(e=>e.length===4)){
+  if(ax<left-1&&bx<left-1||ax>right+1&&bx>right+1||ay<top-1&&by<top-1||ay>bottom+1&&by>bottom+1)continue;
   ctx.moveTo(ax*CELL,ay*CELL);ctx.lineTo(bx*CELL,by*CELL);
  }
  ctx.stroke();
+  drawUniversalDoors(ctx);
   // Gate rendering block
   for (const [ax, ay, bx, by, colors] of gateSegments()) {
+    if(circuitForGate(colors)){drawCircuitGate(ctx,ax,ay,bx,by,colors);continue;}
     if (colors.every(c => playerKeys.has(c))) continue;
     
     const missing=colors.filter(c=>!playerKeys.has(c));
@@ -1190,84 +2047,165 @@ function draw(){
 
 
 
- const torch=torchState();
- if(torch.fog){
-  // Visibility rays stop at the FIRST solid wall. Gate barriers also block light.
-  const polygon=computeLightPolygon(torch);
-  const lc=lightCtx;
-  lc.setTransform(1,0,0,1,0,0);
-  lc.globalCompositeOperation='source-over';
-  lc.clearRect(0,0,lightCanvas.width,lightCanvas.height);
-  // Entire unseen map is hidden, even when ambient lighting is enabled.
-  lc.fillStyle=$('colorBg').value;
-  lc.fillRect(0,0,lightCanvas.width,lightCanvas.height);
-  // Previously illuminated cells remain as a dark map, not a live view.
-  lc.save();
-  lc.setTransform(scale*dpr,0,0,scale*dpr,offsetX*dpr,offsetY*dpr);
-  lc.globalCompositeOperation='destination-out';
-  lc.fillStyle='rgba(0,0,0,1)';
-  for(let y=top;y<bottom;y++)for(let x=left;x<right;x++)if(revealedMap[y][x])
-    lc.fillRect(x*CELL,y*CELL,CELL,CELL);
-  lc.restore();
-  lc.globalCompositeOperation='source-over';
-  lc.fillStyle=`rgba(11,12,16,${1-Math.min(.8,torch.ambient)})`;
-  lc.save();lc.setTransform(scale*dpr,0,0,scale*dpr,offsetX*dpr,offsetY*dpr);
-  for(let y=top;y<bottom;y++)for(let x=left;x<right;x++)if(revealedMap[y][x])
-    lc.fillRect(x*CELL,y*CELL,CELL,CELL);
-  lc.restore();
-  // Remove the overlay only inside the wall-occluded light polygon.
-  lc.globalCompositeOperation='destination-out';
-  lc.fillStyle='#000';
-  lc.beginPath();
-  polygon.forEach(([x,y],i)=>i?lc.lineTo((x*CELL*scale+offsetX)*dpr,(y*CELL*scale+offsetY)*dpr):lc.moveTo((x*CELL*scale+offsetX)*dpr,(y*CELL*scale+offsetY)*dpr));
-  lc.closePath();lc.fill();
-  lc.globalCompositeOperation='source-over';
-  ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(lightCanvas,0,0);
-  // Wall strokes straddle their boundary. Draw discovered edges ABOVE the fog
-  // so the near face is visible even when the ray ends precisely at the wall.
-  drawDiscoveredWalls(dpr);
-  drawRememberedGates(dpr);
-  // Live entities are drawn ONLY inside the light. They cannot show through remembered areas.
-  ctx.save();ctx.setTransform(scale*dpr,0,0,scale*dpr,offsetX*dpr,offsetY*dpr);
-  ctx.beginPath();polygon.forEach(([x,y],i)=>i?ctx.lineTo(x*CELL,y*CELL):ctx.moveTo(x*CELL,y*CELL));ctx.closePath();ctx.clip();
-  drawLiveEntities(ctx);
+ drawLiveEntities(ctx);
+ if(fogOn){
   ctx.restore();
- } else {
-  // Without fog all entities are visible.
-  ctx.setTransform(scale*dpr,0,0,scale*dpr,offsetX*dpr,offsetY*dpr);
-  drawLiveEntities(ctx);
+  ctx.strokeStyle=$('colorWall').value;ctx.lineWidth=levelSettings.lineWidth;ctx.beginPath();
+  for(let y=top;y<bottom;y++)for(let x=left;x<right;x++)if(revealedMap[y][x])for(const [d,dx,dy] of DIRS)if(!(grid[y][x]&d)){const ax=x+(dx===1?1:0),ay=y+(dy===1?1:0);ctx.moveTo(ax*CELL,ay*CELL);ctx.lineTo((ax+(dy!==0?1:0))*CELL,(ay+(dx!==0?1:0))*CELL);}ctx.stroke();
+  drawVisibleGates(dpr,(x,y)=>[[Math.floor(x),Math.floor(y)],[Math.ceil(x)-1,Math.ceil(y)-1]].some(([a,b])=>revealedMap[b]?.[a]));
  }
-
+ ctx.setTransform(scale*dpr,0,0,scale*dpr,offsetX*dpr,offsetY*dpr);drawCrumbs(ctx);
+ // Navigation trails are drawn after the fog mask so illuminated route segments
+ // cannot be obscured. Keep the existing user-controlled trail visibility.
+ ctx.save();ctx.setTransform(scale*dpr,0,0,scale*dpr,offsetX*dpr,offsetY*dpr);
+ drawNavigationTrails(ctx);
+ // The explorer is always rendered last: even when a narrow beam, a wall-edge
+ // clipping artefact or an unlit configuration masks the centre of the cell,
+ // the character must remain identifiable at their actual position.
+ drawExplorer(ctx);
+ ctx.restore();
+ perfTrackFrame(performance.now()-frameStart);
 }
 
 
   
-function step(dx,dy){
+function updateNavigationButtons(){
+ const marker=$('btnDropMarker'),undo=$('btnUndoMove'),start=$('btnReturnStart'),back=$('btnReturnMarker');
+ if(!marker)return;
+ marker.classList.toggle('active',!!dropMarker);
+ marker.title=dropMarker?'Remove drop marker':'Drop marker at current square';
+ undo.disabled=movementHistory.length<2||isFinished;
+ start.disabled=(px===0&&py===0)||isFinished;
+ back.disabled=!dropMarker||(px===dropMarker.x&&py===dropMarker.y)||isFinished;
+}
+function toggleDropMarker(){if(!$('enableNavMarker').checked)return;
+ if(isFinished||!grid.length)return;
+ // Tapping the character when a marker exists removes it, allowing relocation.
+ dropMarker=dropMarker?null:{x:px,y:py};
+ autoNavigation=null;updateNavigationButtons();requestDraw();
+}
+function rewindOneStep(){
+ if(isFinished||movementHistory.length<2)return;
+ autoNavigation=null;
+ const previous=movementHistory[movementHistory.length-2];
+ const direction=[previous.x-px,previous.y-py];
+ // An unlocked gate or new corridor can never make an earlier step invalid.
+ if(Math.abs(direction[0])+Math.abs(direction[1])!==1)return;
+ movementHistory.pop();
+ aimInDirection(direction);step(direction[0],direction[1],false);
+}
+function routeTo(x,y){
+ if(isFinished||!grid.length)return;
+ const path=findPath(px,py,x,y);
+ if(!path||path.length<2)return;
+ autoNavigation={target:{x,y},last:0,path,index:0,key:[...playerKeys].sort().join("|")};updateNavigationButtons();requestDraw();
+}
+function advanceAutoNavigation(now){
+ if(!autoNavigation||isFinished)return;
+ if(now-autoNavigation.last<Math.max(90,moveDelay))return;
+ const {x,y}=autoNavigation.target;
+ if(px===x&&py===y){autoNavigation=null;updateNavigationButtons();return;}
+ // Reuse the planned route; recalculate only if the player deviates or gates change.
+ const key=[...playerKeys].sort().join('|');
+ let {path,index}=autoNavigation;
+ if(key!==autoNavigation.key||!path||!path[index]||path[index][0]!==px||path[index][1]!==py){
+  path=findPath(px,py,x,y);index=0;autoNavigation.path=path;autoNavigation.index=0;autoNavigation.key=key;
+ }
+ if(!path||index+1>=path.length){autoNavigation=null;updateNavigationButtons();return;}
+ const [nx,ny]=path[index+1];
+ if(!step(nx-px,ny-py)){autoNavigation=null;updateNavigationButtons();return;}
+ autoNavigation.index=index+1;autoNavigation.last=now;
+}
+function drawNavigationTrails(c){
+ const drawRoute=(path,color)=>{
+  if(path.length<2)return;
+  c.save();c.strokeStyle=color;c.lineWidth=5;c.lineJoin='round';c.lineCap='round';c.globalAlpha=.9;
+  c.beginPath();path.forEach(([x,y],i)=>i?c.lineTo((x+.5)*CELL,(y+.5)*CELL):c.moveTo((x+.5)*CELL,(y+.5)*CELL));c.stroke();c.restore();
+ };
+ if($('showStartTrail').checked){
+  // Loop erase the actual walked history, keeping a contiguous route to start.
+  const route=[],positions=new Map();
+  for(const {x,y} of movementHistory){const key=x+','+y;
+   if(positions.has(key)){const index=positions.get(key);while(route.length>index+1){const removed=route.pop();positions.delete(removed.join(','));}}
+   else{positions.set(key,route.length);route.push([x,y]);}
+  }
+  drawRoute(route,$('colorStartTrail').value);
+ }
+ if(dropMarker&&$('enableNavMarker').checked){
+  if($('showMarkerTrail').checked)drawRoute(findPath(dropMarker.x,dropMarker.y,px,py)||[],$('colorMarkerTrail').value);
+  c.save();c.fillStyle=$('colorMarkerTrail').value;c.font='bold 24px sans-serif';c.textAlign='center';c.textBaseline='bottom';c.fillText('⚑',(dropMarker.x+.5)*CELL,(dropMarker.y+.5)*CELL);c.restore();
+ }
+}
+function drawAdditionalTorches(c){
+ c.save();c.font='bold 19px sans-serif';c.textAlign='center';c.textBaseline='middle';
+ for(const p of fixedLightPoints){c.fillStyle=p.active?'#facc15':'#64748b';c.fillText(p.active?'✺':'◇',(p.x+.5)*CELL,(p.y+.5)*CELL);}
+ c.fillStyle='#ffb86b';for(const p of portableLights)c.fillText('♨',(p.x+.5)*CELL,(p.y+.5)*CELL);
+ c.restore();
+}
+function drawVisibleGates(dpr,inLight){
+ ctx.save();ctx.setTransform(scale*dpr,0,0,scale*dpr,offsetX*dpr,offsetY*dpr);
+ for(const g of universalDoors){const edge=universalEdge(g);if(inLight((edge[0]+edge[2])/2,(edge[1]+edge[3])/2)){drawUniversalDoors(ctx,false,[g]);}}
+ for(const [ax,ay,bx,by,colors] of gateSegments()){
+  if(!inLight((ax+bx)/2,(ay+by)/2))continue;
+  if(drawCircuitGate(ctx,ax,ay,bx,by,colors))continue;
+  const open=colors.every(c=>playerKeys.has(c));ctx.lineWidth=levelSettings.lineWidth+2;
+  colors.forEach((color,i)=>{ctx.strokeStyle=GATE_COLORS[color]||'#fff';
+   for(const [a,b] of (open?[[0,.18],[.82,1]]:[[i/colors.length,(i+1)/colors.length]])){
+    ctx.beginPath();ctx.moveTo((ax+(bx-ax)*a)*CELL,(ay+(by-ay)*a)*CELL);ctx.lineTo((ax+(bx-ax)*b)*CELL,(ay+(by-ay)*b)*CELL);ctx.stroke();
+   }
+  });
+  if(open){ctx.fillStyle='#a7f3d0';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.fillText('✓',(ax+bx)/2*CELL,(ay+by)/2*CELL);}
+ }
+ ctx.restore();
+}
+function drawRememberedObjects(c){
+ c.save();c.globalAlpha=.95;
+ for(const k of universalKeys)if(rememberedKeys.has(k.x+','+k.y)){c.fillStyle='#e5e7eb';c.font='bold 19px sans-serif';c.textAlign='center';c.fillText(k.collected?'◇':'◆',(k.x+.5)*CELL,(k.y+.5)*CELL);}
+ for(const k of keys)if(!k.collected&&rememberedKeys.has(k.x+','+k.y)){
+  c.fillStyle=GATE_COLORS[k.color]||'#fff';c.beginPath();c.arc((k.x+.5)*CELL,(k.y+.5)*CELL,CELL*.22,0,Math.PI*2);c.fill();
+ }
+ if(rememberedExit){c.fillStyle='#ef4444';c.beginPath();c.arc((exitX+.5)*CELL,(exitY+.5)*CELL,CELL*.3,0,Math.PI*2);c.fill();}
+ c.restore();
+}
+function drawRememberedWingSwitches(c){
+ for(const marker of (puzzlePlan?.wingSwitches||[]))
+  if(rememberedWingSwitches.has(marker.token))drawWingSwitch(c,marker);
+}
+function step(dx,dy,record=true){
+ markPerfAction('movement');
+ if(perfEnabled){perfMoveRequested++;perfInputStart=performance.now();}
  if(isFinished||!grid.length||Math.abs(dx)+Math.abs(dy)!==1)return false;
  const dir=dx===1?E:dx===-1?W:dy===1?S:N;
- if(!walkable(px,py,dir))return false;
- px+=dx;py+=dy;visitedMap[py][px]=1;hintKey='';visibilityDirty=true;
+ if(!walkable(px,py,dir)){
+  const door=universalDoors.find(g=>!g.open&&((g.x===px&&g.y===py&&g.dir===dir)||(g.x===px+dx&&g.y===py+dy&&g.dir===OPPOSITE[dir])));
+  if(!door||!universalHeld||!walkable(px,py,dir,false)||gateMap[py][px].some(g=>g.dir===dir&&!g.colors.every(c=>playerKeys.has(c)))){if(perfEnabled)perfMoveBlocked++;return false;}
+  door.open=true;universalHeld--;lightGeneration++;lightCache.clear();
+ }
+ if(clockMode==='waiting'||clockMode==='paused'){clockMode='running';startTime=performance.now()-elapsedTime*1000;renderClock();}
+ if(perfEnabled)perfMoveSucceeded++;
+ px+=dx;py+=dy;lightSteps.push({x:px,y:py});if(lightSteps.length>20)lightSteps.shift();if(record)movementHistory.push({x:px,y:py});updateNavigationButtons();visitedMap[py][px]=1;hintKey='';visibilityDirty=true;
  for(const g of gems)if(!g.collected&&g.x===px&&g.y===py)g.collected=true;
  for(const latch of [...(puzzlePlan?.returnLatches||[]),...(puzzlePlan?.wingSwitches||[])])if(latch.x===px&&latch.y===py)playerKeys.add(latch.token);
  for(const k of keys)if(!k.collected&&k.x===px&&k.y===py){k.collected=true;playerKeys.add(k.color);}
- moveDelay=slimeMap[py][px]?240:120;updateHUD();
- const done=levelObjective==='standard'||(levelObjective==='collector'&&gems.every(g=>g.collected))||(levelObjective==='keys'&&keys.every(k=>k.collected));
+ for(const k of universalKeys)if(!k.collected&&k.x===px&&k.y===py){k.collected=true;universalHeld++;}
+ applyCrumbAuto();revealCells();moveDelay=120;updateHUD();
+ const done=(!levelSettings.requireFixed||!levelSettings.fixed||fixedLightPoints.every(p=>p.active))&&(levelObjective!=='keys'||keys.every(k=>k.collected))&&gems.every(g=>g.collected);
  if(px===exitX&&py===exitY&&done){
-  isFinished=true;clearInterval(timerInterval);
-  $('modal-stats').textContent=`Cleared in ${formatTime(elapsedTime)} · Seed: ${activeSeed}`;$('modal-overlay').style.display='flex';
+  if(clockMode==='running')elapsedTime=(performance.now()-startTime)/1000;isFinished=true;clearInterval(timerInterval);renderClock();
+  $('modal-stats').textContent=clockUnscored?`Maze cleared · Seed: ${activeSeed}`:`Cleared in ${formatTime(elapsedTime)} · Seed: ${activeSeed}`;prepareWin();$('modal-overlay').style.display='flex';
  }
  requestDraw();return true;
 }
-function move(dx,dy){aimInDirection([dx,dy]);step(dx,dy);}
+function move(dx,dy){autoNavigation=null;aimInDirection([dx,dy]);step(dx,dy);}
 function aimInDirection(direction){
  if(!direction)return;
  const angle=Math.atan2(direction[1],direction[0]);
  if(aimAngle!==angle){aimAngle=angle;visibilityDirty=true;requestDraw();}
 }
-// Shared movement rate for held arrows and joystick. Slime slows movement.
+// Shared movement rate for held arrows and joystick.
 function inputStepInterval(rate=Number($('touchSensitivity').value)){return Math.max(moveDelay,1000/rate);}
 function repeatDirection(direction,rate){
- if(!direction||isFinished)return;
+ if(!direction||isFinished)return;autoNavigation=null;
  aimInDirection(direction);
  const now=performance.now();
  if(now-lastMoveTime<inputStepInterval(rate))return;
@@ -1357,9 +2295,15 @@ function handleDragMove(){
 }
 function zoomAt(factor,x,y){
  const old=scale;scale=clamp(scale*factor,.08,10);
- offsetX=x-(x-offsetX)*scale/old;offsetY=y-(y-offsetY)*scale/old;requestDraw();
+ offsetX=x-(x-offsetX)*scale/old;offsetY=y-(y-offsetY)*scale/old;requestDraw('zoom');
 }
 canvas.addEventListener('pointerdown',e=>{
+ if(e.button===0&&grid.length&&!isFinished){
+  const x=Math.floor((e.clientX-offsetX)/(CELL*scale)),y=Math.floor((e.clientY-offsetY)/(CELL*scale));
+  // Tap/click on player square places/removes the independent marker.
+  if(x===px&&y===py&&$('enableNavMarker').checked){toggleDropMarker();return;}
+ }
+ autoNavigation=null;
  if(e.button===2){dragMode='pan';lastPointer={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);return;}
  if(e.pointerType==='mouse'&&e.button!==0)return;
  dragTarget=null;dragTargetInput=null;
@@ -1382,9 +2326,9 @@ canvas.addEventListener('pointermove',e=>{
  if(pointers.has(e.pointerId))pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
  if(dragMode==='pinch'&&pointers.size>=2){const [a,b]=[...pointers.values()];const dist=Math.hypot(a.x-b.x,a.y-b.y),mid={x:(a.x+b.x)/2,y:(a.y+b.y)/2};
   if(pinchDistance>0)zoomAt(dist/pinchDistance,pinchMid.x,pinchMid.y);
-  offsetX+=mid.x-pinchMid.x;offsetY+=mid.y-pinchMid.y;pinchDistance=dist;pinchMid=mid;requestDraw();return;
+  offsetX+=mid.x-pinchMid.x;offsetY+=mid.y-pinchMid.y;pinchDistance=dist;pinchMid=mid;requestDraw('zoom');return;
  }
- if(dragMode==='pan'&&lastPointer){offsetX+=e.clientX-lastPointer.x;offsetY+=e.clientY-lastPointer.y;lastPointer={x:e.clientX,y:e.clientY};requestDraw();return;}
+ if(dragMode==='pan'&&lastPointer){offsetX+=e.clientX-lastPointer.x;offsetY+=e.clientY-lastPointer.y;lastPointer={x:e.clientX,y:e.clientY};requestDraw('pan');return;}
  if(pointers.has(e.pointerId)&&touchOrigin){
   if(dragMode==='relative'){updateSwipeMovement(e.clientX,e.clientY);return;}
   if(dragMode==='continuous'){continuousDrag(e.clientX,e.clientY);return;}
@@ -1430,6 +2374,7 @@ for(const type of ['pointerup','pointercancel','lostpointercapture'])joystick.ad
  joystickPointer=null;joystickStrength=1;joystickKnob.style.transform='translate(0,0)';stopHeldDirection();
 });
 $('objectiveMode').addEventListener('change',updateObjectiveControls);
+$('requireGems').addEventListener('change',updateObjectiveControls);
 for(const id of ['w','h'])$(id).addEventListener('input',updateObjectiveControls);
 $('gemCount').addEventListener('input',()=>{
  $('gemCount').dataset.followMax=Number($('gemCount').value)===Number($('gemCount').max)?'true':'false';
@@ -1437,19 +2382,182 @@ $('gemCount').addEventListener('input',()=>{
 });
 $('gateCount').addEventListener('input',updateObjectiveControls);
 updateObjectiveControls();
+
+// Menu navigation, help and configuration summary
+const menuSections=[...document.querySelectorAll('.menu-section')];
+document.querySelectorAll('[data-jump]').forEach(b=>b.addEventListener('click',()=>{
+ const target=$('section-'+b.dataset.jump);if(!target)return;target.open=true;target.scrollIntoView({block:'start',behavior:'smooth'});
+}));
+$('expandSections').onclick=()=>menuSections.forEach(d=>d.open=true);
+$('collapseSections').onclick=()=>menuSections.forEach(d=>d.open=false);
+function updateSetupSummary(){
+ const mode=$('objectiveMode').value==='keys'?'Keys & gates':'Standard';
+ $('setupSummary').textContent=`Next maze: ${$('w').value}×${$('h').value} · ${mode}${$('requireGems').checked?' + gems':''} · Fog ${$('enableFog').checked?'on':'off'} · ${randomOptionIds.filter(optionIsLocked).length} locked / ${randomOptionIds.filter(id=>!optionIsLocked(id)).length} randomisable · Generate Maze keeps these rules`;
+}
+$('controls').addEventListener('input',updateSetupSummary);
+$('controls').addEventListener('change',updateSetupSummary);
+updateSetupSummary();
+
+// One-touch presets modify setup controls only; they never regenerate the active level.
+const MAZY_PRESETS={
+ basic:{size:15,objectiveMode:'standard',requireGems:false,gateCount:1,algo:'backtracker',enableFog:true,explorerTorch:'on',fixedTorches:'off',portableTorches:'off',lightMemory:'remembered',topology:'off'},
+ gate:{size:31,objectiveMode:'keys',requireGems:false,gateCount:3,algo:'backtracker',enableFog:false,explorerTorch:'on',fixedTorches:'off',portableTorches:'off',topology:'off'},
+ explorer:{size:51,objectiveMode:'keys',requireGems:false,gateCount:3,algo:'backtracker',enableFog:true,explorerTorch:'random',fixedTorches:'random',portableTorches:'random',lightMemory:'temporary',topology:'random'},
+ treasure:{size:31,objectiveMode:'standard',requireGems:true,gateCount:2,algo:'prims',enableFog:true,explorerTorch:'on',fixedTorches:'on',portableTorches:'random',lightMemory:'remembered',topology:'off'},
+ challenge:{size:81,objectiveMode:'keys',requireGems:true,gateCount:4,algo:'backtracker',enableFog:true,explorerTorch:'random',fixedTorches:'random',portableTorches:'random',lightMemory:'temporary',topology:'random'}
+};
+let activePreset=null,presetApplying=false;
+function setPresetValue(id,value){const el=$(id);if(!el)return;if(el.type==='checkbox')el.checked=!!value;else el.value=String(value);}
+function markCustom(){if(presetApplying||!activePreset)return;$('presetState').textContent='Custom (from '+activePreset+')';$('resetPreset').hidden=false;document.querySelectorAll('[data-preset]').forEach(b=>b.classList.remove('active'));}
+function applyPreset(name,override=null){const p=MAZY_PRESETS[name];if(!p)return;if(override===null){showPresetChoice(name);return;}presetApplying=true;
+ const presetSet=(id,value)=>{if(override||!optionIsLocked(id))setPresetValue(id,value);};
+ try{
+  for(const [id,v] of Object.entries(p))if(id!=='size'&&id!=='topology')presetSet(id,v);
+  presetSet('w',p.size);presetSet('h',p.size);
+  for(const id of ['topoCrossOver','topoHub','topoWings','topoCycles'])presetSet(id,p.topology);
+  updateObjectiveControls();if(p.requireGems){const max=Number($('gemCount').max);if(override||!optionIsLocked('gemCount')){$('gemCount').value=Math.max(1,Math.round(max*(name==='treasure'?.2:.1)));$('gemCount').dataset.followMax='false';}updateObjectiveControls();}
+  for(const [id,label] of [['fixedPct','fixedPctLabel'],['portablePct','portablePctLabel'],['glowSteps','glowStepsLabel']])$(label).textContent=$(id).value+(id==='glowSteps'?'':'%');
+  activePreset=name;$('presetState').textContent=name.replace(/^./,c=>c.toUpperCase());$('resetPreset').hidden=true;
+  document.querySelectorAll('[data-preset]').forEach(b=>b.classList.toggle('active',b.dataset.preset===name));
+  updateSetupSummary();updateSizeButtons();queueConfigSave();
+ }finally{presetApplying=false;}
+}
+function updateSizeButtons(){document.querySelectorAll('[data-size]').forEach(b=>b.classList.toggle('active',Number(b.dataset.size)===Number($('w').value)&&Number($('w').value)===Number($('h').value)));}
+function showPresetChoice(name){
+ const dlg=$('presetChoiceDialog');$('presetChoiceName').textContent=name.replace(/^./,c=>c.toUpperCase());
+ dlg.dataset.preset=name;
+ if(typeof dlg.showModal==='function')dlg.showModal();else{const choice=window.prompt('Preset '+name+': type R to respect locks, O to override locks, or C to cancel','R');if(choice&&choice.toLowerCase()==='r')applyPreset(name,false);else if(choice&&choice.toLowerCase()==='o')applyPreset(name,true);}
+}
+$('presetChoiceDialog').addEventListener('click',e=>{const action=e.target.dataset.presetChoice;if(!action)return;const dlg=$('presetChoiceDialog'),name=dlg.dataset.preset;dlg.close();if(action==='respect')applyPreset(name,false);else if(action==='override')applyPreset(name,true);});
+document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>applyPreset(b.dataset.preset)));
+$('resetPreset').addEventListener('click',()=>activePreset&&applyPreset(activePreset));
+document.querySelectorAll('[data-size]').forEach(b=>b.addEventListener('click',()=>{const n=Number(b.dataset.size);setPresetValue('w',n);setPresetValue('h',n);updateObjectiveControls();updateSizeButtons();markCustom();updateSetupSummary();queueConfigSave();}));
+$('controls').addEventListener('input',e=>{if(e.target.closest('.preset-panel,.size-shortcuts'))return;markCustom();if(e.target.id==='w'||e.target.id==='h')updateSizeButtons();});
+$('controls').addEventListener('change',e=>{if(e.target.closest('.preset-panel,.size-shortcuts'))return;markCustom();if(e.target.id==='w'||e.target.id==='h')updateSizeButtons();});
+updateSizeButtons();
+buildOptionLockUI();
+// Versioned settings persistence: only generation options, never active gameplay state.
+const CONFIG_STORAGE_KEY='mazy-generation-configuration-v2';
+function snapshotGenerationConfig(){return {schema:2,version:APP_VERSION,settings:Object.fromEntries([...new Set([...randomOptionIds,'seedInput','keepSeed']),'lightingEngine','rayDensity','minRays','lightProbes','cornerSpill','cornerSpillStrength'].filter(id=>$(id)).map(id=>[id,$(id).type==='checkbox'?$(id).checked:$(id).value])),locks:{...optionLocks}};}
+function saveGenerationConfig(){try{localStorage.setItem(CONFIG_STORAGE_KEY,JSON.stringify(snapshotGenerationConfig()));}catch(e){debugLog('Settings save unavailable: '+e.message);}}
+function restoreGenerationConfig(){try{const data=JSON.parse(localStorage.getItem(CONFIG_STORAGE_KEY)||'null');if(!data||data.schema!==2||!data.settings)return;
+ for(const id of [...new Set([...randomOptionIds,'seedInput','keepSeed']),'lightingEngine','rayDensity','minRays','lightProbes','cornerSpill','cornerSpillStrength']){const el=$(id),value=data.settings[id];if(!el||value===undefined)continue;
+  if(el.type==='checkbox'){if(typeof value==='boolean')el.checked=value;}
+  else if(el.tagName==='SELECT'){if([...el.options].some(o=>o.value===String(value)))el.value=String(value);}
+  else if(el.type==='range'||el.type==='number'){const n=Number(value);if(Number.isFinite(n))el.value=String(Math.max(Number(el.min)||0,Math.min(Number(el.max)||n,n)));}
+  else if(el.type==='color'){if(/^#[0-9a-f]{6}$/i.test(String(value)))el.value=value;}
+  else el.value=String(value);
+ }
+ if(data.locks&&typeof data.locks==='object')for(const id of randomOptionIds)if(typeof data.locks[id]==='boolean')optionLocks[id]=data.locks[id];
+ updateObjectiveControls();updateRandomLockUI();updateSizeButtons();updateSetupSummary();
+ for(const [id,label] of [['fixedPct','fixedPctLabel'],['portablePct','portablePctLabel'],['glowSteps','glowStepsLabel']])$(label).textContent=$(id).value+(id==='glowSteps'?'':'%');
+ }catch(e){debugLog('Settings restore skipped: '+e.message);}}
+restoreGenerationConfig();
+let configSaveTimer=null;
+function queueConfigSave(){clearTimeout(configSaveTimer);configSaveTimer=setTimeout(saveGenerationConfig,180);}
+$('controls').addEventListener('input',queueConfigSave);
+$('controls').addEventListener('change',queueConfigSave);
+
+
+// v0.48 diagnostic harness. Tests use the real generator, not a simplified model.
+// Batch runs replace the current maze; the original seed is regenerated at completion.
+let generationTestResults=[];
+function inspectGeneratedMaze(){
+ const problems=[],size=cols*rows;
+ if(!size||!grid?.length)return {ok:false,problems:['No maze grid exists']};
+ let edges=0;
+ for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)for(const [d,dx,dy] of DIRS){
+  if(!(grid[y][x]&d))continue;
+  const nx=x+dx,ny=y+dy;
+  if(!isValid(nx,ny)||!(grid[ny][nx]&OPPOSITE[d]))problems.push('Non-reciprocal passage at '+x+','+y);
+  edges++;
+ }
+ // Traverse ignoring gate restrictions to check the physical maze graph.
+ const seen=new Uint8Array(size),queue=[0];seen[0]=1;
+ for(let i=0;i<queue.length;i++){
+  const c=queue[i],x=c%cols,y=Math.floor(c/cols);
+  for(const [d,dx,dy] of DIRS)if(grid[y][x]&d){
+   const nx=x+dx,ny=y+dy;if(!isValid(nx,ny))continue;
+   const n=ny*cols+nx;if(!seen[n]){seen[n]=1;queue.push(n);}
+  }
+ }
+ if(queue.length!==size)problems.push('Disconnected cells: '+(size-queue.length));
+ if(!seen[exitY*cols+exitX])problems.push('Exit physically unreachable');
+ if(levelObjective==='keys'){
+  if(!puzzleZones||!puzzlePlan)problems.push('Missing region puzzle plan');
+  else if(!validateMultiTopologySolvability())problems.push('Region progression failed validation');
+  if(keys.length!==Number($('gateCount').value))problems.push('Unexpected key count: '+keys.length);
+ }
+ const cells=new Set();for(const g of gems){const k=g.y*cols+g.x;if(!seen[k])problems.push('Unreachable gem '+k);if(cells.has(k))problems.push('Duplicate gem '+k);cells.add(k);}
+ for(const k of keys)if(!seen[k.y*cols+k.x])problems.push('Unreachable key '+k.color);
+ return {ok:!problems.length,problems,cols,rows,seed:activeSeed,objective:levelObjective,keys:keys.length,gems:gems.length,edges:edges/2,reachable:queue.length};
+}
+function recordGenerationTest(result){generationTestResults.push(result);$('testStatus').textContent=generationTestResults.length+' checks; '+generationTestResults.filter(r=>!r.ok).length+' failures. Latest: '+(result.ok?'PASS':'FAIL')+' ('+result.seed+')';}
+$('testCurrentMaze').onclick=()=>{const result=inspectGeneratedMaze();recordGenerationTest(result);debugLog('Maze validation '+JSON.stringify(result));};
+$('testExport').onclick=()=>{
+ const payload={format:'Mazy-generation-tests',version:APP_VERSION,created:new Date().toISOString(),configuration:snapshotGenerationConfig(),results:generationTestResults};
+ const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));
+ const a=document.createElement('a');a.href=url;a.download='MazyV'+APP_VERSION+'_generation_tests.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+$('testBatchMazes').onclick=async()=>{
+ if(!confirm('Test 25 seeds using the current generation settings? This will reset the active maze and regenerate its original seed afterwards.'))return;
+ const button=$('testBatchMazes'),originalSeed=activeSeed,originalInput=$('seedInput').value,originalKeep=$('keepSeed').checked;
+ const originalAlert=window.alert;button.disabled=true;generationTestResults=[];
+ try{
+  window.alert=message=>{debugLog('Batch generator notice: '+message);};
+  $('keepSeed').checked=true;
+  for(let i=0;i<25;i++){
+   const seed='test-'+Date.now().toString(36)+'-'+i;
+   const started=performance.now();let result;
+   try{
+    generateMaze(seed);
+    if(activeSeed!==seed)result={ok:false,seed,problems:['Generator rejected seed or restored prior maze']};
+    else result=inspectGeneratedMaze();
+   }catch(error){result={ok:false,seed,problems:[String(error?.stack||error)]};}
+   result.elapsedMs=Math.round(performance.now()-started);recordGenerationTest(result);
+   if(i%3===0)await new Promise(resolve=>setTimeout(resolve,0));
+  }
+ }finally{
+  window.alert=originalAlert;
+  $('keepSeed').checked=originalKeep;
+  try{generateMaze(originalSeed);}catch(error){debugLog('Could not restore original seed: '+error);}
+  $('seedInput').value=originalInput;button.disabled=false;
+  const failed=generationTestResults.filter(r=>!r.ok);
+  $('testStatus').textContent='Batch complete: '+generationTestResults.length+' tested, '+failed.length+' failed. Export results for details.';
+  debugLog('Generation batch complete '+generationTestResults.length+' tested, '+failed.length+' failures');
+ }
+};
+
 $('btnGenerate').onclick=()=>generateMaze();
+$('btnRandomMaze').onclick=()=>{if(selectedRandomGroups().length)shuffleUnlocked('config-'+freshSeed()+'-'+(++previewCounter));generateMaze();};
 $('btnFit').onclick=fitCamera;
+$('btnCentre').onclick=centreExplorer;
+$('btnFullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch(e){debugLog('Fullscreen unavailable: '+e.message);}};
+document.addEventListener('fullscreenchange',()=>{$('btnFullscreen').textContent=document.fullscreenElement?'⛶ Exit Fullscreen':'⛶ Fullscreen';resize();});
+for(const [id,out] of [['rayDensity','rayDensityLabel'],['minRays','minRaysLabel']])$(id).addEventListener('input',()=>{$(out).textContent=$(id).value;});
+for(const id of ['lightingEngine','rayDensity','minRays','lightProbes'])$(id).addEventListener('change',()=>{$('lightingEffort').value='custom';queueConfigSave();});
+$('lightingEffort').addEventListener('change',()=>{if($('lightingEffort').value==='custom')$('advancedLighting').open=true;updateSetupSummary();queueConfigSave();});
+
+$('btnDropMarker').onclick=toggleDropMarker;
+
+for(const [id,label] of [['fixedPct','fixedPctLabel'],['portablePct','portablePctLabel'],['glowSteps','glowStepsLabel']])$(id).addEventListener('input',()=>$(label).textContent=$(id).value+(id==='glowSteps'?'':'%'));
+$('btnUndoMove').onclick=rewindOneStep;
+$('btnReturnStart').onclick=()=>routeTo(0,0);
+$('btnReturnMarker').onclick=()=>{if(dropMarker)routeTo(dropMarker.x,dropMarker.y);};
+for(const id of ['showStartTrail','showMarkerTrail','colorStartTrail','colorMarkerTrail'])$(id).addEventListener('input',requestDraw);
+updateNavigationButtons();
 $('btnExportPNG').onclick=()=>{
  requestDraw();const link=document.createElement('a');link.download=`Mazy_${activeSeed}.png`;link.href=canvas.toDataURL('image/png');link.click();
 };
 $('btnExportJSON').onclick=()=>{
  const data={format:'Mazy-level',version:APP_VERSION,seed:activeSeed,cols,rows,algorithm:levelSettings.algorithm,objective:levelObjective,
-  settings:{...levelSettings,topology:puzzleTopology,plan:puzzlePlan},zones:puzzleZones?Array.from(puzzleZones):null,
-  grid:grid.map(r=>Array.from(r)),slimeMap:slimeMap.map(r=>Array.from(r)),gems,keys,gateMap,completionTime:elapsedTime,player:profileName};
+  settings:{...levelSettings,topology:puzzleTopology,plan:puzzlePlan,randomConfiguration:lastRandomConfiguration},zones:puzzleZones?Array.from(puzzleZones):null,
+  grid:grid.map(r=>Array.from(r)),gems,keys,gateMap,completionTime:clockUnscored?null:elapsedTime,player:profileName};
  const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
  const a=document.createElement('a');a.href=url;a.download=`Mazy_Level_${activeSeed}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 function saveVictoryProfile(){
+ if(clockUnscored)return;
  profileName=$('usernameInput').value.trim()||'Explorer_1';
  try{localStorage.setItem(`Mazy_Score_${activeSeed}`,JSON.stringify({user:profileName,time:elapsedTime,objective:levelObjective}));}
  catch(e){console.warn('Local score could not be saved:',e);}
@@ -1459,9 +2567,9 @@ $('btnRetryMaze').onclick=()=>{saveVictoryProfile();$('modal-overlay').style.dis
 $('btnNewMazeAfterWin').onclick=()=>{saveVictoryProfile();$('modal-overlay').style.display='none';generateMaze('');};
 $('toggle-btn').onclick=()=>{
  $('controls').classList.toggle('collapsed');
- $('toggle-btn').textContent=$('controls').classList.contains('collapsed')?'▸ Controls':'▾ Controls';
+ $('toggle-btn').textContent=$('controls').classList.contains('collapsed')?'☰':'☰';
 };
-for(const id of ['clickToMove','showHint','colorBg','colorWall','colorFill'])$(id).addEventListener('input',()=>{hintKey='';requestDraw();});
+for(const id of ['clickToMove','showHint','colorBg','colorWall','colorFill','colorWingInactive','colorWingActive','colorWingOpen'])$(id).addEventListener('input',()=>{hintKey='';requestDraw();});
 $('showPuzzlePlan').addEventListener('change',requestDraw);
 for(const [id,seed] of [['exampleA','spruce-31'],['exampleB','river-31'],['exampleC','orbit-8']])$(id).onclick=()=>{
  $('objectiveMode').value='keys';$('algo').value='backtracker';$('w').value=31;$('h').value=31;$('gateCount').value=3;$('topoCrossOver').value='on';$('topoHub').value='off';$('showPuzzlePlan').checked=true;
@@ -1470,9 +2578,108 @@ for(const [id,seed] of [['exampleA','spruce-31'],['exampleB','river-31'],['examp
 for(const [id,teasers] of [['hubAlone','off'],['hubTeasers','on']])$(id).onclick=()=>{
  $('objectiveMode').value='keys';$('algo').value='backtracker';$('w').value=31;$('h').value=31;$('gateCount').value=3;$('topoCrossOver').value=teasers;$('topoHub').value='on';$('showPuzzlePlan').checked=true;generateMaze('nexus-32');
 };
-window.addEventListener('resize',resize);
-resize();generateMaze();
 
+const crumbs=new Map();let lastRevealKey='',lastPlaced=null,lastPassed=null;
+const crumbAuto={up:false,down:false,right:false,left:false};
+function revealCells(){if(!grid.length)return;const key=[px,py,...playerKeys,...universalDoors.map(g=>+g.open)].join('|');if(key===lastRevealKey)return;lastRevealKey=key;revealedMap[py][px]=1;for(const [d,dx,dy] of DIRS){let x=px,y=py;for(let i=0;i<5&&walkable(x,y,d);i++){x+=dx;y+=dy;revealedMap[y][x]=1;}}}
+function crumbKey(){return px+','+py;}
+function removeCrumb(k){crumbs.delete(k);if(lastPlaced===k)lastPlaced=null;if(lastPassed===k)lastPassed=null;}
+function placeCrumb(){if(!$('enableCrumbs').checked||!grid.length)return;const k=crumbKey();if(crumbs.has(k))removeCrumb(k);else{crumbs.set(k,true);lastPlaced=k;}updateHUD();requestDraw();}
+function applyCrumbAuto(){if(!$('enableCrumbs').checked)return;const k=crumbKey();if(crumbs.has(k)){if(crumbAuto.left)removeCrumb(k);else if(crumbAuto.down)lastPassed=k;}else if(crumbAuto.up&&DIRS.filter(([d])=>walkable(px,py,d)).length>=3){crumbs.set(k,true);lastPlaced=k;}}
+function drawCrumbs(c){if(!$('enableCrumbs').checked)return;for(const k of crumbs.keys()){const [x,y]=k.split(',').map(Number);if($('enableFog').checked&&!revealedMap[y]?.[x])continue;c.fillStyle=crumbAuto.right&&k===lastPlaced?'#54d9bd':crumbAuto.down&&k===lastPassed?'#e4b45f':'#788b98';c.beginPath();c.arc((x+.16)*CELL,(y+.16)*CELL,CELL*.065,0,Math.PI*2);c.fill();}}
+for(const id of ['enableFog','fogStyle','fogColor'])$(id).addEventListener('input',requestDraw);
+const crumbButton=$('btnPortableTorch');crumbButton.style.touchAction='none';crumbButton.onclick=null;const wheel=document.createElement('div');wheel.style.cssText='display:none;position:fixed;z-index:9999;width:210px;height:210px;pointer-events:none;background:#17272dee;border:1px solid #45a29e;border-radius:50%;color:#66fcf1;font:12px sans-serif';document.body.append(wheel);let gesture=null,timer;
+const labels={up:'Auto-place',down:'On passing',right:'Recent colour',left:'Auto-remove'};
+function showWheel(){if(!gesture)return;gesture.held=true;wheel.style.left=Math.max(0,Math.min(innerWidth-210,gesture.x-105))+'px';wheel.style.top=Math.max(0,Math.min(innerHeight-210,gesture.y-105))+'px';wheel.style.display='block';wheel.innerHTML=Object.keys(labels).map((d,i)=>`<span style="position:absolute;${['top:12px;left:65px','bottom:12px;left:65px','right:5px;top:95px','left:5px;top:95px'][i]};opacity:${crumbAuto[d]?1:.55}">${labels[d]}<br>${crumbAuto[d]?'ON':'OFF'}</span>`).join('');}
+crumbButton.addEventListener('pointerdown',e=>{if(gesture)return;e.preventDefault();crumbButton.setPointerCapture(e.pointerId);gesture={x:e.clientX,y:e.clientY,id:e.pointerId,held:false};timer=setTimeout(showWheel,350);});
+crumbButton.addEventListener('pointerup',e=>{if(!gesture||gesture.id!==e.pointerId)return;clearTimeout(timer);const dx=e.clientX-gesture.x,dy=e.clientY-gesture.y;if(gesture.held){if(Math.hypot(dx,dy)>18){const d=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');crumbAuto[d]=!crumbAuto[d];requestDraw();}}else if(Math.hypot(dx,dy)<18)placeCrumb();gesture=null;wheel.style.display='none';});crumbButton.addEventListener('pointercancel',()=>{clearTimeout(timer);gesture=null;wheel.style.display='none';});crumbButton.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();placeCrumb();}});
+
+const themePalettes=[['Classic','#0b0c10','#66fcf1','#45a29e','#303944'],['Paper','#e9dfca','#514737','#b5a88d','#cfc3ac'],['Midnight','#111225','#777bbd','#53558a','#20223b'],['Forest','#18241a','#87ad75','#52774a','#293a28'],['Arcade','#16101f','#e46da9','#84558e','#302039'],['Mono','#171717','#bcbcbc','#777777','#303030']];
+let tier='simple',themeIndex=0;
+const profileInputs=[...document.querySelectorAll('#controls input[id],#controls select[id],#debugPanel input[id]')].filter(e=>!['file','button','submit'].includes(e.type));
+const captureProfile=()=>({values:Object.fromEntries(profileInputs.map(e=>[e.id,e.type==='checkbox'?e.checked:e.value])),auto:{...crumbAuto},locks:{...optionLocks},theme:themeIndex});
+const defaults=captureProfile();
+const profiles=Object.fromEntries(['simple','advanced','development'].map(t=>[t,JSON.parse(JSON.stringify(defaults))]));
+profiles.advanced.values.enableNavMarker=true;
+try{const saved=JSON.parse(localStorage.getItem('mazy-profiles-v072')||'{}');for(const t of Object.keys(profiles))if(saved[t])profiles[t]={...profiles[t],...saved[t],values:{...defaults.values,...saved[t].values}};if(!localStorage.getItem('mazy-counts-v075')){for(const p of Object.values(profiles)){for(const id of ['gemCount','gateCount','universalCount','universalDoorCount'])p.values[id]='1';}localStorage.setItem('mazy-counts-v075','1');}}catch(e){}
+function saveProfiles(){profiles[tier]=captureProfile();try{localStorage.setItem('mazy-profiles-v072',JSON.stringify(profiles));}catch(e){}}
+function syncProfileUI(){for(const id of ['btnPortableTorch','hudLights'])$(id).style.display=$('enableCrumbs').checked?'':'none';for(const id of ['btnDropMarker','btnReturnMarker'])$(id).style.display=$('enableNavMarker').checked?'':'none';$('debugPanel').style.display=tier==='development'?'':'none';perfEnabled=tier==='development'&&$('perfEnabled').checked;perfThreshold=Number($('perfThreshold').value)||50;if(tier!=='development')$('debugPanel').open=false;if(levelSettings)levelSettings.lineWidth=Number($('lineWidth').value);for(const d of Object.keys(crumbAuto)){const e=$('crumbAuto-'+d);if(e)e.checked=crumbAuto[d];}document.querySelectorAll('[data-theme]').forEach(b=>b.classList.toggle('active',Number(b.dataset.theme)===themeIndex));updateObjectiveControls();updateSizeButtons();updateRandomLockUI();updateNavigationButtons();requestDraw();}
+function setTier(t,initial=false){if(!initial)saveProfiles();tier=t;const p=profiles[t];for(const e of profileInputs)if(Object.hasOwn(p.values,e.id)){if(e.type==='checkbox')e.checked=!!p.values[e.id];else e.value=p.values[e.id];}Object.assign(crumbAuto,p.auto);Object.assign(optionLocks,p.locks);themeIndex=p.theme||0;$('controls').dataset.tier=t;document.querySelectorAll('button[data-tier]').forEach(b=>b.classList.toggle('active',b.dataset.tier===t));syncProfileUI();try{localStorage.setItem('mazy-menu-tier',t)}catch(e){}}
+function applyTheme(i){themeIndex=i;const p=themePalettes[i];['colorBg','colorWall','colorFill','fogColor'].forEach((id,j)=>$(id).value=p[j+1]);document.querySelectorAll('[data-theme]').forEach(b=>b.classList.toggle('active',Number(b.dataset.theme)===i));requestDraw();}
+$('themeCards').innerHTML=themePalettes.map((p,i)=>`<button type="button" data-theme="${i}"><svg viewBox="0 0 90 48"><rect width="90" height="48" fill="${p[1]}"/><rect x="55" width="35" height="48" fill="${p[4]}"/><path d="M8 8 H40 V24 H22 V40 H58 M8 24 H15 V40" stroke="${p[2]}" stroke-width="2" fill="none"/><circle cx="30" cy="16" r="4" fill="${p[3]}"/></svg>${p[0]}</button>`).join('');
+document.querySelectorAll('[data-theme]').forEach(b=>b.onclick=()=>applyTheme(Number(b.dataset.theme)));document.querySelectorAll('button[data-tier]').forEach(b=>b.onclick=()=>setTier(b.dataset.tier));
+$('simpleStart').onclick=()=>{for(const [id,v] of Object.entries({w:$('simpleSize').value,h:$('simpleSize').value,algo:$('simpleDifficulty').value,objectiveMode:'standard',requireGems:false,universalEnabled:false,topoCrossOver:'off',topoHub:'off',topoWings:'off',topoCycles:'off',seedInput:'',keepSeed:false,enableFog:false,enableCrumbs:false,enableNavMarker:false})) {const e=$(id);if(e.type==='checkbox')e.checked=v;else e.value=v;}syncProfileUI();generateMaze('');saveProfiles();};
+$('topologyChoice').onchange=()=>{const v=$('topologyChoice').value;if(v==='custom')return;for(const [id,mode] of [['topoCrossOver','shortcuts'],['topoHub','hub'],['topoWings','branches'],['topoCycles','shortcuts']])$(id).value=v==='mixed'?'random':v===mode?'on':'off';};
+for(const d of Object.keys(crumbAuto)){const l=document.createElement('label');l.className='checkbox-group';const c=document.createElement('input');c.type='checkbox';c.id='crumbAuto-'+d;c.checked=crumbAuto[d];c.onchange=()=>{crumbAuto[d]=c.checked;requestDraw()};l.append(c,document.createTextNode(labels[d]));$('section-lighting').append(l);crumbButton.addEventListener('pointerup',()=>{c.checked=crumbAuto[d]});}
+$('lineWidth').addEventListener('input',()=>{levelSettings.lineWidth=Number($('lineWidth').value);requestDraw()});
+let savedTier='simple';try{savedTier=localStorage.getItem('mazy-menu-tier')||'simple'}catch(e){}setTier(['simple','advanced','development'].includes(savedTier)?savedTier:'simple',true);
+
+
+const topStart=document.createElement('button');topStart.id='topStart';topStart.className='btn btn-primary';topStart.textContent='Start maze';$('controls').prepend(topStart);
+const subtabs=document.createElement('nav');subtabs.className='subtabs';$('menuTier').after(subtabs);
+const simple=$('simpleMenu'),simplePanes={};for(const [key,nodes] of [['Play',[...simple.querySelectorAll('label')]],['Theme',[simple.querySelector('strong'),$('themeCards')]]]){const p=document.createElement('div');p.className='simple-pane';nodes.forEach(n=>p.append(n));simple.append(p);simplePanes[key]=p;}simple.querySelector('h3').remove();
+const tabsByTier={simple:'Play Theme',advanced:'maze objectives lighting movement appearance',development:'maze objectives lighting movement appearance advanced export'};const tabNames={maze:'Maze',objectives:'Goals & Structure',topology:'Structure',lighting:'Explore',movement:'Controls',appearance:'Style',advanced:'Tests',export:'Export'};const selectedTabs={simple:'Play',advanced:'maze',development:'maze'};
+function renderTabs(){const selected=selectedTabs[tier];subtabs.replaceChildren();for(const k of tabsByTier[tier].split(' ')){const b=document.createElement('button');b.type='button';b.textContent=tabNames[k]||k;b.classList.toggle('active',k===selected);b.onclick=()=>{selectedTabs[tier]=k;renderTabs()};subtabs.append(b);}for(const [k,p] of Object.entries(simplePanes))p.hidden=k!==selected;for(const p of document.querySelectorAll("#controls .menu-section")){p.open=true;p.hidden=p.id!=='section-'+selected;} $('debugPanel').style.display=tier==='development'&&selected==='advanced'?'':'none';}
+const exportPane=document.createElement('details');exportPane.id='section-export';exportPane.className='menu-section';$('controls').append(exportPane);exportPane.append($('btnExportJSON'));$('section-advanced').append($('debugPanel'));$('debugPanel').open=true;
+const choiceSync=[];for(const e of document.querySelectorAll('#controls select')){if(e.closest('[hidden]'))continue;const box=document.createElement('div');box.className='choice-buttons';e.classList.add('choice-source');e.after(box);for(const o of e.options){const b=document.createElement('button');b.type='button';b.textContent=o.textContent.replace('Forced On','On').replace(' (Seed-driven)','').replace(' (seed-driven)','');b.onclick=ev=>{ev.preventDefault();e.value=o.value;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));refreshChoices()};box.append(b);choiceSync.push(()=>{b.classList.toggle('active',e.value===o.value);b.setAttribute('aria-pressed',String(e.value===o.value));b.disabled=o.disabled||e.disabled;});}}
+function refreshChoices(){choiceSync.forEach(f=>f());}document.addEventListener('input',refreshChoices);document.addEventListener('change',refreshChoices);document.addEventListener('click',()=>queueMicrotask(refreshChoices));
+
+const toast=document.createElement('div');toast.id='infoToast';toast.hidden=true;toast.setAttribute('role','status');document.body.append(toast);let toastAnim,toastTimer,toastDuration=3000;function countdown(){clearTimeout(toastTimer);toastAnim?.cancel();toastAnim=toast.animate([{background:'linear-gradient(#17272d,#17272d) padding-box,linear-gradient(#45a29e 0%,#45a29e 100%) border-box'},{background:'linear-gradient(#17272d,#17272d) padding-box,linear-gradient(#17272d 100%,#45a29e 100%) border-box'}],{duration:toastDuration,fill:'forwards'});toastTimer=setTimeout(()=>{toast.hidden=true},toastDuration);}toast.onclick=()=>{toastDuration+=1000;countdown()};
+for(const n of [...document.querySelectorAll('#controls .section-help,#controls .menu-section p,#controls .menu-section small')]){if(n.closest('[hidden]'))continue;const text=n.querySelector('p')?.textContent||n.textContent;const b=document.createElement('button');b.type='button';b.className='info-button';b.textContent='ⓘ';b.setAttribute('aria-label','Information');b.onclick=e=>{e.preventDefault();toast.textContent=text;toast.hidden=false;toastDuration=3000;countdown()};n.after(b);n.style.display='none';}
+const oldSetTier=setTier;setTier=function(...args){oldSetTier(...args);renderTabs();refreshChoices()};
+function collapseAfter(fn){const before=generationCount;fn();if(generationCount!==before){$('controls').classList.add('collapsed');$('toggle-btn').setAttribute('aria-expanded','false');saveProfiles();}refreshChoices();}
+topStart.onclick=()=>collapseAfter(()=>tier==='simple'?$('simpleStart').onclick():generateMaze());$('toggle-btn').setAttribute('aria-label','Menu');$('toggle-btn').setAttribute('aria-expanded','true');$('toggle-btn').addEventListener('click',()=> $('toggle-btn').setAttribute('aria-expanded',String(!$('controls').classList.contains('collapsed'))));renderTabs();refreshChoices();
+
+
+function captureRunConfig(){return {tier,values:captureProfile().values,seed:activeSeed,algorithm:levelSettings.algorithm,w:cols,h:rows};}
+const difficultyRank={braided:0,prims:0,mixed:1,backtracker:1,balanced:2,expert:3};
+const rankAlgorithms=['braided','mixed','balanced','expert'];
+function prepareWin(){const c=winningConfig||captureRunConfig();$('winHarder').hidden=difficultyRank[c.algorithm]>=3;$('winLarger').hidden=Math.max(c.w,c.h)>=121;$('winBoth').hidden=$('winHarder').hidden||$('winLarger').hidden;}
+function winAction(harder=false,larger=false,retry=false){const c=winningConfig||captureRunConfig();saveVictoryProfile();if(tier!==c.tier)setTier(c.tier);for(const e of profileInputs){if(!Object.hasOwn(c.values,e.id))continue;if(e.type==='checkbox')e.checked=c.values[e.id];else e.value=c.values[e.id];}const a=harder?rankAlgorithms[Math.min(3,difficultyRank[c.algorithm]+1)]:c.algorithm;const n=[15,31,61,121].find(n=>n>Math.max(c.w,c.h))||121;$('algo').value=a;$('simpleDifficulty').value=a;if(larger){$('w').value=n;$('h').value=n;$('simpleSize').value=n;}else{$('w').value=c.w;$('h').value=c.h;}$('modal-overlay').style.display='none';collapseAfter(()=>generateMaze(retry?c.seed:''));syncProfileUI();saveProfiles();}
+$('btnSaveProfile').textContent='View Maze';$('btnSaveProfile').className='btn btn-secondary';$('btnRetryMaze').textContent='Speed Retry';$('btnNewMazeAfterWin').textContent='Next Maze';$('btnNewMazeAfterWin').className='btn btn-primary';$('usernameInput').closest('label').hidden=true;
+for(const [id,text,fn] of [['winMenu','Menu',()=>{saveVictoryProfile();$('modal-overlay').style.display='none';$('controls').classList.remove('collapsed');}],['winHarder','Harder Maze',()=>winAction(true)],['winLarger','Larger Maze',()=>winAction(false,true)],['winBoth','Harder & Larger!',()=>winAction(true,true)]]){const b=document.createElement('button');b.id=id;b.className='btn btn-secondary';b.textContent=text;b.onclick=fn;$('btnNewMazeAfterWin').before(b);}
+$('btnRetryMaze').onclick=()=>winAction(false,false,true);$('btnNewMazeAfterWin').onclick=()=>winAction();
+const cameraTools=document.createElement('div');cameraTools.id='cameraTools';document.body.append(cameraTools);for(const [id,icon,title] of [['btnFit','⊞','Fit maze'],['btnCentre','◎','Centre on explorer'],['btnFullscreen','⛶','Fullscreen']]){const b=$(id);b.textContent=icon;b.title=title;b.setAttribute('aria-label',title);cameraTools.append(b);}document.addEventListener('fullscreenchange',()=>{$('btnFullscreen').textContent='⛶'});
+const shot=$('btnExportPNG');shot.textContent='📷';shot.title='Save screenshot';shot.setAttribute('aria-label','Save screenshot');$('appVersionHeading').before(shot);
+$('showHint').closest('.checkbox-group').classList.add('dev-only');
+const previousSync=syncProfileUI;syncProfileUI=function(){if(tier!=='development')$('showHint').checked=false;previousSync();refreshChoices();};
+const generatorNames={braided:'Easy',prims:'Easy · Prim’s',mixed:'Medium',backtracker:'Medium · Recursive',balanced:'Hard',expert:'Expert'};
+const algoBox=$('algo').nextElementSibling;const algoCaption=document.createElement('span');algoCaption.className='generator-caption';$('algo').before(algoCaption);[...algoBox.children].forEach((b,i)=>{b.textContent=generatorNames[$('algo').options[i].value];});choiceSync.push(()=>{algoCaption.textContent=': '+$('algo').selectedOptions[0].textContent;});
+for(const e of document.querySelectorAll('#controls input[type=checkbox]')){const b=document.createElement('button');b.type='button';b.className='toggle-choice';e.classList.add('toggle-source');e.after(b);b.onclick=ev=>{ev.preventDefault();e.click();refreshChoices();};choiceSync.push(()=>{b.textContent=e.checked?'On':'Off';b.classList.toggle('active',e.checked);b.setAttribute('aria-pressed',String(e.checked));b.disabled=e.disabled;});}
+for(const tools of document.querySelectorAll('.group-random-tools')){const b=tools.querySelector('[data-action=shuffle]');b.textContent='🎲';b.title='Randomise '+tools.dataset.group;const reset=document.createElement('button');reset.type='button';reset.textContent='↺';reset.title='Reset '+tools.dataset.group;reset.onclick=()=>{for(const id of groupOptionIds(tools.dataset.group)){const e=$(id),v=defaults.values[id];if(e.type==='checkbox')e.checked=v;else e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));}syncProfileUI();refreshChoices();saveProfiles();};tools.append(reset);}
+// Place each maze dice immediately above its own controls.
+const maze=$('section-maze');const sizeTools=maze.querySelector('[data-group=size]'),algoTools=maze.querySelector('[data-group=algorithm]');maze.querySelector('.size-shortcuts').before(sizeTools);($('algo').closest('.setting-lock-row')||$('algo').closest('label')).before(algoTools);
+for(const section of ['movement']){const pane=$('section-'+section),bar=document.createElement('div');bar.className='group-random-tools local-tools';const dice=document.createElement('button'),reset=document.createElement('button');dice.textContent='🎲';reset.textContent='↺';dice.title='Randomise controls';reset.title='Reset controls';for(const b of [dice,reset])b.type='button';bar.append(dice,reset);pane.prepend(bar);const fields=[...pane.querySelectorAll('input[id],select[id]')].filter(e=>!e.closest('.dev-only')&&e.type!=='color');function apply(resetting){for(const e of fields){if(e.type==='checkbox')e.checked=resetting?defaults.values[e.id]:Math.random()<.5;else if(e.tagName==='SELECT')e.value=resetting?defaults.values[e.id]:e.options[Math.floor(Math.random()*e.options.length)].value;else if(e.type==='range')e.value=resetting?defaults.values[e.id]:Number(e.min)+Math.floor(Math.random()*(1+(Number(e.max)-Number(e.min))/Number(e.step||1)))*Number(e.step||1);else continue;e.dispatchEvent(new Event('change',{bubbles:true}));}syncProfileUI();refreshChoices();saveProfiles();}dice.onclick=()=>apply(false);reset.onclick=()=>apply(true);}
+const goalsPane=$('section-objectives'),structurePane=$('section-topology');
+const objectiveRow=$('objectiveMode').closest('.setting-lock-row')||$('objectiveMode').closest('label');
+const gateToggle=document.createElement('button');gateToggle.type='button';gateToggle.className='toggle-choice';
+const gateLabel=document.createElement('div');gateLabel.textContent='Keys & Gates ';gateLabel.append(gateToggle);
+objectiveRow.style.display='none';$('gemOptions').after(gateLabel);
+gateToggle.onclick=()=>{const on=$('objectiveMode').value!=='keys';$('objectiveMode').value=on?'keys':'standard';if(!on){for(const id of structureIds)$(id).value='off';$('topologyChoice').value='classic';}normalizePuzzleOptions();refreshChoices();saveProfiles();};
+choiceSync.push(()=>{const on=$('objectiveMode').value==='keys';gateToggle.textContent=on?'On':'Off';gateToggle.classList.toggle('active',on);gateToggle.setAttribute('aria-pressed',String(on));});
+const universalRow=$('universalEnabled').closest('.setting-lock-row')||$('universalEnabled').closest('label');
+const structureGroup=document.createElement('div');structureGroup.className='puzzle-structure-group';
+for(const node of [...structurePane.children])if(node.tagName!=='SUMMARY')structureGroup.append(node);
+universalRow.before(structureGroup);structurePane.hidden=true;
+$('friendlyTopology').style.display='none';
+for(const id of structureIds){const e=$(id);const row=e.closest('.setting-lock-row')||e.closest('label');row.style.display='';}
+// Advanced previously hid the individual module rows; expose them here.
+const style=document.createElement('style');style.textContent='#controls[data-tier=advanced] .puzzle-structure-group label:not(#friendlyTopology),#controls[data-tier=advanced] .puzzle-structure-group .setting-lock-row{display:flex!important} #controls[data-tier=advanced] .puzzle-structure-group .choice-buttons button:last-child{display:none}';document.head.append(style);
+for(const id of [...structureIds,'topologyChoice','gateCount','w','h','universalEnabled','universalCount','universalDoorCount'])$(id).addEventListener('change',()=>{normalizePuzzleOptions();refreshChoices();saveProfiles();});
+const priorProfileSync=syncProfileUI;syncProfileUI=function(){normalizePuzzleOptions();priorProfileSync();};
+renderTabs();refreshChoices();syncProfileUI();
+
+window.addEventListener('resize',resize);
+resize();generateMaze();syncProfileUI();
+for(const id of ['enableCrumbs','enableNavMarker'])$(id).addEventListener('change',syncProfileUI);
+document.addEventListener('change',e=>{if(e.target.closest('#controls,#debugPanel'))saveProfiles();});window.addEventListener('pagehide',saveProfiles);
+
+
+$('perfEnabled').addEventListener('change',e=>{perfEnabled=e.target.checked;});
+$('perfThreshold').addEventListener('change',e=>{perfThreshold=Math.max(16,Math.min(2000,Number(e.target.value)||50));});
+$('perfExport').addEventListener('click',exportPerfReport);
+$('perfCompact').addEventListener('click',exportPerfCompact);
+$('perfClear').addEventListener('click',()=>{perfFrames.length=0;perfSamples.length=0;lightMissDetails.length=0;for(const v of Object.values(perfActionStats))v.length=0;for(const k of Object.keys(perfAggregate))delete perfAggregate[k];perfWorst=0;perfLastRaf=0;perfTotal=0;perfDiscardedSamples=0;perfDiscardedSlow=0;perfStartTime=null;perfMoveRequested=0;perfMoveSucceeded=0;perfMoveBlocked=0;});
 </script>
 </body>
 </html>
