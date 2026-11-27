@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Mazy - Offline Vector Maze Adventure</title>
 <style>
   * { box-sizing: border-box; }
@@ -168,6 +168,67 @@
 #controls[data-tier=advanced] .option-lock,#controls[data-tier=advanced] .group-status,#controls[data-tier=advanced] [data-action=lock],#controls[data-tier=advanced] [data-action=unlock],#controls:not([data-tier=development]) .dev-only{display:none!important}
 #controls .toggle-source{display:none!important} .toggle-choice{min-width:54px;min-height:34px;border:1px solid #456;border-radius:6px;background:#20333e;color:#d4e9e8;cursor:pointer} .toggle-choice.active{background:#45a29e;color:#07131b;font-weight:bold} #cameraTools{position:fixed;bottom:16px;left:12px;z-index:16;display:flex;gap:6px} #cameraTools button,#btnExportPNG{width:40px;height:40px;padding:0;margin:0;border:1px solid #45a29e;border-radius:6px;background:#1f2833;color:#66fcf1;font-size:22px} #btnExportPNG{width:32px;height:32px;font-size:16px;vertical-align:middle;margin-right:8px} #modal-card{max-height:90vh;overflow:auto;max-width:90vw} #modal-card [hidden]{display:none!important} #controls[data-tier=advanced] .setting-lock-row .setting-body{width:100%} .generator-caption{font-weight:normal;text-transform:none} 
 #hudTime{order:-1;color:#66fcf1;cursor:pointer;min-width:0!important;font:inherit}#hudTime[data-mode=paused],#hudTime[data-mode=waiting]{color:#e4b45f}#hudTime [hidden]{display:none!important}#hud{top:10px!important;right:10px!important}#controls[data-tier=advanced] input[type=checkbox]{display:none!important}
+
+/* Shared menu design: consistent cards, hierarchy and touch targets. */
+#controls{background:#101b23;color:#d4e9e8;scroll-padding-top:112px}
+#controls .menu-section,#controls .simple-pane{background:#182731;border:1px solid #354d58;border-radius:12px;padding:12px;margin:10px 0}
+#controls .simple-pane label,#controls .menu-section label{margin:9px 0;line-height:1.35}
+#controls .choice-buttons button,#controls .toggle-choice,#controls #sizePresets button,#controls .themegrid button{min-height:42px;border-radius:8px}
+#controls .choice-buttons button{flex:1 1 42%}
+#controls .subtabs button{min-height:36px;font-size:12px}
+#controls .tierbar button{min-height:42px;font-size:12px}
+#controls .section-title{margin:18px 0 0;padding:10px 0 4px;border-top:1px solid #45616c;border-bottom:0;color:#c9e6e4;font-size:12px;text-transform:none}
+#controls .group-random-tools{border-bottom:0;border-top:1px solid #354d58;padding:8px 0 3px;margin:8px 0 4px;justify-content:flex-end}
+#controls .section-title+.group-random-tools{border-top:0;margin-top:0}
+#controls .group-random-tools button{min-width:38px;min-height:34px;font-size:15px}
+#controls .menu-heading{font-size:14px;font-weight:700;color:#b8dedd;margin:2px 0 8px}
+#runActions{position:sticky;top:0;z-index:26;background:#101b23;padding:6px 0 8px;box-shadow:0 5px 10px #0007}
+#runActions #topStart{position:static;margin:0 0 5px;box-shadow:none;min-height:44px}
+#restartCurrent{width:100%;position:relative;overflow:hidden;min-height:36px;touch-action:none;user-select:none;isolation:isolate}
+#restartCurrent:before{content:'';position:absolute;inset:0;background:#45a29e66;transform:scaleX(0);transform-origin:left;z-index:-1}
+#restartCurrent.holding:before{transform:scaleX(1);transition:transform 500ms linear}
+#restartCurrent:disabled{opacity:.45}
+#dpad{width:156px;height:156px;bottom:30px;right:30px}
+#navigationActions{bottom:200px;right:26px}
+@media(max-width:600px){#dpad{bottom:26px;right:22px}#navigationActions{bottom:190px;right:18px}}
+#controls[data-tier=development] #debugPanel{font:12px/1.5 system-ui,sans-serif!important;border:0;background:transparent;padding:0}
+#controls[data-tier=development] #debugPanel button{min-height:36px;margin:3px 2px;border-radius:6px}
+#controls[data-tier=development] #debugLog{max-height:180px;background:#101b23;padding:8px;border-radius:6px}
+
+#controls .setting-lock-row{align-items:flex-start;gap:8px;min-width:0} #controls .setting-body{min-width:0;flex:1}
+#controls .menu-section label,#controls .simple-pane label{display:block;text-align:left;max-width:100%;overflow-wrap:anywhere;color:#d4e9e8;font-size:13px;line-height:1.4}
+#controls .uniform-toggle{display:flex!important;align-items:center;justify-content:flex-start;gap:10px;min-height:44px;margin:5px 0;width:100%;min-width:0;text-align:left;flex-wrap:nowrap}
+#controls .uniform-toggle .toggle-choice{flex:0 0 58px;width:58px;min-width:58px;max-width:58px;height:40px;padding:0;margin:0;line-height:1}
+#controls .toggle-label{flex:1;min-width:0;font-size:13px;line-height:1.4;overflow-wrap:anywhere}
+#controls .field-caption{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0;margin-bottom:4px}
+#controls .info-button{flex:0 0 25px;margin:0;vertical-align:middle}
+#controls .numeric-controls{display:grid;grid-template-columns:34px minmax(0,1fr) 34px;gap:5px;align-items:center;margin:6px 0}
+#controls .numeric-controls button{height:36px;border:1px solid #456;border-radius:8px;background:#20333e;color:#d4e9e8;font-size:18px;padding:0}
+#controls .numeric-controls input[type=number]{width:100%;min-width:0;text-align:center;margin:0;box-sizing:border-box}
+#controls .numeric-slider{width:100%;margin:6px 0;accent-color:#45a29e}
+#controls .disabled-field{opacity:.45}
+#controls .topology-toggle{display:none!important} #controls[data-tier=advanced] .topology-toggle{display:flex!important} #controls[data-tier=advanced] .topology-original{display:none!important}
+#controls .obsolete-objective{display:none!important} #controls .universal-quantity{margin:10px 0} #controls .universal-quantity output{margin-left:auto;color:#9bd8d4}
+#controls .menu-section,#controls .simple-pane{padding:12px;box-sizing:border-box} #controls .group-random-tools{justify-content:flex-end} #controls .choice-buttons button{min-width:0;white-space:normal;overflow-wrap:anywhere;font-size:12px}
+#controls .puzzle-structure-group .uniform-toggle{display:flex!important} #controls .puzzle-structure-group .topology-original{display:none!important} #controls[data-tier=development] .puzzle-structure-group .topology-original{display:block!important}
+
+/* 0.79 portrait-first application shell */
+#controls{inset:0;width:100%;height:100dvh;max-width:none;padding:0;border:0;box-shadow:none;display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden;transform:none;background:#101b23;z-index:40;transition:none;scroll-padding:0}
+#controls.collapsed{display:none!important;transform:none} #toggle-btn,#controls.collapsed + #toggle-btn{left:max(12px,env(safe-area-inset-left));top:max(12px,env(safe-area-inset-top));width:48px;height:48px;padding:0;display:grid;place-items:center;z-index:41} #controls:not(.collapsed)+#toggle-btn{display:none}
+.m79-header{padding:calc(12px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 10px max(16px,env(safe-area-inset-left));border-bottom:1px solid #354d58;display:flex;align-items:center;gap:12px;background:#101b23}.m79-header h1{font-size:23px;color:#66fcf1;margin:0;flex:1}.m79-header button{width:44px;height:44px;flex-shrink:0}.m79-header small{font-size:12px;color:#a8c9cc}
+.m79-body{min-height:0;overflow:auto;overscroll-behavior:contain;padding:16px;display:block}.m79-nav{display:grid;gap:8px}.m79-link{display:flex;align-items:center;text-align:left;gap:12px;min-height:64px;padding:12px!important}.m79-link span{flex:1;min-width:0}.m79-link strong,.m79-link small{display:block}.m79-link small{color:#a8c9cc;font-size:13px;margin-top:4px;font-weight:400}.m79-link svg{flex-shrink:0;color:#66fcf1}.m79-main{min-width:0}.m79-footer{padding:10px 16px calc(12px + env(safe-area-inset-bottom));background:#101b23;border-top:1px solid #354d58;display:grid;grid-template-columns:1fr 1fr;gap:8px}.m79-footer .btn{margin:0;min-height:48px}.m79-footer #restartCurrent{grid-column:1/-1;min-height:44px}.m79-status{grid-column:1/-1;font-size:13px;color:#a8c9cc}.m79-summary{padding:14px;background:#182731;border-radius:12px;margin:0 0 12px;font-size:14px;line-height:1.5}.m79-summary strong{color:#66fcf1;display:block;font-size:17px}.m79-preview{margin:12px 0}.m79-preview svg{display:block;width:100%;max-height:200px}.m79-preview small{display:block;color:#a8c9cc;text-align:center;margin:5px}.m79-help{position:fixed;inset:auto 12px calc(12px + env(safe-area-inset-bottom));max-width:520px;margin:auto;background:#20333e;border:1px solid #66fcf1;border-radius:12px;padding:16px;z-index:10000;color:#d4e9e8;line-height:1.5}.m79-help button{display:block;margin-top:12px;width:100%}
+#controls .menu-section,#controls .simple-pane{padding:0;margin:0;border:0;background:none;border-radius:0} #controls .menu-heading{font-size:20px;color:#d4e9e8;margin:0 0 14px} #controls .menu-section label,#controls .simple-pane label{font-size:15px;line-height:1.45;margin:12px 0;text-transform:none} #controls .section-title{font-size:15px;margin:20px 0 8px} #controls .tierbar{margin:0 0 16px;gap:6px} #controls button,#controls input,#controls select{font-family:inherit} #controls button:not(.info-button){min-height:44px;font-size:14px;line-height:1.25} #controls button:focus-visible,button:focus-visible{outline:2px solid #fff;outline-offset:2px} #controls button{cursor:pointer} #controls .choice-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px} #controls .choice-buttons button{padding:12px 8px;position:relative;min-height:48px} #controls .choice-buttons button.active:after,#controls .themegrid button.active:after,#controls #sizePresets button.active:after,#controls .tierbar button.active:after{content:'';display:inline-block;width:8px;height:5px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);margin-left:6px;vertical-align:3px} #controls .uniform-toggle{min-height:52px;flex-direction:row-reverse;justify-content:space-between;gap:12px} #controls .uniform-toggle .toggle-choice{width:84px;min-width:84px;max-width:84px;flex-basis:84px;height:44px} #controls .toggle-label{font-size:15px} #controls .info-button{width:44px;height:44px;flex-basis:44px;border:0;background:none} #controls .numeric-controls{grid-template-columns:44px minmax(0,1fr) 44px} #controls input[type=number],#controls input[type=text]{font-size:16px;min-height:44px;padding:10px} #controls input[type=range]{height:30px} #controls input[type=color]{width:64px;height:44px;margin-left:auto;flex-shrink:0} #controls .m79-color{display:flex!important;align-items:center;gap:8px;justify-content:space-between} #controls .themegrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px} #controls .themegrid svg{height:64px} #controls .themegrid button{position:relative;padding:6px} #controls .size-shortcuts{padding:0;background:none;border:0} #sizePresets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))} #controls .group-random-tools{gap:6px;justify-content:flex-start} #controls .option-lock{min-width:44px;min-height:44px} #controls:not(.m79-locks) .option-lock{display:none!important} #controls[data-tier=advanced] .local-tools button:first-child{display:none} #controls .m79-body .random-global{display:block!important} #controls .m79-body .preset-panel{display:block!important} #controls .m79-body .menu-section[hidden],#controls .m79-body .simple-pane[hidden]{display:none!important} #controls .m79-body .menu-section:not([hidden]){display:block} #controls .m79-body #btnExportPNG{width:100%;height:auto;min-height:44px;margin:8px 0;font-size:14px} #controls .m79-body #simpleMenu{display:block} #controls:not([data-tier=simple]) #simpleMenu{display:none} #controls .m79-body #simpleMenu[hidden]{display:none!important} #controls .m79-body .m79-hidden{display:none!important} #controls .m79-body .m79-random{margin-top:16px} #controls .m79-body .m79-custom{margin-top:12px} #controls .m79-body .m79-choice-long{grid-template-columns:1fr} #controls .m79-body .m79-choice-long button{text-align:left} #controls .m79-body button{color:#d4e9e8;background:#20333e;border:1px solid #45616c;border-radius:8px} #controls .m79-body button.active,#controls .m79-body .btn-primary{color:#07131b;background:#45a29e;border-color:#66fcf1} #controls .m79-body button:disabled{opacity:.45} #controls .m79-body .m79-link{background:#182731} #controls .m79-body .m79-link.active{background:#203e43;color:#d4e9e8} #controls .m79-body .m79-link.active small{color:#a8c9cc} #controls .m79-body .m79-link.active svg{color:#66fcf1} #controls .m79-body .m79-link svg{width:22px;height:22px} #controls .m79-body .m79-link svg:last-child{width:16px} .m79-svg{width:22px;height:22px;vertical-align:middle;display:inline-block;flex-shrink:0} button .m79-svg{pointer-events:none} #controls .m79-footer button{display:flex;align-items:center;justify-content:center;gap:7px;text-transform:none} #controls .m79-footer #topStart{position:static;margin:0;box-shadow:none} #hud{top:max(12px,env(safe-area-inset-top))!important;right:max(12px,env(safe-area-inset-right))!important;max-width:calc(100vw - 80px);font-size:13px} #navigationActions button,#cameraTools button{width:44px;height:44px} #navigationActions{right:12px;bottom:calc(185px + env(safe-area-inset-bottom));max-width:calc(100vw - 24px);flex-wrap:wrap} #dpad{right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:156px;height:156px} #cameraTools{left:12px;bottom:calc(16px + env(safe-area-inset-bottom));gap:4px} #modal-card{width:min(440px,calc(100vw - 24px));padding:20px;max-height:90dvh} #modal-card .btn{min-height:48px;font-size:14px;text-transform:none} #modal-card .btn-primary{background:#66fcf1} #modal-card h2{font-size:26px} #modal-card .m79-win-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px} #modal-card .m79-win-grid .btn{margin:0} #modal-card #winBoth{grid-column:1/-1} #controls:not(.collapsed)~#hud,#controls:not(.collapsed)~#dpad,#controls:not(.collapsed)~#navigationActions,#controls:not(.collapsed)~#cameraTools{visibility:hidden} @media(max-width:360px){.m79-body{padding:12px}.m79-footer{padding-left:12px;padding-right:12px}#cameraTools{flex-direction:column}#controls .themegrid svg{height:48px}} @media(min-width:760px) and (min-height:480px){.m79-body{display:grid;grid-template-columns:minmax(220px,300px) minmax(0,1fr);gap:24px;max-width:1100px;width:100%;margin:auto;align-content:start}.m79-nav{align-content:start}.m79-main{padding:0 8px 16px}.m79-footer{grid-template-columns:minmax(160px,1fr) minmax(160px,1fr) minmax(160px,1fr);padding-left:max(20px,calc((100vw - 1050px)/2));padding-right:max(20px,calc((100vw - 1050px)/2))}.m79-footer #restartCurrent{grid-column:auto}.m79-header{padding-left:max(20px,calc((100vw - 1050px)/2));padding-right:max(20px,calc((100vw - 1050px)/2))}.m79-header #m79Back{display:none}.m79-main .m79-preview svg{max-height:240px}} @media(max-height:450px) and (orientation:landscape){.m79-header{padding:5px 12px}.m79-footer{padding:5px 12px;grid-template-columns:1fr 1fr 1fr}.m79-footer #restartCurrent{grid-column:auto}.m79-body{padding:8px 16px}.m79-footer .btn{min-height:44px}} @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+
+#controls .m79-header button{background:#20333e;color:#66fcf1;border:1px solid #45616c;border-radius:9px;display:grid;place-items:center;padding:0} #controls .m79-header button[hidden]{display:none!important} #controls .m79-footer #m79Restart{grid-column:1/-1} #controls .m79-body [hidden]{display:none!important} #controls .m79-body .group-random-tools .group-status{font-size:13px} #controls .m79-body .m79-custom>summary{padding:14px 0;cursor:pointer;font-size:15px;font-weight:600} #controls .m79-body .m79-custom{border-bottom:1px solid #354d58} #controls .m79-body .m79-color{margin:9px 0} #controls .m79-body .menu-heading .info-button{margin-left:4px} #controls .m79-body .toggle-choice svg{width:16px;height:16px;margin-right:4px} #controls .m79-body .m79-link:focus-visible{outline:2px solid #66fcf1} #controls .m79-body #simpleMenu .simple-pane .menu-heading{margin-top:8px} #controls .m79-body .themegrid button.active{background:#203e43;color:#d4e9e8} #controls .m79-body .themegrid button.active:after{color:#66fcf1} #controls .m79-body #section-appearance .menu-heading:not(:first-child){display:none} #controls .m79-body #section-appearance .group-random-tools{margin-top:8px} #controls .m79-body .m79-link span{text-align:left} #controls .m79-body .m79-summary{margin-bottom:16px} #controls .m79-body .m79-nav[hidden]{display:none!important} #controls .m79-body #section-appearance label.m79-color input[type=color]{flex:0 0 64px} #controls .m79-body #section-appearance label.m79-color .field-caption{flex:1} #controls .m79-body .m79-appearance-title{margin:18px 0 8px;font-size:16px;font-weight:700;color:#d4e9e8} @media(min-width:760px) and (min-height:480px){#controls .m79-footer #m79Restart{grid-column:auto}} @media(max-height:450px) and (orientation:landscape){#controls .m79-footer #m79Restart{grid-column:auto}} 
+
+/* V0.80: one navigation vocabulary, non-blocking feedback, complementary tiers. */
+#controls .m79-body .m80-link{width:100%;display:flex;align-items:center;gap:12px;text-align:left;min-height:60px;padding:12px;margin:0 0 8px;background:#182731;border:1px solid #354d58;border-radius:9px;color:#d4e9e8}
+#controls .m80-link>span{flex:1;min-width:0}#controls .m80-link strong,#controls .m80-link small{display:block}#controls .m80-link small{font-size:13px;color:#a8c9cc;margin-top:3px}#controls .m80-link svg{color:#66fcf1}#controls .m80-link svg:last-child{width:18px}
+#controls .m79-body{display:block;max-width:980px;margin:0 auto;width:100%;align-content:start}#controls .m79-main{padding:0;max-width:720px;margin:auto}#controls .m79-nav{display:none!important}#controls .m79-header #m79Back{display:none!important}#controls .m79-header h1{font-size:21px}#controls .m79-body .m80-homegrid{display:grid;gap:8px}#controls .m79-body .m80-homegrid .m80-link{margin:0}#controls .m79-body .m80-note{font-size:13px;line-height:1.45;color:#a8c9cc;margin:6px 0 12px}#controls .m79-body .m80-warning{color:#f1c481}#controls .m79-body .m80-section{margin:12px 0 20px;padding:12px;background:#182731;border:1px solid #354d58;border-radius:10px}#controls .m80-section>h3{font-size:16px;margin:0 0 8px;color:#d4e9e8}#controls .m80-section .menu-heading{font-size:16px}
+#controls .m79-body .m80-page[hidden],#controls .m79-body [hidden],#controls .m79-body .m80-hidden{display:none!important}#controls .m79-body .m80-page:not([hidden]){display:block!important}#controls .m79-body .m80-page .choice-source,#controls .m79-body .m80-page .toggle-source{display:none!important}#controls .m79-body .m80-page label{display:block;margin:12px 0;font-size:15px;text-transform:none}#controls .m79-body .m80-page .uniform-toggle{display:flex!important;flex-direction:row-reverse;align-items:center;justify-content:space-between}#controls .m79-body .m80-page .m80-module-row{display:flex!important;align-items:center;justify-content:space-between;gap:12px}#controls .m79-body .m80-page .m80-module-row[hidden]{display:none!important}#controls .m79-body .m80-page .m80-module-row .toggle-choice{min-width:84px}#controls .m79-body .m80-page .m80-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#controls .m80-choice-grid button{min-height:52px}#controls .m79-body .m80-page .m80-info{display:inline-flex;vertical-align:middle;width:44px;height:44px;align-items:center;justify-content:center;background:none;border:0;color:#66fcf1;padding:0}#controls .m80-info svg{width:20px;height:20px}#controls .m80-helptext{font-size:13px;line-height:1.5;color:#a8c9cc;margin:4px 0 10px}#controls .m79-body .m80-headrow{display:flex;align-items:center;justify-content:space-between;gap:6px}#controls .m80-headrow h3{margin:0;font-size:16px}#controls .m79-body .m80-lockrow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:5px 0}#controls .m80-lockrow button{min-width:48px;padding:6px 12px}#controls .m80-lockrow button[aria-pressed=true]{color:#ffd18b;border-color:#a87a42}#controls .m80-lockrow span{flex:1}#controls .m80-lockrow{flex-wrap:wrap}#controls .m79-body .group-random-tools,#controls .m79-body .option-lock,#controls .m79-body .info-button{display:none!important}#controls .m79-body .m80-page #friendlyTopology,#controls .m79-body .m80-page .topology-original{display:none!important}#controls .m79-body .m80-page .setting-lock-row{display:block!important}#controls .m79-body .m80-page .setting-lock-row[hidden]{display:none!important}#controls .m79-body .m80-page .m80-module-row[hidden]{display:none!important}
+.m80-feedback{position:fixed;z-index:12000;max-width:min(320px,calc(100vw - 20px));padding:9px 12px;border:1px solid #66fcf1;border-radius:8px;background:#20333e;color:#e2f6f4;font:14px/1.35 system-ui,sans-serif;box-shadow:0 3px 12px #0008;pointer-events:none;overflow-wrap:anywhere}.m80-armed{outline:2px solid #e4b45f!important;outline-offset:2px}#m80ResultsButton{position:fixed;top:calc(68px + env(safe-area-inset-top));left:12px;z-index:30;min-height:44px;padding:8px 12px;color:#66fcf1;background:#182731;border:1px solid #45a29e;border-radius:8px;cursor:pointer}#controls:not(.collapsed)~#m80ResultsButton{display:none!important}#modal-overlay{display:none!important}#controls .m80-results .btn{margin:6px 0;min-height:48px}#controls .m80-results .btn-primary{background:#66fcf1;color:#07131b}#controls .m80-results .m79-win-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}#controls .m80-results #winBoth{grid-column:1/-1}#controls .m79-footer #m79Restart{grid-column:1/-1}#controls .m79-footer.m80-subfooter{display:none}#controls .m79-body .m80-resultstatus{color:#e4b45f;margin:8px 0;font-size:15px}#controls .m79-body .m80-page #debugPanel{display:block!important}#controls .m79-body .m80-page #debugPanel>summary{display:none}#controls .m79-body .m80-page #debugPanel{max-width:none!important}
+@media(min-width:760px){#controls .m79-body .m80-homegrid{grid-template-columns:1fr 1fr}#controls .m79-footer #m79Restart{grid-column:auto}#controls .m79-body .m80-page .m80-choice-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -183,10 +244,9 @@
       <button type="button" data-preset="basic">Basic</button><button type="button" data-preset="gate">Gate Puzzle</button><button type="button" data-preset="explorer">Explorer</button><button type="button" data-preset="treasure">Treasure Hunt</button><button type="button" data-preset="challenge">Challenge</button>
     </div><button type="button" id="resetPreset" class="preset-reset" hidden>Reset to preset</button>
   </div>
-  <dialog id="presetChoiceDialog" aria-labelledby="presetChoiceTitle"><h3 id="presetChoiceTitle">Apply <span id="presetChoiceName"></span> preset?</h3><p>Choose how existing randomisation locks are handled. Lock states themselves are preserved.</p><div class="preset-choice-buttons"><button type="button" data-preset-choice="respect">Respect locks</button><button type="button" data-preset-choice="override">Override locked values</button><button type="button" data-preset-choice="cancel">Cancel</button></div></dialog>
-  <div class="random-global"><strong>Randomisation locks</strong><div class="random-lock-actions"><button type="button" id="globalUnlock">🔓 Unlock all</button><button type="button" id="globalLock">🔒 Lock all</button><button type="button" id="globalShuffle">🎲 Shuffle unlocked</button></div><div id="randomFeedback" class="random-note" aria-live="polite">Unlocked options can be shuffled; locked options stay unchanged.</div></div>
+  <div class="random-global"><strong>Randomisation locks</strong><div class="random-lock-actions"><button type="button" id="globalUnlock">Unlock all</button><button type="button" id="globalLock">Lock all</button><button type="button" id="globalShuffle">Shuffle unlocked</button></div><div id="randomFeedback" class="random-note" aria-live="polite">Unlocked options can be shuffled; locked options stay unchanged.</div></div>
   <!-- Generation configuration -->
-  <div class="generation-actions"><button class="btn btn-primary" id="btnGenerate">Start maze</button><button class="btn btn-secondary" id="btnRandomMaze">🎲 Random Maze</button></div>
+  <div class="generation-actions"><button class="btn btn-primary" id="btnGenerate">Start maze</button><button class="btn btn-secondary" id="btnRandomMaze">Random maze</button></div>
   <nav class="menu-nav" aria-label="Settings sections">
     <button type="button" data-jump="maze">Maze</button><button type="button" data-jump="objectives">Objectives</button><button type="button" data-jump="topology">Topology</button><button type="button" data-jump="lighting">Exploration</button><button type="button" data-jump="movement">Movement</button><button type="button" data-jump="appearance">Colours</button><button type="button" data-jump="advanced">Advanced</button>
   </nav>
@@ -220,7 +280,7 @@
   <label class="checkbox-group"><input type="checkbox" id="keepSeed"><span>Keep seed for next generation</span></label>
 
   </details>
-  <details class="menu-section" id="section-objectives"><summary>Objectives & Gates<span class="menu-status">Next maze</span></summary><details class="section-help"><summary>ⓘ About this section</summary><p>Choose Standard or Keys & Gates. Gems are an optional extra completion requirement in either mode.</p></details>
+  <details class="menu-section" id="section-objectives"><summary>Objectives & Gates<span class="menu-status">Next maze</span></summary><details class="section-help"><summary>ⓘ About this section</summary><p>Plain maze has no extra objectives. Keys, gems and puzzle structures are optional.</p></details>
   <label>Objective Mode
     <select id="objectiveMode">
       <option value="standard" selected>Standard (Start to Exit)</option>
@@ -409,8 +469,8 @@
   <button class="btn btn-secondary" id="btnFit">⊞ Fit Maze to Screen</button>
   <button class="btn btn-secondary" id="btnCentre">◎ Centre on Explorer</button>
   <button class="btn btn-secondary" id="btnFullscreen">⛶ Fullscreen</button>
-  <button class="btn btn-secondary" id="btnExportJSON">💾 Export Level Package (.json)</button>
-  <button class="btn btn-secondary" id="btnExportPNG">📷 Save Canvas Screenshot</button>
+  <button class="btn btn-secondary" id="btnExportJSON">Export Level Package (.json)</button>
+  <button class="btn btn-secondary" id="btnExportPNG">Save Canvas Screenshot</button>
 </div>
 
 <button id="toggle-btn">☰</button>
@@ -441,14 +501,14 @@
 <!-- Victory / Profile Modal -->
 <div id="modal-overlay">
   <div id="modal-card">
-    <h2>🎉 Maze Cleared!</h2>
+    <h2>Maze Cleared!</h2>
     <p id="modal-stats" style="font-size: 14px; margin-bottom: 16px;"></p>
     <label style="text-align: left;">Enter Pilot Username:
       <input type="text" id="usernameInput" value="Explorer_1">
     </label>
     <button class="btn btn-primary" id="btnSaveProfile" style="margin-top: 16px;">Save Score & Close</button>
     <button class="btn btn-secondary" id="btnRetryMaze" style="margin-top: 10px;">↻ Retry Same Maze</button>
-    <button class="btn btn-secondary" id="btnNewMazeAfterWin" style="margin-top: 10px;">⚡ Generate New Maze</button>
+    <button class="btn btn-secondary" id="btnNewMazeAfterWin" style="margin-top: 10px;">Generate New Maze</button>
   </div>
 </div>
 
@@ -460,7 +520,7 @@
 // VERSION AND FILE NAMING RULE:
 // Update APP_VERSION here only. Release the HTML as MazyV#.##.html
 // (for example, MazyV0.16.html). Do not hard-code versions elsewhere.
-const APP_VERSION='0.76';
+const APP_VERSION='0.80';
 document.title=`Mazy v${APP_VERSION} - Offline Vector Maze Adventure`;
 document.getElementById('appVersionHeading').textContent=`MAZY v${APP_VERSION}`;
 const $ = id => document.getElementById(id);
@@ -489,7 +549,7 @@ for(const [id,out] of [['touchDistance','touchDistanceValue'],['touchThreshold',
 function debugLog(message){const line=new Date().toLocaleTimeString()+' '+message;debugLines.push(line);if(debugLines.length>80)debugLines.shift();$('debugLog').textContent=debugLines.join('\n');}
 window.addEventListener('error',e=>{debugLog('ERROR '+e.message+' at '+e.filename+':'+e.lineno);$('debugStatus').textContent='Error detected — expand diagnostics';});
 window.addEventListener('unhandledrejection',e=>debugLog('PROMISE ERROR '+String(e.reason)));
-$('debugCopy').onclick=()=>{const data=debugLines.join('\n');if(navigator.clipboard?.writeText)navigator.clipboard.writeText(data).catch(()=>prompt('Copy diagnostics',data));else prompt('Copy diagnostics',data);};
+$('debugCopy').onclick=()=>{const data=debugLines.join('\n');if(navigator.clipboard?.writeText)navigator.clipboard.writeText(data).then(()=>notice80('Diagnostics copied',$('debugCopy'))).catch(()=>downloadDiagnostics80(data));else downloadDiagnostics80(data);};
 
 const canvas=$('canvas'), ctx=canvas.getContext('2d');
 const N=1,E=2,S=4,W=8, DIRS=[[N,0,-1],[E,1,0],[S,0,1],[W,-1,0]];
@@ -1074,13 +1134,13 @@ const LOCK_STORAGE_KEY='mazy-random-option-locks-v1';
 try{const stored=JSON.parse(localStorage.getItem(LOCK_STORAGE_KEY)||'null');if(stored&&typeof stored==='object')for(const id of randomOptionIds)if(typeof stored[id]==='boolean')optionLocks[id]=stored[id];}catch(e){}
 function persistOptionLocks(){try{localStorage.setItem(LOCK_STORAGE_KEY,JSON.stringify(optionLocks));}catch(e){}if(typeof queueConfigSave==='function'&&typeof configSaveTimer!=='undefined')queueConfigSave();}
 function groupOptionIds(group){return RANDOM_OPTION_GROUPS[group]||[];}
-function optionIsLocked(id){return $('controls').dataset.tier==='advanced'?false:!!optionLocks[id];}
+function optionIsLocked(id){return !!optionLocks[id];}
 function setOptionLock(id,locked){if(!(id in optionLocks))return;optionLocks[id]=!!locked;persistOptionLocks();updateRandomLockUI();}
 function setGroupLocks(group,locked){for(const id of groupOptionIds(group))optionLocks[id]=!!locked;persistOptionLocks();updateRandomLockUI();}
 function flashChanged(ids){for(const id of ids){const el=$(id);if(!el)continue;const target=el.closest('.setting-lock-row')||el;target.classList.remove('random-changed');void target.offsetWidth;target.classList.add('random-changed');setTimeout(()=>target.classList.remove('random-changed'),1600);}}
 function buildOptionLockUI(){
  for(const group of RANDOM_GROUPS){const section=$('section-'+(group==='algorithm'||group==='size'?'maze':group));if(!section)continue;
-  let tools=section.querySelector('.group-random-tools[data-group="'+group+'"]');if(!tools){tools=document.createElement('div');tools.className='group-random-tools';tools.dataset.group=group;tools.innerHTML='<span class="group-status"></span><button type="button" data-action="shuffle">🎲 Shuffle</button><button type="button" data-action="unlock">🔓 Unlock all</button><button type="button" data-action="lock">🔒 Lock all</button>';
+  let tools=section.querySelector('.group-random-tools[data-group="'+group+'"]');if(!tools){tools=document.createElement('div');tools.className='group-random-tools';tools.dataset.group=group;tools.innerHTML='<span class="group-status"></span><button type="button" data-action="shuffle">Shuffle</button><button type="button" data-action="unlock">Unlock all</button><button type="button" data-action="lock">Lock all</button>';
    if(group==='algorithm'){section.insertBefore(tools,section.querySelector('.size-shortcuts'));}else if(group==='size'){section.insertBefore(tools,section.querySelector('label'));}else{section.insertBefore(tools,section.querySelector('.section-help')?.nextSibling||section.firstChild.nextSibling);}
    tools.addEventListener('click',e=>{const action=e.target.dataset.action;if(action==='shuffle')shuffleUnlocked('config-'+freshSeed()+'-'+(++previewCounter),[group]);else if(action==='lock'||action==='unlock')setGroupLocks(group,action==='lock');});}
   for(const id of groupOptionIds(group)){const el=$(id);if(!el||el.dataset.hasRandomLock)continue;let parent=el.closest('label');if(!parent){parent=el.closest('.checkbox-group');}if(!parent)continue;
@@ -1197,7 +1257,7 @@ function generateMaze(seedOverride=null){
   const width=readNumber('w',31,3,121),height=readNumber('h',31,3,121),pairs=readNumber('gateCount',3,1,12);
   if(width<9||height<9||width*height<55*(pairs+1)){
    const message='The region planner needs both sides at least 9 and at least '+(55*(pairs+1))+' cells for '+pairs+' gate pairs. Increase the grid or reduce the pairs. Your current maze has been kept.';
-   $('puzzleReport').textContent=message;debugLog(message);alert(message);return;
+   $('puzzleReport').textContent=message;debugLog(message);notice80(message);return;
   }
  }
  debugLog('Mazy v'+APP_VERSION+' — generating maze…');
@@ -1241,13 +1301,13 @@ function generateMaze(seedOverride=null){
     ({movementHistory,dropMarker,rememberedKeys,rememberedWingSwitches,rememberedExit,fixedLightPoints,portableLights,portableSupply,lightSteps}=previousLevel);
     discoveredWalls.clear();previousLevel.discovered.forEach(v=>discoveredWalls.add(v));currentlyLitWalls.clear();previousLevel.lit.forEach(v=>currentlyLitWalls.add(v));
     $('seedInput').value=activeSeed;
-    const message=error.message+' Your previous maze is unchanged.';$('puzzleReport').textContent=message;debugLog(message);alert(message);return;
+    const message=error.message+' Your previous maze is unchanged.';$('puzzleReport').textContent=message;debugLog(message);notice80(message);return;
    }
    levelObjective='standard';keys=[];puzzleZones=null;puzzlePlan=null;puzzleTopology=null;
    gateMap=Array.from({length:rows},()=>Array.from({length:cols},()=>[]));grid=Array.from({length:rows},()=>new Uint8Array(cols));
    generateSelected();exitX=cols-1;exitY=rows-1;
    const message=error.message+' Showing a STANDARD maze preview, not a teaser puzzle.';
-   $('puzzleReport').textContent=message;debugLog(message);alert(message);
+   $('puzzleReport').textContent=message;debugLog(message);notice80(message);
   }
  }
  if($('universalEnabled').checked){
@@ -2101,6 +2161,7 @@ function routeTo(x,y){
  autoNavigation={target:{x,y},last:0,path,index:0,key:[...playerKeys].sort().join("|")};updateNavigationButtons();requestDraw();
 }
 function advanceAutoNavigation(now){
+ if(!$('controls').classList.contains('collapsed'))return;
  if(!autoNavigation||isFinished)return;
  if(now-autoNavigation.last<Math.max(90,moveDelay))return;
  const {x,y}=autoNavigation.target;
@@ -2172,6 +2233,7 @@ function drawRememberedWingSwitches(c){
   if(rememberedWingSwitches.has(marker.token))drawWingSwitch(c,marker);
 }
 function step(dx,dy,record=true){
+ if(!$('controls').classList.contains('collapsed'))return false;
  markPerfAction('movement');
  if(perfEnabled){perfMoveRequested++;perfInputStart=performance.now();}
  if(isFinished||!grid.length||Math.abs(dx)+Math.abs(dy)!==1)return false;
@@ -2192,7 +2254,7 @@ function step(dx,dy,record=true){
  const done=(!levelSettings.requireFixed||!levelSettings.fixed||fixedLightPoints.every(p=>p.active))&&(levelObjective!=='keys'||keys.every(k=>k.collected))&&gems.every(g=>g.collected);
  if(px===exitX&&py===exitY&&done){
   if(clockMode==='running')elapsedTime=(performance.now()-startTime)/1000;isFinished=true;clearInterval(timerInterval);renderClock();
-  $('modal-stats').textContent=clockUnscored?`Maze cleared · Seed: ${activeSeed}`:`Cleared in ${formatTime(elapsedTime)} · Seed: ${activeSeed}`;prepareWin();$('modal-overlay').style.display='flex';
+  $('modal-stats').textContent=clockUnscored?`Maze cleared · Seed: ${activeSeed}`:`Cleared in ${formatTime(elapsedTime)} · Seed: ${activeSeed}`;prepareWin();showResults80();
  }
  requestDraw();return true;
 }
@@ -2341,7 +2403,7 @@ canvas.addEventListener('pointerup',endPointer);canvas.addEventListener('pointer
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.deltaY>0?.9:1.1,e.clientX,e.clientY);},{passive:false});
 document.addEventListener('keydown',e=>{
- if(e.target.closest('input,select,textarea,button'))return;
+ if(!$('controls').classList.contains('collapsed')||e.target.closest('input,select,textarea,button'))return;
  const actions={ArrowUp:[0,-1],w:[0,-1],ArrowDown:[0,1],s:[0,1],ArrowLeft:[-1,0],a:[-1,0],ArrowRight:[1,0],d:[1,0]};
  const choice=actions[e.key]||actions[e.key.toLowerCase()];if(choice){e.preventDefault();move(...choice);}
 });
@@ -2357,8 +2419,8 @@ function updateJoystick(e){
  const dx=e.clientX-(rect.left+rect.width/2),dy=e.clientY-(rect.top+rect.height/2);
  const radius=rect.width*.28,length=Math.hypot(dx,dy),ratio=length?Math.min(1,radius/length):0;
  joystickKnob.style.transform=`translate(${dx*ratio}px,${dy*ratio}px)`;
- joystickStrength=Math.min(1,Math.max(.15,length/(rect.width*.45)));
- const next=directionFromDelta(dx,dy,rect.width*.14);
+ joystickStrength=Math.min(1,Math.max(.15,length/(rect.width*.28)));
+ const next=directionFromDelta(dx,dy,rect.width*.075);
  if(!sameDirection(next,heldDirection)){
   heldDirection=next;lastMoveTime=-Infinity;if(next)aimInDirection(next);
  }
@@ -2423,12 +2485,7 @@ function applyPreset(name,override=null){const p=MAZY_PRESETS[name];if(!p)return
  }finally{presetApplying=false;}
 }
 function updateSizeButtons(){document.querySelectorAll('[data-size]').forEach(b=>b.classList.toggle('active',Number(b.dataset.size)===Number($('w').value)&&Number($('w').value)===Number($('h').value)));}
-function showPresetChoice(name){
- const dlg=$('presetChoiceDialog');$('presetChoiceName').textContent=name.replace(/^./,c=>c.toUpperCase());
- dlg.dataset.preset=name;
- if(typeof dlg.showModal==='function')dlg.showModal();else{const choice=window.prompt('Preset '+name+': type R to respect locks, O to override locks, or C to cancel','R');if(choice&&choice.toLowerCase()==='r')applyPreset(name,false);else if(choice&&choice.toLowerCase()==='o')applyPreset(name,true);}
-}
-$('presetChoiceDialog').addEventListener('click',e=>{const action=e.target.dataset.presetChoice;if(!action)return;const dlg=$('presetChoiceDialog'),name=dlg.dataset.preset;dlg.close();if(action==='respect')applyPreset(name,false);else if(action==='override')applyPreset(name,true);});
+function showPresetChoice(name){preset80(name);}
 document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>applyPreset(b.dataset.preset)));
 $('resetPreset').addEventListener('click',()=>activePreset&&applyPreset(activePreset));
 document.querySelectorAll('[data-size]').forEach(b=>b.addEventListener('click',()=>{const n=Number(b.dataset.size);setPresetValue('w',n);setPresetValue('h',n);updateObjectiveControls();updateSizeButtons();markCustom();updateSetupSummary();queueConfigSave();}));
@@ -2500,9 +2557,9 @@ $('testExport').onclick=()=>{
  const a=document.createElement('a');a.href=url;a.download='MazyV'+APP_VERSION+'_generation_tests.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 $('testBatchMazes').onclick=async()=>{
- if(!confirm('Test 25 seeds using the current generation settings? This will reset the active maze and regenerate its original seed afterwards.'))return;
+ 
  const button=$('testBatchMazes'),originalSeed=activeSeed,originalInput=$('seedInput').value,originalKeep=$('keepSeed').checked;
- const originalAlert=window.alert;button.disabled=true;generationTestResults=[];
+ const originalAlert=window.alert;button.disabled=true;batch80=true;generationTestResults=[];
  try{
   window.alert=message=>{debugLog('Batch generator notice: '+message);};
   $('keepSeed').checked=true;
@@ -2518,7 +2575,7 @@ $('testBatchMazes').onclick=async()=>{
    if(i%3===0)await new Promise(resolve=>setTimeout(resolve,0));
   }
  }finally{
-  window.alert=originalAlert;
+  window.alert=originalAlert;batch80=false;
   $('keepSeed').checked=originalKeep;
   try{generateMaze(originalSeed);}catch(error){debugLog('Could not restore original seed: '+error);}
   $('seedInput').value=originalInput;button.disabled=false;
@@ -2669,8 +2726,196 @@ for(const id of [...structureIds,'topologyChoice','gateCount','w','h','universal
 const priorProfileSync=syncProfileUI;syncProfileUI=function(){normalizePuzzleOptions();priorProfileSync();};
 renderTabs();refreshChoices();syncProfileUI();
 
+
+// v0.77 menu organisation and explicit maze lifecycle.
+const runActions=document.createElement('div');runActions.id='runActions';topStart.before(runActions);runActions.append(topStart);
+const restartCurrent=document.createElement('button');restartCurrent.id='restartCurrent';restartCurrent.type='button';restartCurrent.className='btn btn-secondary';restartCurrent.textContent='Restart current maze · hold';runActions.append(restartCurrent);
+const genFields=['w','h','algo','objectiveMode','requireGems','gemCount','gateCount','universalEnabled','universalCount','universalDoorCount',...structureIds];
+function generationSignature(values){const a=Object.fromEntries(genFields.map(id=>[id,values[id]]));if(!a.requireGems)delete a.gemCount;if(a.objectiveMode!=='keys'){delete a.gateCount;for(const id of structureIds)delete a[id];}if(!a.universalEnabled){delete a.universalCount;delete a.universalDoorCount;}return JSON.stringify(a);}
+function requestedValues(){const v=captureProfile().values;if(tier==='simple')Object.assign(v,{w:v.simpleSize,h:v.simpleSize,algo:v.simpleDifficulty,objectiveMode:'standard',requireGems:false,universalEnabled:false});return v;}
+function needsGeneration(){const v=requestedValues();return !winningConfig||isFinished||generationSignature(v)!==generationSignature(winningConfig.values)||(tier!=='simple'&&v.keepSeed&&v.seedInput.trim()!==activeSeed);}
+function updateRunActions(){topStart.textContent=needsGeneration()?'Generate maze':'Continue maze';restartCurrent.disabled=!winningConfig||!grid.length;}
+topStart.onclick=()=>{if(!needsGeneration()){$('controls').classList.add('collapsed');$('toggle-btn').setAttribute('aria-expanded','false');saveProfiles();return;}collapseAfter(()=>tier==='simple'?$('simpleStart').onclick():generateMaze());updateRunActions();};
+// Restart the exact generated configuration and seed, not the pending choices.
+function restartExact(){const c=winningConfig;if(!c)return;const pending=captureProfile().values;for(const id of genFields){const e=$(id);if(c.values[id]===undefined)continue;if(e.type==='checkbox')e.checked=c.values[id];else e.value=c.values[id];}const before=generationCount;generateMaze(c.seed);for(const id of genFields){const e=$(id);if(e.type==='checkbox')e.checked=pending[id];else e.value=pending[id];}$('seedInput').value=pending.seedInput;normalizePuzzleOptions();refreshChoices();saveProfiles();if(generationCount!==before){$('controls').classList.add('collapsed');$('toggle-btn').setAttribute('aria-expanded','false');$('modal-overlay').style.display='none';}updateRunActions();}
+let restartHold=null;function cancelRestart(){clearTimeout(restartHold);restartHold=null;restartCurrent.classList.remove('holding');}
+function beginRestart(){if(restartHold!==null||restartCurrent.disabled)return;restartCurrent.classList.add('holding');restartHold=setTimeout(()=>{cancelRestart();restartExact();},500);}
+restartCurrent.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();restartCurrent.setPointerCapture(e.pointerId);beginRestart();});for(const event of ['pointerup','pointercancel','lostpointercapture'])restartCurrent.addEventListener(event,cancelRestart);
+restartCurrent.addEventListener('pointermove',e=>{const r=restartCurrent.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)cancelRestart();});restartCurrent.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();if(!e.repeat)beginRestart();}});restartCurrent.addEventListener('keyup',cancelRestart);restartCurrent.addEventListener('blur',cancelRestart);window.addEventListener('blur',cancelRestart);
+// Section headings precede their own controls and dice, never the preceding section.
+function heading(text){const h=document.createElement('div');h.className='menu-heading';h.textContent=text;return h;}
+for(const [key,pane] of Object.entries(simplePanes))pane.prepend(heading(key==='Play'?'Choose your maze':'Choose a theme'));
+for(const [key,name] of Object.entries({maze:'Maze setup',objectives:'Goals & structure',lighting:'Exploration',movement:'Movement & navigation',appearance:'Maze appearance',advanced:'Development tools',export:'Export maze'})){const p=$('section-'+key);p.prepend(heading(name));}
+const topologyTitle=structureGroup.querySelector('.section-title');topologyTitle.textContent='Puzzle structure';const topologyTools=structureGroup.querySelector('[data-group=topology]');topologyTitle.after(topologyTools);topologyTools.after(gateLabel,$('gateOptions'));
+const goalsTools=goalsPane.querySelector('[data-group=objectives]');const goalsTitle=heading('Collection goals');goalsTools.before(goalsTitle);
+// Split diagnostics into separate Dev tabs, retaining existing handlers.
+for(const [key,title,id] of [['performance','Performance','performanceTests'],['validation','Validation','generationTests']]){const pane=document.createElement('details');pane.id='section-'+key;pane.className='menu-section';pane.append(heading(title),$(id));$('controls').append(pane);tabNames[key]=title;}
+tabsByTier.development='maze objectives lighting movement appearance advanced performance validation export';
+const oldRenderTabs77=renderTabs;renderTabs=function(){oldRenderTabs77();updateRunActions();};
+const oldGenerate77=generateMaze;generateMaze=function(...args){const result=oldGenerate77(...args);updateRunActions();return result;};
+renderTabs();refreshChoices();
+
+
+// v0.78: common settings layout, preserving authoritative input IDs and handlers.
+objectiveRow.classList.add('obsolete-objective');
+function makeToggleRow(row,button,text){row.classList.add('uniform-toggle');const label=document.createElement('span');label.className='toggle-label';label.textContent=text;row.replaceChildren(button,label);return row;}
+for(const e of document.querySelectorAll('#controls input[type=checkbox]')){
+ const row=e.closest('.checkbox-group');const b=e.nextElementSibling;if(!row||!b?.classList.contains('toggle-choice'))continue;
+ const text=[...row.childNodes].filter(n=>n!==e&&n!==b&&!(n.nodeType===1&&n.classList.contains('info-button'))).map(n=>n.textContent).join(' ').trim();const infos=[...row.querySelectorAll('.info-button')];makeToggleRow(row,b,text);row.prepend(e);row.querySelector('.toggle-label').append(...infos);
+}
+makeToggleRow(gateLabel,gateToggle,'Keys & coloured gates');
+for(const id of structureIds){const e=$(id),original=e.closest('label'),outer=e.closest('.setting-lock-row')||original;original.classList.add('topology-original');const r=document.createElement('div'),b=document.createElement('button');b.type='button';b.className='toggle-choice';makeToggleRow(r,b,({topoCrossOver:'Teaser gates',topoHub:'Hub',topoWings:'Branches',topoCycles:'Shortcuts'})[id]);r.classList.add('topology-toggle');outer.before(r);b.onclick=()=>{e.value=e.value==='off'?'on':'off';e.dispatchEvent(new Event('change',{bubbles:true}));};choiceSync.push(()=>{const on=e.value!=='off';b.textContent=on?'On':'Off';b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});}
+// Keep quantities in place while disabled; retain IDs for profiles and validation.
+for(const id of ['universalCount','universalDoorCount']){const e=$(id),row=e.closest('label');e.type='range';e.min=1;e.max=30;e.step=1;e.classList.add('numeric-slider');row.classList.add('universal-quantity');const out=document.createElement('output');e.before(out);choiceSync.push(()=>{e.disabled=!$('universalEnabled').checked;row.classList.toggle('disabled-field',e.disabled);out.textContent=e.value;});}
+for(const id of ['w','h']){const e=$(id),row=e.closest('label'),slider=document.createElement('input');slider.type='range';slider.min=e.min;slider.max=e.max;slider.step=1;slider.className='numeric-slider';slider.setAttribute('aria-label',id==='w'?'Columns':'Rows');const wrap=document.createElement('div');wrap.className='numeric-controls';const minus=document.createElement('button'),plus=document.createElement('button');minus.type=plus.type='button';minus.textContent='−';plus.textContent='+';minus.setAttribute('aria-label','Decrease '+(id==='w'?'columns':'rows'));plus.setAttribute('aria-label','Increase '+(id==='w'?'columns':'rows'));e.before(wrap);wrap.append(minus,e,plus);wrap.after(slider);function commit(v){e.value=Math.max(Number(e.min),Math.min(Number(e.max),Math.round(Number(v)||Number(e.min))));e.dispatchEvent(new Event('change',{bubbles:true}));refreshChoices();}minus.onclick=()=>commit(Number(e.value)-1);plus.onclick=()=>commit(Number(e.value)+1);slider.oninput=()=>{e.value=slider.value;updateRunActions();};slider.onchange=()=>commit(slider.value);choiceSync.push(()=>{slider.value=e.value;});}
+// Attach help to the preceding field or section heading, rather than leaving standalone icons.
+for(const b of [...document.querySelectorAll('#controls .info-button')]){if(b.closest('.toggle-label,.field-caption'))continue;let prev=b.previousElementSibling;while(prev&&(prev.matches('small,p,.section-help')||prev.hidden||prev.style.display==='none'))prev=prev.previousElementSibling;let target=prev?.matches('label')?prev:prev?.querySelector('label:last-of-type');if(!target)target=b.closest('.menu-section')?.querySelector('.menu-heading');if(!target)continue;if(target.classList.contains('menu-heading')){target.append(' ',b);continue;}let cap=target.querySelector(':scope > .field-caption');if(!cap){cap=document.createElement('span');cap.className='field-caption';const nodes=[...target.childNodes].filter(n=>n.nodeType===3||(n.nodeType===1&&n.matches('span:not(.choice-buttons),output')));target.prepend(cap);cap.append(...nodes);}cap.append(b);}
+// Hide the legacy selector even in Dev; topology source fields remain available.
+$('friendlyTopology').hidden=true;
+choiceSync.push(updateRunActions);refreshChoices();
+
+
+// 0.79: responsive shell; retain authoritative engine inputs and profile bindings.
+const iconPaths79={menu:'M4 6h16M4 12h16M4 18h16',close:'M6 6l12 12M18 6 6 18',back:'M15 18l-6-6 6-6',chevron:'M9 18l6-6-6-6',play:'M8 5l12 7-12 7z',restart:'M3 12a9 9 0 1 1 3 7M3 4v8h8',shuffle:'M3 6h3c5 0 7 12 12 12h3m-4-4 4 4-4 4M3 18h3c2 0 4-3 5-5m3-5c1-1 2-2 4-2h3m-4-4 4 4-4 4',lock:'M6 11h12v10H6zM8 11V7a4 4 0 0 1 8 0v4',unlock:'M6 11h12v10H6zM8 11V7a4 4 0 0 1 7-3',info:'M12 11v6m0-10h.01M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20',maze:'M3 3h18v18H3zM3 9h6v6h6V3M9 21v-3M21 15h-3',target:'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10M12 12h.01',eye:'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6',controls:'M6 8h12l3 9-3 2-4-4h-4l-4 4-3-2zM7 10v4m-2-2h4m7 0h.01m2 2h.01',palette:'M12 3a9 9 0 1 0 0 18h2a2 2 0 0 0 0-4h-1a2 2 0 0 1 0-4h6a2 2 0 0 0 2-2 9 9 0 0 0-9-8zM7 9h.01M10 6h.01M15 6h.01',code:'M8 5 2 12l6 7m8-14 6 7-6 7M14 3l-4 18',activity:'M2 12h5l3-8 4 16 3-8h5',check:'M4 12l5 5L20 6',download:'M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5',camera:'M3 7h4l2-3h6l2 3h4v13H3zM12 10a4 4 0 1 0 0 8 4 4 0 0 0 0-8',fit:'M3 9V3h6m6 0h6v6m0 6v6h-6m-6 0H3v-6M8 8h8v8H8z',full:'M3 9V3h6m6 0h6v6m0 6v6h-6m-6 0H3v-6',marker:'M5 22V3m0 1h14l-3 5 3 5H5',crumb:'M5 18h.01M12 12h.01M19 6h.01',undo:'M3 10h10a6 6 0 0 1 0 12M3 10l6-6m-6 6 6 6',home:'M2 11l10-8 10 8M5 10v11h14V10M10 21v-7h4v7',return:'M20 4v10H4m6-6-6 6 6 6',up:'M5 15l7-7 7 7',down:'M5 9l7 7 7-7',left:'M15 5l-7 7 7 7',right:'M9 5l7 7-7 7',timer:'M9 2h6M12 6a8 8 0 1 0 0 16 8 8 0 0 0 0-16m0 4v4l3 2',trophy:'M7 3h10v8a5 5 0 0 1-10 0zM7 5H3v3a4 4 0 0 0 4 4m10-7h4v3a4 4 0 0 1-4 4M12 16v5m-5 0h10',minus:'M5 12h14',plus:'M5 12h14m-7-7v14'};
+function svg79(name){return `<svg class="m79-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${iconPaths79[name]||iconPaths79.info}"/></svg>`;}
+function button79(text,icon,fn){const b=document.createElement('button');b.type='button';b.innerHTML=(icon?svg79(icon):'')+`<span>${text}</span>`;if(fn)b.onclick=fn;return b;}
+const shell79=$('controls'), header79=document.createElement('header'), body79=document.createElement('div'), nav79=document.createElement('nav'), main79=document.createElement('main'),footer79=document.createElement('footer');
+header79.className='m79-header';body79.className='m79-body';nav79.className='m79-nav';main79.className='m79-main';footer79.className='m79-footer';
+const back79=button79('', 'back',()=>open79('home'));back79.id='m79Back';back79.setAttribute('aria-label','Back to menu');const title79=document.createElement('h1');title79.textContent='MAZY';const version79=document.createElement('small');version79.textContent='v'+APP_VERSION;const close79=button79('','close',()=>closeMenu79());close79.setAttribute('aria-label','Close menu');header79.append(back79,title79,version79,close79);
+const home79=document.createElement('div'),summary79=document.createElement('div'), random79=document.createElement('details');home79.id='m79Home';summary79.className='m79-summary';random79.id='section-random';random79.className='menu-section';random79.open=true;random79.append(heading('Randomisation'),shell79.querySelector('.random-global'),shell79.querySelector('.preset-panel'));const locks79=button79('Edit individual locks','lock',()=>{shell79.classList.toggle('m79-locks');locks79.setAttribute('aria-pressed',String(shell79.classList.contains('m79-locks')));});random79.append(locks79);home79.append(summary79);
+const oldPanes79=[...shell79.querySelectorAll(':scope > .menu-section')];const profileBar79=$('menuTier');const legacy79=document.createElement('div');legacy79.hidden=true;legacy79.className='m79-hidden';
+// Move the existing fields, not copies, to their final categories.
+const appear79=$('section-appearance');function moveField79(id,to){const e=$(id);if(!e)return;const row=e.closest('.setting-lock-row')||e.closest('label')||e.closest('.checkbox-group');if(row)to.append(row);}
+for(const id of ['lineWidth','fogStyle','fogColor','colorStartTrail','colorMarkerTrail'])moveField79(id,appear79);
+const theme79=$('themeCards');const preview79=document.createElement('div');preview79.className='m79-preview';const themeTitle79=heading('Visual theme');appear79.prepend(themeTitle79,preview79,theme79);for(const b of [...appear79.querySelectorAll('.menu-heading .info-button')])themeTitle79.append(b);for(const e of appear79.querySelectorAll('input[type=color]'))e.closest('label')?.classList.add('m79-color');
+for(const b of theme79.querySelectorAll('button')){const old=b.onclick;b.onclick=()=>{old();refreshChoices();saveProfiles();};}const restore79=button79('Restore theme colours','restart',()=>{applyTheme(themeIndex);refreshChoices();saveProfiles();});appear79.append(restore79);
+for(const id of ['btnExportPNG']){const b=$(id);$('section-export').append(b);b.className='btn btn-secondary';b.innerHTML=svg79('camera')+' Save screenshot';}
+const crumbGroup79=document.createElement('div');crumbGroup79.className='m79-custom';crumbGroup79.append(heading('Breadcrumb automation'));for(const d of Object.keys(crumbAuto))moveField79('crumbAuto-'+d,crumbGroup79);$('section-lighting').append(crumbGroup79);
+const custom79=document.createElement('details');custom79.className='m79-custom';custom79.innerHTML='<summary>Custom dimensions</summary>';for(const id of ['w','h'])moveField79(id,custom79);$('section-maze').querySelector('.size-shortcuts').after(custom79);
+const seed79=document.createElement('details');seed79.className='m79-custom';seed79.innerHTML='<summary>Seed and replay</summary>';for(const id of ['seedInput','keepSeed'])moveField79(id,seed79);$('section-maze').append(seed79);
+for(const id of ['algo','touchMoveStyle'])$(id).nextElementSibling?.classList.add('m79-choice-long');
+// Persistent help replaces disappearing toast.
+const help79={open:false};
+const continue79=button79('Continue maze','play',()=>closeMenu79());continue79.className='btn btn-primary';topStart.className='btn btn-secondary';const status79=document.createElement('div');status79.className='m79-status';const restart79=button79('Restart current maze','restart',()=>restartExact());restart79.id='m79Restart';restart79.className='btn btn-secondary';footer79.append(status79,continue79,topStart,restart79);
+const simpleThemeHeading79=heading('Appearance');const simpleThemeButton79=button79('Choose theme','palette',()=>open79('appearance'));simpleThemeButton79.className='btn btn-secondary';simplePanes.Play.append(simpleThemeHeading79,simpleThemeButton79);
+// Preserve legacy nodes for engine code that still references their IDs, but remove them from navigation.
+const retained79=new Set([profileBar79,simple,...oldPanes79,random79]);for(const node of [...shell79.children])if(!retained79.has(node))legacy79.append(node);
+main79.append(home79,simple,...oldPanes79,random79);body79.append(nav79,main79);shell79.replaceChildren(header79,body79,footer79,legacy79);home79.prepend(profileBar79);
+let page79='home';const navNames79={maze:['Maze','maze'],objectives:['Goals & structure','target'],lighting:['Exploration','eye'],movement:['Controls','controls'],appearance:['Appearance','palette'],random:['Randomisation','shuffle'],advanced:['Development tools','code'],performance:['Performance','activity'],validation:['Validation','check'],export:['Export','download']};
+function summaries79(k){switch(k){case'maze':return `${$('w').value} × ${$('h').value} · ${$('algo').selectedOptions[0]?.textContent||''}`;case'objectives':return ($('objectiveMode').value==='keys'?'Keys & gates':'Reach the exit')+($('requireGems').checked?' · Gems':'');case'lighting':return ['Fog','Breadcrumbs','Marker'].filter((_,i)=>$(['enableFog','enableCrumbs','enableNavMarker'][i]).checked).join(' · ')||'No exploration aids';case'movement':return $('touchMoveStyle').selectedOptions[0]?.textContent||'';case'appearance':return themePalettes[themeIndex]?.[0]||'Custom';case'random':return Object.values(optionLocks).filter(Boolean).length+' options locked';default:return ({advanced:'Puzzle plans and diagnostics',performance:'Frame recording and reports',validation:'Generation checks',export:'Level package and screenshot'})[k]||'';}}
+function navKeys79(){return tier==='simple'?['appearance']:tier==='advanced'?['maze','objectives','lighting','movement','appearance']:['maze','objectives','lighting','movement','appearance','random','advanced','performance','validation','export'];}
+function open79(page){page79=page;renderTabs();body79.scrollTop=0;}
+renderTabs=function(){const wide=innerWidth>=760&&innerHeight>=480;const isHome=page79==='home';const keys79=navKeys79();if(!isHome&&!keys79.includes(page79))page79='home';const home=page79==='home';title79.textContent=home?'MAZY':navNames79[page79]?.[0]||'MAZY';back79.hidden=home;home79.hidden=!home&&!wide;profileBar79.hidden=!home&&!wide;simple.hidden=!(tier==='simple'&&home);simplePanes.Play.hidden=false;simplePanes.Theme.hidden=true;for(const p of [...oldPanes79,random79]){p.open=true;p.hidden=p.id!=='section-'+page79;}nav79.replaceChildren();if((home&&tier!=='simple')||wide){if(wide){const b=button79('Overview','menu',()=>open79('home'));b.className='m79-link';nav79.append(b);}for(const k of keys79){const b=button79('','',()=>open79(k));b.className='m79-link'+(page79===k?' active':'');b.innerHTML=svg79(navNames79[k][1])+`<span><strong>${navNames79[k][0]}</strong><small></small></span>`+svg79('chevron');b.querySelector('small').textContent=summaries79(k);nav79.append(b);}}nav79.hidden=!(wide||(home&&tier!=='simple'));if(!wide&&home){nav79.before(home79);main79.append(simple); }else if(wide){main79.prepend(home79);}else{main79.prepend(home79);}if(!wide&&home){main79.hidden=tier!=='simple';}else main79.hidden=false; // home and navigation share the portrait scroll container
+if(!home&&!wide)home79.hidden=true; $('debugPanel').style.display=tier==='development'&&page79==='advanced'?'':'none';updateRunActions();};
+// Keep current maze available regardless of pending configuration.
+updateRunActions=function(){const pending=needsGeneration();topStart.innerHTML=svg79('plus')+' Generate maze';continue79.disabled=!grid.length;restart79.disabled=!winningConfig||!grid.length;status79.textContent=pending?'Next maze settings changed · visual and control settings apply live':'Ready · visual and control settings apply live';summary79.innerHTML=`<strong>Current maze</strong>${grid.length?cols+' × '+rows+' · '+(isFinished?'Completed':'In progress'):'No active maze'}<br><span style="color:#a8c9cc">${pending?'Next maze settings differ':'Next maze settings ready'}</span>`;};
+function closeMenu79(){shell79.classList.add('collapsed');$('toggle-btn').setAttribute('aria-expanded','false');saveProfiles();if(menuClock79!==null&&clockMode==='paused'&&!isFinished){clockMode='running';startTime=performance.now()-elapsedTime*1000;renderClock();}menuClock79=null;}
+let menuClock79=null;function showMenu79(){shell79.classList.remove('collapsed');$('toggle-btn').setAttribute('aria-expanded','true');stopHeldDirection();resetNewTouchModes();pointers.clear();dragMode=null;if(clockMode==='running'){elapsedTime=(performance.now()-startTime)/1000;clockMode='paused';menuClock79=true;renderClock();}open79('home');}
+$('toggle-btn').onclick=()=>shell79.classList.contains('collapsed')?showMenu79():closeMenu79();
+topStart.onclick=()=>{const before=generationCount; if(tier==='simple')$('simpleStart').onclick();else generateMaze();if(generationCount!==before){menuClock79=null;closeMenu79();}refreshChoices();};
+$('winMenu').onclick=()=>{saveVictoryProfile();$('modal-overlay').style.display='none';showMenu79();};
+const setTier79=setTier;setTier=function(...args){page79='home';setTier79(...args);renderTabs();};
+// Replace UI glyphs with inline vector artwork, including dynamically updated labels.
+const iconButtons79={ 'toggle-btn':'menu',btnFit:'fit',btnCentre:'target',btnFullscreen:'full',btnPortableTorch:'crumb',btnDropMarker:'marker',btnUndoMove:'undo',btnReturnStart:'home',btnReturnMarker:'return','btn-up':'up','btn-down':'down','btn-left':'left','btn-right':'right'};
+function icons79(){for(const [id,name] of Object.entries(iconButtons79)){const e=$(id);if(!e.querySelector('svg'))e.innerHTML=svg79(name);}for(const b of shell79.querySelectorAll('.option-lock')){const name=b.getAttribute('aria-pressed')==='true'?'lock':'unlock';if(b.dataset.icon79!==name||!b.querySelector('svg')){b.innerHTML=svg79(name);b.dataset.icon79=name;}}for(const b of shell79.querySelectorAll('.group-random-tools button')){const name=({shuffle:'shuffle',lock:'lock',unlock:'unlock'})[b.dataset.action]||(b.title?.startsWith('Reset')?'restart':'shuffle');if(!b.querySelector('svg')){b.innerHTML=svg79(name);b.setAttribute('aria-label',b.title||b.dataset.action||name);}}for(const [id,name,label] of [['globalLock','lock','Lock all'],['globalUnlock','unlock','Unlock all'],['globalShuffle','shuffle','Shuffle unlocked']]){const e=$(id);if(!e.querySelector('svg'))e.innerHTML=svg79(name)+' '+label;}for(const el of shell79.querySelectorAll('.group-status'))el.textContent=el.textContent.replace(/[🔓🔒◐]/gu,'').trim();}
+const hudTime79=$('hudTime');hudTime79.replaceChildren();hudTime79.insertAdjacentHTML('beforeend',svg79('timer'));const timerSpan79=document.createElement('span');timerSpan79.id='timerDisplay';hudTime79.append(timerSpan79);for(const [id,name,text] of [['hudObjectives','target','Objectives'],['hudLights','crumb','Markers']]){const el=$(id).querySelector('summary'),span=el.querySelector('span');el.innerHTML=svg79(name)+' '+text+' ';el.append(span);}const modal79=$('modal-card');modal79.querySelector('h2').innerHTML=svg79('trophy')+' Maze cleared!';const winGrid79=document.createElement('div');winGrid79.className='m79-win-grid';modal79.append($('btnNewMazeAfterWin'),$('btnRetryMaze'),winGrid79,$('btnSaveProfile'),$('winMenu'));winGrid79.append($('winHarder'),$('winLarger'),$('winBoth'));
+function update79(){icons79();for(const b of shell79.querySelectorAll('.toggle-choice')){const on=b.getAttribute('aria-pressed')==='true';b.innerHTML=svg79(on?'check':'minus')+(on?'On':'Off');}const g=$('objectiveMode').value==='keys';structureGroup.hidden=!g;crumbGroup79.hidden=!$('enableCrumbs').checked;for(const id of ['universalCount','universalDoorCount'])$(id).closest('label').hidden=!$('universalEnabled').checked;const fog=$('enableFog').checked;for(const id of ['fogStyle','fogColor']){const row=$(id).closest('.setting-lock-row')||$(id).closest('label');if(row)row.hidden=false;}const style=$('touchMoveStyle').value;for(const [id,visible] of [['touchDistance',style!=='absolute'],['touchThreshold',style==='relative'||style==='continuous'],['touchAxisLock',style==='relative']]){const row=$(id).closest('label,.checkbox-group');if(row)row.hidden=!visible;}const bg=$('colorBg').value,wall=$('colorWall').value,fill=$('colorFill').value;preview79.innerHTML=`<svg viewBox="0 0 300 130" aria-label="Sample maze style"><rect width="300" height="130" rx="10" fill="${bg}"/><path d="M15 15H285V115H15V15M60 15V55H105V95H60V115M105 15V55H195V95H150V115M240 15V55H285M240 115V95H285" stroke="${wall}" stroke-width="${Number($('lineWidth').value)}" fill="none"/><path d="M36 36V75H80" stroke="${fill}" stroke-width="18" opacity=".7" fill="none"/><circle cx="80" cy="75" r="7" fill="white"/><circle cx="265" cy="100" r="7" fill="#ef4444"/></svg><small>Sample maze · style preview</small>`;for(const b of nav79.querySelectorAll('.m79-link')){const k=Object.keys(navNames79).find(k=>navNames79[k][0]===b.querySelector('strong')?.textContent);if(k)b.querySelector('small').textContent=summaries79(k);}updateRunActions();}
+choiceSync.push(update79);document.addEventListener('fullscreenchange',icons79);const oldLocks79=updateRandomLockUI;updateRandomLockUI=function(){oldLocks79();icons79();};
+// Update native input-backed controls without exposing native checkboxes.
+for(const b of shell79.querySelectorAll('.toggle-choice')){b.classList.add('m79-toggle');}
+// Profile visibility for the shared Appearance component.
+const advancedAppearance79=[...appear79.children].filter(e=>e!==theme79&&e!==themeTitle79&&e!==preview79&&e!==restore79);const oldRender79=renderTabs;renderTabs=function(){oldRender79();for(const e of advancedAppearance79)e.classList.toggle('m79-hidden',tier==='simple');if(tier==='simple'&&page79==='appearance'){appear79.hidden=false;}update79();};
+window.addEventListener('resize',()=>renderTabs());
+// Menu opening from victory/restart uses the same screen structure.
+const oldCollapse79=collapseAfter;collapseAfter=function(fn){oldCollapse79(fn);if(shell79.classList.contains('collapsed'))menuClock79=null;};
+renderTabs();refreshChoices();
+
+// V0.80 menu navigation and interaction rules. Existing game engine input IDs are retained.
+let batch80=false,feedback80=null,feedbackTimer80=null,armed80=null,armTimer80=null,actionAnchor80=null;
+function clearArm80(){clearTimeout(armTimer80);armed80?.classList.remove('m80-armed');armed80=null;}
+function notice80(message,anchor=actionAnchor80||topStart){if(batch80){debugLog(String(message));return;}feedback80?.remove();clearTimeout(feedbackTimer80);const note=document.createElement('div');note.className='m80-feedback';note.setAttribute('role','status');note.textContent=String(message);document.body.append(note);feedback80=note;const r=anchor?.getBoundingClientRect(),w=note.offsetWidth,h=note.offsetHeight;note.style.left=Math.max(10,Math.min(innerWidth-w-10,(r?.width?r.left+(r.width-w)/2:(innerWidth-w)/2)))+'px';note.style.top=Math.max(8,Math.min(innerHeight-h-8,r?.height?(r.top>=h+12?r.top-h-8:r.bottom+8):12))+'px';feedbackTimer80=setTimeout(()=>{note.remove();if(feedback80===note)feedback80=null;},1000);}
+function confirm80(button,message,fn){if(batch80)return;if(armed80===button){clearArm80();feedback80?.remove();actionAnchor80=button;try{return fn();}finally{actionAnchor80=null;}}clearArm80();armed80=button;button.classList.add('m80-armed');notice80(message,button);armTimer80=setTimeout(clearArm80,3500);}
+function downloadDiagnostics80(data){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'text/plain'}));a.download='Mazy-diagnostics.txt';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);notice80('Diagnostics downloaded',$('debugCopy'));}
+document.addEventListener('pointerdown',e=>{if(armed80&&!armed80.contains(e.target))clearArm80();},true);
+function wrapConfirm80(b,message){const fn=b.onclick;if(!fn)return;b.onclick=e=>confirm80(b,message,()=>fn.call(b,e));}
+// Remove all inherited information buttons and replace with deliberate, local explanations.
+for(const b of shell79.querySelectorAll('.info-button'))b.remove();toast.remove();
+function note80(text,warning=false){const p=document.createElement('p');p.className='m80-note'+(warning?' m80-warning':'');p.textContent=text;return p;}
+function help80(target,text){const b=button79('','info');b.className='m80-info';b.setAttribute('aria-label','Information: '+text);const p=document.createElement('p');p.className='m80-helptext';p.hidden=true;p.textContent=text;const row=document.createElement('div');row.className='m80-headrow';const title=document.createElement('h3');title.textContent=target;row.append(title,b);b.onclick=()=>{p.hidden=!p.hidden;b.setAttribute('aria-expanded',String(!p.hidden));};b.setAttribute('aria-expanded','false');return [row,p];}
+function group80(title,text){const g=document.createElement('section');g.className='m80-section';if(text)g.append(...help80(title,text));else{const h=document.createElement('h3');h.textContent=title;g.append(h);}return g;}
+function field80(id){const e=$(id);return e.closest('.setting-lock-row')||e.closest('label,.checkbox-group')||e;}
+function move80(id,to){const row=field80(id);to.append(row);return row;}
+function page80(id,title,icon,desc){const p=document.createElement('section');p.id='m80-'+id;p.className='m80-page';p.hidden=true;main79.append(p);pages80[id]={p,title,icon,desc};return p;}
+const pages80={};const names80={simple:'Basic',advanced:'Advanced',development:'Development'};
+// Convert profile tiers into navigation categories over one shared configuration. Retain original stored profiles untouched.
+const oldSaveProfiles80=saveProfiles;const SHARED80='mazy-shared-configuration-v080';
+let shared80=null;try{shared80=JSON.parse(localStorage.getItem(SHARED80)||'null');}catch(e){}
+if(shared80?.values){for(const e of profileInputs){if(!Object.hasOwn(shared80.values,e.id))continue;if(e.type==='checkbox')e.checked=!!shared80.values[e.id];else e.value=shared80.values[e.id];}Object.assign(crumbAuto,shared80.auto||{});Object.assign(optionLocks,shared80.locks||{});themeIndex=shared80.theme||0;}
+else if(tier==='simple'){// Legacy Simple settings are the canonical starting values for a Simple migration.
+ $('w').value=$('h').value=$('simpleSize').value;$('algo').value=$('simpleDifficulty').value;
+}
+saveProfiles=function(){try{localStorage.setItem(SHARED80,JSON.stringify(captureProfile()));}catch(e){}};
+function syncBasic80(){const a=$('algo').value;const map={prims:'braided',backtracker:'mixed'};if([...$('simpleDifficulty').options].some(o=>o.value===a))$('simpleDifficulty').value=a;else $('simpleDifficulty').value=map[a]||'balanced';const w=$('w').value,h=$('h').value;if(w===h&&[...$('simpleSize').options].some(o=>o.value===w))$('simpleSize').value=w;}
+requestedValues=function(){return captureProfile().values;};
+// All tiers edit one configuration, including navigation between tiers.
+setTier=function(t){if(!names80[t])return;tier=t;shell79.dataset.tier=t;for(const b of profileBar79.querySelectorAll('button'))b.classList.toggle('active',b.dataset.tier===t);try{localStorage.setItem('mazy-menu-tier',t);}catch(e){}page79='home';stack80=[];renderTabs();saveProfiles();};
+for(const b of profileBar79.querySelectorAll('button')){b.textContent=names80[b.dataset.tier];b.onclick=()=>setTier(b.dataset.tier);}
+// Basic: all preset sizes and generator choices are kept in one place, not duplicated in Advanced.
+const challenge80=page80('challenge','Challenge','maze',()=>$('algo').selectedOptions[0]?.textContent||'');
+const challengeGroup80=group80('Choose a generator','Generators change corridor patterns. Difficulty is a guide, not a guaranteed completion time.');challenge80.append(challengeGroup80);move80('algo',challengeGroup80);$('algo').nextElementSibling?.classList.add('m79-choice-long');
+const size80=page80('size','Maze size','maze',()=>`${$('w').value} × ${$('h').value}`);const sizeGroup80=group80('Choose a size','These presets set equal rows and columns. Use Advanced → Custom dimensions for a rectangular maze.');size80.append(sizeGroup80);const sizeGrid80=document.createElement('div');sizeGrid80.className='m80-choice-grid';sizeGroup80.append(sizeGrid80);const sizeChoices80=[[15,'Small'],[31,'Medium'],[51,'Large'],[61,'Larger'],[81,'Extra large'],[121,'Huge']];for(const [n,label] of sizeChoices80){const b=button79(label+' · '+n+' × '+n,'',()=>{$('w').value=$('h').value=n;normalizeWithFeedback80(b);refreshChoices();saveProfiles();});sizeGrid80.append(b);choiceSync.push(()=>{const on=Number($('w').value)===n&&Number($('h').value)===n;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});}
+const themePage80=page80('theme','Appearance · themes','palette',()=>themePalettes[themeIndex]?.[0]||'Custom');themePage80.append(themeTitle79,preview79,theme79);themeTitle79.textContent='Visual theme';
+// Advanced: custom geometry, rules, exploration, controls and fine appearance only.
+const customPage80=page80('dimensions','Custom dimensions','maze',()=>`${$('w').value} × ${$('h').value}`);const dimGroup80=group80('Grid dimensions','Choose any supported width and height from 3 to 121. Puzzle structures may require a larger grid.');customPage80.append(dimGroup80);for(const id of ['w','h'])move80(id,dimGroup80);
+const seedPage80=page80('seed','Seed & replay','restart',()=>$('keepSeed').checked?'Keep seed enabled':'New seed each maze');const seedGroup80=group80('Seed','A seed recreates maze geometry when the generation settings are also the same. Keep seed reuses it on the next generation.');seedPage80.append(seedGroup80);for(const id of ['seedInput','keepSeed'])move80(id,seedGroup80);
+const goals80=page80('goals','Goals & structure','target',()=>summaries79('objectives'));
+const collection80=group80('Collection goals','Collect every required gem before reaching the exit.');goals80.append(collection80);move80('requireGems',collection80);collection80.append($('gemOptions'));
+const gateGroup80=group80('Keys & coloured gates','Coloured keys unlock their matching barriers. Puzzle structure modules require this feature.');goals80.append(gateGroup80);gateGroup80.append(gateLabel);gateLabel.querySelector('.toggle-label').textContent='Enable coloured gates'; // never inside conditional content
+const gateContent80=document.createElement('div');gateGroup80.append(gateContent80);gateContent80.append($('gateOptions'));
+const moduleGroup80=group80('Puzzle structure','Teasers and hubs need at least two key pairs. Branches introduce wing objectives; shortcuts add loops and gated connections.');gateContent80.append(moduleGroup80,note80('Gated mazes require at least 9 × 9 and 55 cells per region. Size and key quantities are adjusted to meet these requirements.'));
+const moduleNames80={topoCrossOver:'Teaser gates',topoHub:'Hub',topoWings:'Branches',topoCycles:'Shortcuts'};
+// Rebuild module rows directly instead of depending on moved legacy selectors and CSS.
+for(const id of structureIds){const r=document.createElement('div');r.className='m80-module-row';const label=document.createElement('span');label.textContent=moduleNames80[id];const b=button79('','');b.className='toggle-choice';r.append(label,b);moduleGroup80.append(r);b.onclick=()=>{$(id).value=$(id).value==='off'?'on':'off';normalizeWithFeedback80(b);refreshChoices();saveProfiles();};choiceSync.push(()=>{const v=$(id).value;b.classList.toggle('active',v!=='off');b.setAttribute('aria-pressed',String(v!=='off'));b.innerHTML=svg79(v==='off'?'minus':v==='random'?'shuffle':'check')+(v==='random'?'Random':v==='on'?'On':'Off');});}
+const universal80=group80('Universal keys & doors','Universal keys open any one chosen universal door permanently. Solvability is not guaranteed.');goals80.append(universal80);move80('universalEnabled',universal80).querySelector('.toggle-label').textContent='Enable universal keys & doors';const universalContent80=document.createElement('div');universal80.append(universalContent80);for(const id of ['universalCount','universalDoorCount'])move80(id,universalContent80);universalContent80.append(note80('Warning: these independent doors can make a maze unsolvable.',true));
+gateToggle.onclick=()=>{const on=$('objectiveMode').value!=='keys';$('objectiveMode').value=on?'keys':'standard';if(!on)for(const id of structureIds)$(id).value='off';normalizeWithFeedback80(gateToggle);refreshChoices();saveProfiles();};
+function normalizeWithFeedback80(anchor){const before=[ $('w').value,$('h').value,$('gateCount').value,$('universalCount').value ];normalizePuzzleOptions();const after=[$('w').value,$('h').value,$('gateCount').value,$('universalCount').value];const changes=[];if(before[0]!==after[0]||before[1]!==after[1])changes.push('Grid adjusted to '+after[0]+' × '+after[1]);if(before[2]!==after[2])changes.push('Gate pairs adjusted to '+after[2]);if(before[3]!==after[3])changes.push('Universal keys adjusted to '+after[3]);if(changes.length)notice80(changes.join(' · '),anchor);}
+const explore80=page80('exploration','Exploration','eye',()=>summaries79('lighting'));const fogGroup80=group80('Visibility','Fog reveals passages as you explore. Its visual style is under Advanced → Appearance · details.');explore80.append(fogGroup80);move80('enableFog',fogGroup80);const markerGroup80=group80('Navigation aids','Breadcrumbs can be placed manually or automatically. The navigation marker lets you return to a chosen square.');explore80.append(markerGroup80);for(const id of ['enableCrumbs','enableNavMarker'])move80(id,markerGroup80);markerGroup80.append(crumbGroup79);const control80=page80('controls','Controls','controls',()=>summaries79('movement'));const movementGroup80=group80('Touch movement','Choose how dragging moves the explorer. The relevant tuning controls appear below.');control80.append(movementGroup80);for(const id of ['clickToMove','touchMoveStyle'])move80(id,movementGroup80);movementGroup80.append($('velocitySettings'));for(const id of ['touchDistance','touchThreshold','touchAxisLock','touchSensitivity'])move80(id,movementGroup80);const assist80=group80('Navigation assistance','Trails show the route back to the start or your marker; they do not reveal additional squares.');control80.append(assist80);for(const id of ['showStartTrail','showMarkerTrail'])move80(id,assist80);
+const styling80=page80('styling','Appearance · details','palette',()=>`Wall thickness ${$('lineWidth').value}`);const mazeColors80=group80('Maze colours','Change the maze background, walls, visited path and wall thickness. Themes are selected in Basic.');styling80.append(mazeColors80);for(const id of ['colorBg','colorWall','colorFill','lineWidth'])move80(id,mazeColors80);const fogStyle80=group80('Fog appearance','Match the background or use a separate fog colour.');styling80.append(fogStyle80);for(const id of ['fogStyle','fogColor'])move80(id,fogStyle80);const trails80=group80('Navigation trail colours');styling80.append(trails80);for(const id of ['colorStartTrail','colorMarkerTrail'])move80(id,trails80);const circuit80=group80('Wing circuit colours','Circuit switches and opened gates have separate colours.');styling80.append(circuit80);for(const id of ['colorWingInactive','colorWingActive','colorWingOpen'])move80(id,circuit80);styling80.append(restore79);wrapConfirm80(restore79,'Press again to restore theme colours.');
+// Development has tools only, not copies of Basic/Advanced screens.
+const randomPage80=page80('randomisation','Randomisation','shuffle',()=>Object.values(optionLocks).filter(Boolean).length+' options locked');randomPage80.append(random79.querySelector('.random-global'));const policy80=group80('Preset lock behaviour','Respect keeps locked values. Override changes values but preserves lock states.');randomPage80.append(policy80);let override80=false;const policyButton80=button79('Respect locks','lock',()=>{override80=!override80;policyButton80.innerHTML=svg79(override80?'unlock':'lock')+(override80?' Override locked values':' Respect locks');});policy80.append(policyButton80);const presetPanel80=random79.querySelector('.preset-panel');randomPage80.append(presetPanel80);
+function preset80(name){const focused=document.activeElement?.closest('button');const b=focused&&presetPanel80.contains(focused)?focused:presetPanel80.querySelector(`[data-preset="${name}"]`)||$('resetPreset');confirm80(b,'Press again to apply preset '+name+(override80?' and override locked values.':' respecting locks.'),()=>{applyPreset(name,override80);normalizeWithFeedback80(b);syncBasic80();refreshChoices();saveProfiles();});}
+const lockGroup80=group80('Individual and group locks','Locks protect settings from randomisation, not manual editing.');randomPage80.append(lockGroup80);const lockNames80={algo:'Generator',w:'Columns',h:'Rows',enableFog:'Fog',objectiveMode:'Coloured gates',requireGems:'Require gems',gateCount:'Gate pairs',gemCount:'Gem quantity',colorBg:'Background',colorWall:'Wall colour',colorFill:'Visited path',colorWingInactive:'Inactive switch',colorWingActive:'Active switch',colorWingOpen:'Opened gate',lineWidth:'Wall thickness',...moduleNames80};
+for(const group of RANDOM_GROUPS){const detail=document.createElement('details');const summary=document.createElement('summary');summary.textContent=({algorithm:'Generator',size:'Maze size',topology:'Puzzle structure',lighting:'Exploration',objectives:'Objectives',appearance:'Appearance'})[group];detail.append(summary);detail.className='m79-custom';lockGroup80.append(detail);const bar=document.createElement('div');bar.className='m80-lockrow';detail.append(bar);for(const [text,fn] of [['Lock all',()=>setGroupLocks(group,true)],['Unlock all',()=>setGroupLocks(group,false)],['Shuffle',()=>shuffleUnlocked('config-'+freshSeed(),[group])],['Reset',()=>{for(const id of groupOptionIds(group))setPresetValue(id,defaults.values[id]);syncProfileUI();}]]){const b=button79(text,'',()=>{fn();normalizeWithFeedback80(b);refreshChoices();saveProfiles();});bar.append(b);wrapConfirm80(b,'Press again to '+text.toLowerCase()+' this group.');}for(const id of groupOptionIds(group)){const r=document.createElement('div');r.className='m80-lockrow';const label=document.createElement('span');label.textContent=lockNames80[id]||id;const b=button79('','lock',()=>{setOptionLock(id,!optionIsLocked(id));refreshChoices();saveProfiles();});r.append(label,b);detail.append(r);choiceSync.push(()=>{const on=optionIsLocked(id);b.innerHTML=svg79(on?'lock':'unlock')+(on?' Locked':' Open');b.setAttribute('aria-pressed',String(on));});}}
+const randomTopology80=group80('Seed-driven modules','Set a module to Random here. Basic On/Off configuration remains in Advanced → Goals & structure.');randomPage80.append(randomTopology80);for(const id of structureIds){const r=document.createElement('div');r.className='m80-lockrow';const label=document.createElement('span');label.textContent=moduleNames80[id];const b=button79('','shuffle',()=>{$(id).value=$(id).value==='random'?'off':'random';normalizeWithFeedback80(b);refreshChoices();saveProfiles();});r.append(label,b);randomTopology80.append(r);choiceSync.push(()=>{b.textContent=$(id).value==='random'?'Random':'Manual';b.classList.toggle('active',$(id).value==='random');});}
+for(const [id,msg] of [['globalShuffle','Press again to shuffle unlocked settings.'],['globalLock','Press again to lock all randomisable options.'],['globalUnlock','Press again to unlock all randomisable options.']])wrapConfirm80($(id),msg);
+const dev80=page80('developer','Development tools','code',()=> 'Puzzle plans and diagnostics');const tools80=group80('Puzzle planning','Revealing the plan or solution exposes maze spoilers. Example mazes replace the current maze.');dev80.append(tools80);for(const id of ['showPuzzlePlan','showHint']){const row=move80(id,tools80);row.classList.remove('dev-only');}for(const id of ['exampleA','exampleB','exampleC','hubAlone','hubTeasers']){const b=$(id);tools80.append(b);wrapConfirm80(b,'Press again to replace the current maze with this example.');}tools80.append($('puzzleReport'));dev80.append($('debugPanel'));const controlTest80=group80('Control testing','Randomise or restore movement tuning for testing.');dev80.append(controlTest80);const local80=$('section-movement').querySelector('.local-tools');if(local80){const bs=[...local80.querySelectorAll('button')];for(const [i,b] of bs.entries()){b.innerHTML=svg79(i?'restart':'shuffle')+(i?' Reset controls':' Randomise controls');controlTest80.append(b);wrapConfirm80(b,i?'Press again to restore control defaults.':'Press again to randomise control settings.');}}
+const performance80=page80('performance','Performance','activity',()=>perfEnabled?'Recording':'Recorder off');performance80.append($('performanceTests'));const validation80=page80('validation','Validation','check',()=> 'Generation checks');validation80.append($('generationTests'));wrapConfirm80($('testBatchMazes'),'Press again to test 25 seeds. Current maze progress will be reset.');const export80=page80('export','Export','download',()=> 'Level package and screenshot');export80.append($('btnExportJSON'),$('btnExportPNG'));$('btnExportJSON').innerHTML=svg79('download')+' Export level package';
+// Result actions are a normal menu destination. Completion never opens an overlay.
+const results80=page80('results','Maze results','trophy',()=>isFinished?'Completed':'');results80.classList.add('m80-results');results80.append(modal79.querySelector('h2'),$('modal-stats'),$('usernameInput').closest('label'),$('btnNewMazeAfterWin'),$('btnRetryMaze'),winGrid79,$('btnSaveProfile'));$('btnSaveProfile').onclick=()=>{saveVictoryProfile();closeMenu79();};const resultButton80=button79('Results','trophy',()=>{showMenu79();open79('results');});resultButton80.id='m80ResultsButton';resultButton80.hidden=true;document.body.append(resultButton80);function showResults80(){resultButton80.hidden=false;notice80('Maze cleared. Results are available.',resultButton80);}
+// Preserve development features while navigating between menu tiers; do not disable them solely because a tier changed.
+const sync80=syncProfileUI;syncProfileUI=function(){const hint=$('showHint').checked;sync80();$('showHint').checked=hint;syncBasic80();};
+const groups80={simple:['challenge','size','theme'],advanced:['dimensions','seed','goals','exploration','controls','styling'],development:['randomisation','developer','performance','validation','export']};
+let stack80=[];const grid80=document.createElement('div');grid80.className='m80-homegrid';home79.append(grid80);const homeInfo80=note80('Basic, Advanced and Development edit the same maze configuration.');home79.insertBefore(homeInfo80,grid80);home79.prepend(profileBar79);main79.prepend(home79);simple.hidden=true;for(const p of [...oldPanes79,random79])p.hidden=true;
+function link80(key){const item=pages80[key];const b=button79('','',()=>open79(key));b.className='m80-link';b.innerHTML=svg79(item.icon)+'<span><strong></strong><small></small></span>'+svg79('chevron');b.querySelector('strong').textContent=item.title;b.querySelector('small').textContent=item.desc();b.dataset.page80=key;return b;}
+function render80(){const home=page79==='home';home79.hidden=!home;for(const [k,item] of Object.entries(pages80))item.p.hidden=k!==page79;for(const p of [...oldPanes79,random79])p.hidden=true;simple.hidden=true;nav79.hidden=true;main79.hidden=false;back79.hidden=true;profileBar79.hidden=!home;title79.textContent=home?'MAZY · '+names80[tier]:pages80[page79]?.title||'MAZY';close79.setAttribute('aria-label',home?'Close menu and return to maze':'Return to previous menu');footer79.classList.toggle('m80-subfooter',!home);if(home){grid80.replaceChildren();if(isFinished)grid80.append(link80('results'));for(const key of groups80[tier])grid80.append(link80(key));}updateRunActions();}
+renderTabs=render80;
+open79=function(page){if(page===page79)return;clearArm80();if(page==='home'){stack80=[];}else if(pages80[page])stack80.push({page:page79,scroll:body79.scrollTop});else return;page79=page;render80();body79.scrollTop=0;};
+function back80(){clearArm80();if(page79==='home'){if(!batch80)closeMenu79();return;}const prev=stack80.pop()||{page:'home',scroll:0};page79=prev.page;render80();body79.scrollTop=prev.scroll;}
+close79.onclick=back80;back79.onclick=back80;$('toggle-btn').onclick=()=>shell79.classList.contains('collapsed')?showMenu79():back80();
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!shell79.classList.contains('collapsed')){e.preventDefault();back80();}});
+const generate80=generateMaze;generateMaze=function(...args){const before=generationCount;const result=generate80(...args);if(generationCount!==before){resultButton80.hidden=true;syncBasic80();saveProfiles();}return result;};
+function launch80(){const before=generationCount;generateMaze();if(generationCount!==before){menuClock79=null;closeMenu79();}refreshChoices();}
+topStart.onclick=()=>grid.length&&!isFinished?confirm80(topStart,'Press again to generate a new maze. Current progress will be lost.',launch80):launch80();restart79.onclick=()=>confirm80(restart79,'Press again to restart this maze. Current progress will be lost.',restartExact);
+const oldUpdateRun80=updateRunActions;updateRunActions=function(){oldUpdateRun80();for(const b of grid80.querySelectorAll('[data-page80]'))b.querySelector('small').textContent=pages80[b.dataset.page80].desc();resultButton80.hidden=!isFinished;topStart.disabled=batch80;restart79.disabled=batch80||!winningConfig||!grid.length;continue79.disabled=batch80||!grid.length;};
+// Legacy sync callbacks are retained for inputs but the final callback owns visibility.
+choiceSync.push(()=>{syncBasic80();gateContent80.hidden=$('objectiveMode').value!=='keys';$('gateOptions').hidden=$('objectiveMode').value!=='keys';$('gemOptions').hidden=!$('requireGems').checked;universalContent80.hidden=!$('universalEnabled').checked;for(const id of ['universalCount','universalDoorCount'])$(id).closest('label').hidden=false;crumbGroup79.hidden=!$('enableCrumbs').checked;const color=field80('fogColor');color.hidden=$('fogStyle').value!=='outline';const style=$('touchMoveStyle').value;field80('touchDistance').hidden=style==='absolute';field80('touchThreshold').hidden=!(style==='relative'||style==='continuous');field80('touchAxisLock').hidden=style!=='relative';updateRunActions();});
+// Make non-structural changes persistent and refresh dependent fields.
+for(const id of ['algo','w','h','requireGems','objectiveMode','gateCount','gemCount','universalEnabled','universalCount','universalDoorCount',...structureIds])$(id).addEventListener('change',()=>{syncBasic80();refreshChoices();saveProfiles();});
+// Move the same sample preview between theme and styling rather than duplicate it.
+const originalRender80=renderTabs;renderTabs=function(){if(page79==='styling')styling80.prepend(preview79);else if(page79==='theme')themeTitle79.after(preview79);originalRender80();};render80();refreshChoices();saveProfiles();
+
 window.addEventListener('resize',resize);
-resize();generateMaze();syncProfileUI();
+resize();generateMaze();syncProfileUI();renderTabs();refreshChoices();
 for(const id of ['enableCrumbs','enableNavMarker'])$(id).addEventListener('change',syncProfileUI);
 document.addEventListener('change',e=>{if(e.target.closest('#controls,#debugPanel'))saveProfiles();});window.addEventListener('pagehide',saveProfiles);
 
